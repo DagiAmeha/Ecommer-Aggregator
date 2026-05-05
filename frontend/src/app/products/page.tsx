@@ -217,12 +217,12 @@ export default function ProductsPage() {
     <section className="space-y-6">
       <div className="space-y-3">
         <p className="display-font text-4xl font-semibold text-slate-950 sm:text-5xl">
-          Browse live products
+          Browse Products
         </p>
-        <p className="max-w-3xl text-sm leading-6 text-slate-600 sm:text-base">
+        {/* <p className="max-w-3xl text-sm leading-6 text-slate-600 sm:text-base">
           Search the live backend catalog, add up to four unique products to
           compare, and open product detail pages without touching mock data.
-        </p>
+        </p> */}
       </div>
 
       {compareMessage ? (

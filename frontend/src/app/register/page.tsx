@@ -135,9 +135,6 @@ export default function RegisterPage() {
         <p className="display-font text-3xl font-semibold text-slate-950">
           Create your account
         </p>
-        <p className="mt-2 text-sm text-slate-500">
-          Register with Firebase to save your session and compare products.
-        </p>
       </div>
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div className="space-y-2">
