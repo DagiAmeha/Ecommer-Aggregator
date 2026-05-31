@@ -128,6 +128,21 @@ export default function AdminOverviewPage() {
           </Link>
         </div>
       </div>
+
+      <div className="rounded-3xl border border-black/10 bg-white p-6 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+        <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
+          System reports
+        </p>
+        <h2 className="mt-2 text-xl font-semibold text-slate-950">
+          Analytics, imports, and search trends
+        </h2>
+        <Link
+          href="/admin/reports"
+          className="mt-4 inline-flex items-center rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-emerald-700 hover:text-emerald-800"
+        >
+          View reports
+        </Link>
+      </div>
     </div>
   );
 }

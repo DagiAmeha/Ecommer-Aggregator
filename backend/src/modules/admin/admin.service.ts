@@ -1,4 +1,6 @@
 import { pool } from "../../config/db";
+import { listRecentImportJobs } from "../importJob/importJob.model";
+import { getTopSearchQueries } from "../analytics/analytics.model";
 import { firebaseAuth } from "../../config/firebase";
 import { createStore } from "../store/store.service";
 import { createStoreSource } from "../store/store_source.model";
@@ -263,6 +265,55 @@ export async function getAdminStats(): Promise<{
     total_users: Number(result.rows[0]?.total_users ?? 0),
     total_vendors: Number(result.rows[0]?.total_vendors ?? 0),
     suspended_accounts: Number(result.rows[0]?.suspended_accounts ?? 0),
+  };
+}
+
+export async function getAdminReports(): Promise<{
+  total_products: number;
+  products_by_source: Array<{ source: string; count: number }>;
+  recent_import_jobs: Awaited<ReturnType<typeof listRecentImportJobs>>;
+  top_searches: Awaited<ReturnType<typeof getTopSearchQueries>>;
+  new_users_last_30_days: number;
+}> {
+  const [
+    productsSummary,
+    productsBySource,
+    importJobs,
+    topSearches,
+    newUsers,
+  ] = await Promise.all([
+    pool.query<{ total_products: string }>(
+      `SELECT COUNT(*)::text AS total_products FROM products`,
+    ),
+    pool.query<{ source: string; count: string }>(
+      `
+        SELECT source, COUNT(*)::text AS count
+        FROM products
+        GROUP BY source
+        ORDER BY COUNT(*) DESC
+      `,
+    ),
+    listRecentImportJobs(10),
+    getTopSearchQueries(10),
+    pool.query<{ total: string }>(
+      `
+        SELECT COUNT(*)::text AS total
+        FROM users
+        WHERE deleted_at IS NULL
+          AND created_at >= NOW() - INTERVAL '30 days'
+      `,
+    ),
+  ]);
+
+  return {
+    total_products: Number(productsSummary.rows[0]?.total_products ?? 0),
+    products_by_source: productsBySource.rows.map((row) => ({
+      source: row.source,
+      count: Number(row.count),
+    })),
+    recent_import_jobs: importJobs,
+    top_searches: topSearches,
+    new_users_last_30_days: Number(newUsers.rows[0]?.total ?? 0),
   };
 }
 

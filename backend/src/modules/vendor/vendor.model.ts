@@ -5,6 +5,7 @@ import {
   Product,
   ProductRow,
 } from "../product/product.model";
+import { handleProductPriceChange } from "../price/priceMonitor.service";
 
 const REVIEW_AGG_JOIN = `
   LEFT JOIN (
@@ -40,6 +41,7 @@ export interface VendorProductInput {
   name: string;
   description?: string;
   price: number;
+  stock_quantity?: number;
   category_id: number;
   image_url?: string;
   product_url?: string;
@@ -77,6 +79,7 @@ export async function findVendorProducts(
         p.last_synced_at::text AS last_synced_at,
         p.source,
         p.external_id,
+        p.stock_quantity::int AS stock_quantity,
         ${RATING_SELECT_FIELDS},
         ${WISHLIST_SELECT_FIELD},
         c.id AS category_id,
@@ -115,6 +118,7 @@ export async function findVendorProductById(
         p.last_synced_at::text AS last_synced_at,
         p.source,
         p.external_id,
+        p.stock_quantity::int AS stock_quantity,
         ${RATING_SELECT_FIELDS},
         ${WISHLIST_SELECT_FIELD},
         c.id AS category_id,
@@ -150,19 +154,21 @@ export async function createVendorProduct(
         name,
         description,
         price,
+        stock_quantity,
         category_id,
         store_id,
         image_url,
         product_url,
         source
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, 'manual')
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'manual')
       RETURNING id
     `,
     [
       payload.name,
       payload.description ?? null,
       payload.price,
+      payload.stock_quantity ?? 0,
       payload.category_id,
       storeId,
       payload.image_url ?? null,
@@ -184,6 +190,11 @@ export async function updateVendorProduct(
   productId: number,
   payload: Partial<VendorProductInput>,
 ): Promise<Product | null> {
+  const existing = await findVendorProductById(storeId, productId);
+  if (!existing) {
+    return null;
+  }
+
   const fields: string[] = [];
   const values: Array<string | number | null> = [];
 
@@ -200,6 +211,11 @@ export async function updateVendorProduct(
   if (typeof payload.price !== "undefined") {
     fields.push(`price = $${fields.length + 1}`);
     values.push(payload.price);
+  }
+
+  if (typeof payload.stock_quantity !== "undefined") {
+    fields.push(`stock_quantity = $${fields.length + 1}`);
+    values.push(payload.stock_quantity);
   }
 
   if (typeof payload.category_id !== "undefined") {
@@ -246,7 +262,17 @@ export async function updateVendorProduct(
     return null;
   }
 
-  return findVendorProductById(storeId, updatedId);
+  const updated = await findVendorProductById(storeId, updatedId);
+  if (updated && typeof payload.price !== "undefined") {
+    await handleProductPriceChange(
+      updated.id,
+      updated.name,
+      existing.price,
+      updated.price,
+    );
+  }
+
+  return updated;
 }
 
 export async function deleteVendorProduct(
@@ -270,16 +296,35 @@ export async function getVendorDashboardStats(
 ): Promise<{
   total_products: number;
   total_categories: number;
+  total_views: number;
+  total_clicks: number;
+  low_stock_products: number;
   latest_products: Product[];
 }> {
   const totals = await pool.query<{
     total_products: string;
     total_categories: string;
+    total_views: string;
+    total_clicks: string;
+    low_stock_products: string;
   }>(
     `
       SELECT
         COUNT(*)::text AS total_products,
-        COUNT(DISTINCT category_id)::text AS total_categories
+        COUNT(DISTINCT category_id)::text AS total_categories,
+        (
+          SELECT COUNT(*)::text
+          FROM product_events e
+          JOIN products p2 ON p2.id = e.product_id
+          WHERE p2.store_id = $1 AND e.event_type = 'view'
+        ) AS total_views,
+        (
+          SELECT COUNT(*)::text
+          FROM product_events e
+          JOIN products p2 ON p2.id = e.product_id
+          WHERE p2.store_id = $1 AND e.event_type = 'click'
+        ) AS total_clicks,
+        SUM(CASE WHEN stock_quantity <= 0 THEN 1 ELSE 0 END)::text AS low_stock_products
       FROM products
       WHERE store_id = $1
     `,
@@ -300,6 +345,7 @@ export async function getVendorDashboardStats(
         p.last_synced_at::text AS last_synced_at,
         p.source,
         p.external_id,
+        p.stock_quantity::int AS stock_quantity,
         ${RATING_SELECT_FIELDS},
         ${WISHLIST_SELECT_FIELD},
         c.id AS category_id,
@@ -320,6 +366,9 @@ export async function getVendorDashboardStats(
   return {
     total_products: Number(totals.rows[0]?.total_products ?? 0),
     total_categories: Number(totals.rows[0]?.total_categories ?? 0),
+    total_views: Number(totals.rows[0]?.total_views ?? 0),
+    total_clicks: Number(totals.rows[0]?.total_clicks ?? 0),
+    low_stock_products: Number(totals.rows[0]?.low_stock_products ?? 0),
     latest_products: latestResult.rows.map(mapProductRow),
   };
 }

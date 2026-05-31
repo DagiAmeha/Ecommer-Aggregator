@@ -3,9 +3,11 @@ import {
   createVendorProductForUser,
   deleteVendorProductForUser,
   getVendorProduct,
+  getVendorStoreProfile,
   getVendorStoreSourceType,
   getVendorStats,
   listVendorProducts,
+  updateVendorStoreProfile,
   updateVendorStoreSource,
   updateVendorProductForUser,
 } from "./vendor.service";
@@ -15,6 +17,7 @@ import {
   vendorProductUpdateSchema,
   vendorStoreSourceSchema,
 } from "./vendor.validator";
+import { vendorStoreProfileSchema } from "./vendorStore.validator";
 import { sendError, sendSuccess } from "../../utils/api-response";
 
 function handleVendorError(
@@ -237,6 +240,45 @@ export async function updateVendorStoreSourceHandler(
 
     const payload = vendorStoreSourceSchema.parse(req.body);
     const updated = await updateVendorStoreSource(user.id, payload);
+    sendSuccess(res, updated);
+  } catch (error) {
+    handleVendorError(error, res, next);
+  }
+}
+
+export async function getVendorStoreProfileHandler(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const user = req.authUser;
+    if (!user) {
+      sendError(res, "Unauthorized", 401);
+      return;
+    }
+
+    const store = await getVendorStoreProfile(user.id);
+    sendSuccess(res, store);
+  } catch (error) {
+    handleVendorError(error, res, next);
+  }
+}
+
+export async function updateVendorStoreProfileHandler(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const user = req.authUser;
+    if (!user) {
+      sendError(res, "Unauthorized", 401);
+      return;
+    }
+
+    const payload = vendorStoreProfileSchema.parse(req.body);
+    const updated = await updateVendorStoreProfile(user.id, payload);
     sendSuccess(res, updated);
   } catch (error) {
     handleVendorError(error, res, next);

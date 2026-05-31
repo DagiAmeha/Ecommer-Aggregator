@@ -5,6 +5,8 @@ import { FilterBar } from "@/components/FilterBar";
 import { CompareModal } from "@/components/CompareModal";
 import { ProductList } from "@/components/ProductList";
 import { SearchBar } from "@/components/SearchBar";
+import { RecentlyViewed } from "@/components/RecentlyViewed";
+import { SavedSearches } from "@/components/SavedSearches";
 import { useAuth } from "@/hooks/useAuth";
 import { useWishlist } from "@/components/WishlistProvider";
 import {
@@ -21,6 +23,7 @@ import type {
   CompareProduct,
   Pagination,
   Product,
+  ProductSort,
   Store,
 } from "@/types/catalog";
 
@@ -34,6 +37,7 @@ export default function ProductsPage() {
   const [storeId, setStoreId] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
+  const [sort, setSort] = useState<ProductSort>("newest");
   const [resetKey, setResetKey] = useState(0);
   const [page, setPage] = useState(1);
   const [products, setProducts] = useState<Product[]>([]);
@@ -159,6 +163,7 @@ export default function ProductsPage() {
           store_id: storeId ? Number(storeId) : undefined,
           min_price: minPrice ? Number(minPrice) : undefined,
           max_price: maxPrice ? Number(maxPrice) : undefined,
+          sort,
           page,
           limit: PAGE_SIZE,
         });
@@ -190,7 +195,7 @@ export default function ProductsPage() {
     return () => {
       active = false;
     };
-  }, [category, maxPrice, minPrice, page, search, storeId]);
+  }, [category, maxPrice, minPrice, page, search, sort, storeId]);
 
   useEffect(() => {
     if (!compareModalOpen) {
@@ -377,18 +382,21 @@ export default function ProductsPage() {
           initialStoreId={storeId}
           initialMinPrice={minPrice}
           initialMaxPrice={maxPrice}
+          initialSort={sort}
           highlightedStoreId={vendorStoreId}
           onApply={({
             category: nextCategory,
             storeId: nextStoreId,
             minPrice: nextMin,
             maxPrice: nextMax,
+            sort: nextSort,
           }) => {
             setPage(1);
             setCategory(nextCategory);
             setStoreId(nextStoreId);
             setMinPrice(nextMin);
             setMaxPrice(nextMax);
+            setSort((nextSort as ProductSort) || "newest");
           }}
           onReset={() => {
             setPage(1);
@@ -397,10 +405,32 @@ export default function ProductsPage() {
             setStoreId("");
             setMinPrice("");
             setMaxPrice("");
+            setSort("newest");
             setResetKey((current) => current + 1);
           }}
         />
       </div>
+
+      <SavedSearches
+        isAuthenticated={Boolean(user)}
+        current={{
+          query: search,
+          category,
+          minPrice,
+          maxPrice,
+        }}
+        onApply={(criteria) => {
+          setPage(1);
+          setSearch(criteria.query);
+          setCategory(criteria.category ?? "");
+          setStoreId("");
+          setMinPrice(criteria.minPrice ?? "");
+          setMaxPrice(criteria.maxPrice ?? "");
+          setResetKey((current) => current + 1);
+        }}
+      />
+
+      <RecentlyViewed />
 
       <div className="flex flex-col gap-3 rounded-3xl border border-black/10 bg-white/75 p-4 shadow-[0_16px_50px_rgba(16,35,30,0.08)] sm:flex-row sm:items-center sm:justify-between">
         <div>

@@ -193,4 +193,117 @@ export async function initDb(): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_wishlists_user_id ON wishlists(user_id);
     CREATE INDEX IF NOT EXISTS idx_wishlists_product_id ON wishlists(product_id);
   `);
+
+  // Saved Searches: lets a user store a search query (plus optional filters)
+  // and revisit it later.
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS saved_searches (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      query VARCHAR(255) NOT NULL,
+      category VARCHAR(100),
+      min_price NUMERIC(12, 2),
+      max_price NUMERIC(12, 2),
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      UNIQUE (user_id, query, category)
+    );
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_saved_searches_user_id ON saved_searches(user_id);
+  `);
+
+  await pool.query(`
+    ALTER TABLE products
+      ADD COLUMN IF NOT EXISTS stock_quantity INTEGER NOT NULL DEFAULT 0;
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS product_price_history (
+      id SERIAL PRIMARY KEY,
+      product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+      price NUMERIC(12, 2) NOT NULL,
+      recorded_at TIMESTAMPTZ DEFAULT NOW()
+    );
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_price_history_product_id
+      ON product_price_history(product_id, recorded_at DESC);
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS price_alerts (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+      is_active BOOLEAN NOT NULL DEFAULT true,
+      last_notified_price NUMERIC(12, 2),
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW(),
+      UNIQUE (user_id, product_id)
+    );
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_price_alerts_user_id ON price_alerts(user_id);
+    CREATE INDEX IF NOT EXISTS idx_price_alerts_product_id ON price_alerts(product_id);
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS notifications (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      type VARCHAR(50) NOT NULL,
+      title VARCHAR(255) NOT NULL,
+      message TEXT NOT NULL,
+      related_product_id INTEGER REFERENCES products(id) ON DELETE SET NULL,
+      is_read BOOLEAN NOT NULL DEFAULT false,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_notifications_user_id
+      ON notifications(user_id, created_at DESC);
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS product_events (
+      id SERIAL PRIMARY KEY,
+      event_type VARCHAR(30) NOT NULL,
+      product_id INTEGER REFERENCES products(id) ON DELETE SET NULL,
+      user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+      search_query VARCHAR(255),
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_product_events_type_created
+      ON product_events(event_type, created_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_product_events_product_id
+      ON product_events(product_id, created_at DESC);
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS import_jobs (
+      id SERIAL PRIMARY KEY,
+      store_id INTEGER NOT NULL REFERENCES stores(id) ON DELETE CASCADE,
+      source_id INTEGER REFERENCES store_sources(id) ON DELETE SET NULL,
+      job_type VARCHAR(30) NOT NULL,
+      status VARCHAR(30) NOT NULL DEFAULT 'running',
+      imported_count INTEGER NOT NULL DEFAULT 0,
+      updated_count INTEGER NOT NULL DEFAULT 0,
+      failed_count INTEGER NOT NULL DEFAULT 0,
+      error_message TEXT,
+      started_at TIMESTAMPTZ DEFAULT NOW(),
+      completed_at TIMESTAMPTZ
+    );
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_import_jobs_store_id
+      ON import_jobs(store_id, started_at DESC);
+  `);
 }

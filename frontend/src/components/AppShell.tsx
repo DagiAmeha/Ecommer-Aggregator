@@ -5,6 +5,8 @@ import Link from "next/link";
 import HeaderAuth from "./HeaderAuth";
 import HeaderBrandLink from "./HeaderBrandLink";
 import WishlistLink from "./WishlistLink";
+import ThemeToggle from "./ThemeToggle";
+import NotificationBell from "./NotificationBell";
 
 export default function AppShell({ children }: { children: ReactNode }) {
   return (
@@ -27,7 +29,15 @@ export default function AppShell({ children }: { children: ReactNode }) {
             >
               Compare
             </Link>
+            <Link
+              className="rounded-full border border-black/10 px-4 py-2 transition hover:border-emerald-700 hover:text-emerald-800"
+              href="/dashboard"
+            >
+              Dashboard
+            </Link>
             <WishlistLink />
+            <NotificationBell />
+            <ThemeToggle />
             <HeaderAuth />
           </nav>
         </div>

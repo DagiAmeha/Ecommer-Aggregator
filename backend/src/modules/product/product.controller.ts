@@ -12,6 +12,7 @@ import {
   getRelatedOffers,
   searchProducts,
 } from "./product.service";
+import { recordProductEvent } from "../analytics/analytics.model";
 import { sendError, sendSuccess } from "../../utils/api-response";
 
 export async function getProductsHandler(
@@ -59,11 +60,20 @@ export async function getProductsHandler(
       store_id: query.store_id,
       min_price: query.min_price,
       max_price: query.max_price,
+      sort: query.sort,
       page: query.page ?? 1,
       limit: query.limit ?? 10,
     } as any;
 
     const result = await searchProducts(filters as any, userId);
+
+    if (query.search?.trim()) {
+      await recordProductEvent({
+        event_type: "search",
+        user_id: userId,
+        search_query: query.search.trim(),
+      });
+    }
 
     sendSuccess(res, {
       data: result.data,

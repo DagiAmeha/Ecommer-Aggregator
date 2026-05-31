@@ -9,6 +9,7 @@ export const vendorProductCreateSchema = z.object({
   name: z.string().trim().min(1, "name is required"),
   description: z.string().trim().optional(),
   price: z.number().nonnegative("price must be a non-negative number"),
+  stock_quantity: z.number().int().nonnegative().optional(),
   category_id: z
     .number()
     .int()

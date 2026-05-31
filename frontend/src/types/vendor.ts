@@ -4,6 +4,7 @@ export interface VendorProductInput {
   name: string;
   description?: string;
   price: number;
+  stock_quantity?: number;
   category_id: number;
   image_url?: string;
   product_url?: string;
@@ -12,7 +13,26 @@ export interface VendorProductInput {
 export interface VendorStats {
   total_products: number;
   total_categories: number;
+  total_views: number;
+  total_clicks: number;
+  low_stock_products: number;
   latest_products: Product[];
+}
+
+export interface VendorStoreProfile {
+  id: number;
+  store_name: string;
+  description: string | null;
+  is_active: boolean;
+  recent_import_jobs: Array<{
+    id: number;
+    job_type: string;
+    status: string;
+    imported_count: number;
+    updated_count: number;
+    failed_count: number;
+    started_at: string;
+  }>;
 }
 
 export interface VendorStoreSource {

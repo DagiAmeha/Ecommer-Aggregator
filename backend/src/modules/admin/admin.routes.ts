@@ -3,6 +3,7 @@ import { authMiddleware, requireRoles } from "../../middleware/auth.middleware";
 import {
   createVendorHandler,
   deleteUserHandler,
+  getAdminReportsHandler,
   getAdminStatsHandler,
   getAdminUserHandler,
   listAdminUsersHandler,
@@ -16,6 +17,7 @@ const adminRouter = Router();
 adminRouter.use(authMiddleware, requireRoles(["admin"]));
 
 adminRouter.get("/stats", getAdminStatsHandler);
+adminRouter.get("/reports", getAdminReportsHandler);
 adminRouter.get("/users", listAdminUsersHandler);
 adminRouter.get("/users/:id", getAdminUserHandler);
 adminRouter.patch("/users/:id/role", updateAdminUserRoleHandler);

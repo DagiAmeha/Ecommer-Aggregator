@@ -1,6 +1,10 @@
 import { pool } from "../../config/db";
 import { getCategoryByName } from "./product.service";
 import { createCategory } from "./category.model";
+import {
+  handleProductPriceChange,
+  recordPriceHistory,
+} from "../price/priceMonitor.service";
 
 export interface Category {
   id: number;
@@ -33,6 +37,7 @@ export interface Product {
   last_synced_at: string | null;
   source: ProductSource;
   external_id: string | null;
+  stock_quantity: number;
   category: ProductRelation;
   store: ProductRelation;
   group_id: string;
@@ -58,6 +63,7 @@ export interface ProductRow {
   last_synced_at: string | null;
   source: ProductSource;
   external_id: string | null;
+  stock_quantity: number;
   external_rating_rate: number | null;
   external_rating_count: number | null;
   category_id: number;
@@ -78,6 +84,7 @@ export interface CreateProductInput {
   store_id: number;
   image_url?: string;
   product_url?: string;
+  stock_quantity?: number;
   source?: ProductSource;
   external_id?: string | number;
   external_rating_rate?: number | null;
@@ -145,6 +152,7 @@ export function mapProductRow(row: ProductRow): Product {
     last_synced_at: row.last_synced_at,
     source: row.source,
     external_id: row.external_id,
+    stock_quantity: row.stock_quantity ?? 0,
     category: {
       id: row.category_id,
       name: row.category_name,
@@ -254,6 +262,7 @@ function buildProductSelectQuery(
         p.last_synced_at::text AS last_synced_at,
         p.source,
         p.external_id,
+        p.stock_quantity::int AS stock_quantity,
         ${RATING_SELECT_FIELDS},
         ${wishlist.selectSql},
         c.id AS category_id,
@@ -345,6 +354,7 @@ export async function findProductsByIds(
         p.last_synced_at::text AS last_synced_at,
         p.source,
         p.external_id,
+        p.stock_quantity::int AS stock_quantity,
         ${RATING_SELECT_FIELDS},
         ${wishlist.selectSql},
         c.id AS category_id,
@@ -404,6 +414,7 @@ export async function findProductsByNormalizedTitle(
         p.last_synced_at::text AS last_synced_at,
         p.source,
         p.external_id,
+        p.stock_quantity::int AS stock_quantity,
         ${RATING_SELECT_FIELDS},
         ${wishlist.selectSql},
         c.id AS category_id,
@@ -429,6 +440,31 @@ export interface SearchFilters extends ProductFilters {
   max_price?: number;
   page?: number;
   limit?: number;
+  sort?: "newest" | "price_asc" | "price_desc" | "rating" | "popularity";
+}
+
+function buildSortClause(
+  sort: SearchFilters["sort"],
+  popularityJoin: boolean,
+): string {
+  switch (sort) {
+    case "price_asc":
+      return "p.price ASC, p.created_at DESC";
+    case "price_desc":
+      return "p.price DESC, p.created_at DESC";
+    case "rating":
+      return `CASE
+        WHEN p.source = 'api' THEN COALESCE(p.external_rating_rate, 0)
+        ELSE COALESCE(r.avg_rating, 0)
+      END DESC, p.created_at DESC`;
+    case "popularity":
+      return popularityJoin
+        ? "COALESCE(pop.popularity, 0) DESC, p.created_at DESC"
+        : "p.created_at DESC";
+    case "newest":
+    default:
+      return "p.created_at DESC";
+  }
 }
 
 export async function searchProductsWithPagination(
@@ -505,6 +541,18 @@ export async function searchProductsWithPagination(
   // Data query with relations
   const dataValues = values.slice();
   const wishlist = buildWishlistJoin(userId, dataValues);
+  const usePopularity = filters.sort === "popularity";
+  const popularityJoin = usePopularity
+    ? `
+      LEFT JOIN (
+        SELECT product_id, COUNT(*)::int AS popularity
+        FROM product_events
+        WHERE created_at >= NOW() - INTERVAL '30 days'
+        GROUP BY product_id
+      ) pop ON pop.product_id = p.id
+    `
+    : "";
+  const orderClause = buildSortClause(filters.sort, usePopularity);
 
   const dataQuery = `
     SELECT
@@ -519,6 +567,7 @@ export async function searchProductsWithPagination(
       p.last_synced_at::text AS last_synced_at,
       p.source,
       p.external_id,
+      p.stock_quantity::int AS stock_quantity,
       ${RATING_SELECT_FIELDS},
       ${wishlist.selectSql},
       c.id AS category_id,
@@ -530,8 +579,9 @@ export async function searchProductsWithPagination(
     JOIN stores s ON s.id = p.store_id
     ${REVIEW_AGG_JOIN}
     ${wishlist.joinSql}
+    ${popularityJoin}
     ${whereClause}
-    ORDER BY p.created_at DESC
+    ORDER BY ${orderClause}
     LIMIT $${dataValues.length + 1} OFFSET $${dataValues.length + 2}
   `;
 
@@ -558,6 +608,7 @@ export async function findWishlistedProducts(
         p.last_synced_at::text AS last_synced_at,
         p.source,
         p.external_id,
+        p.stock_quantity::int AS stock_quantity,
         ${RATING_SELECT_FIELDS},
         true AS is_wishlisted,
         c.id AS category_id,
@@ -735,9 +786,10 @@ export async function upsertApiProduct(
           external_rating_rate = $7,
           external_rating_count = $8,
           source = $9,
+          stock_quantity = COALESCE($10, stock_quantity),
           updated_at = NOW(),
           last_synced_at = NOW()
-        WHERE id = $10
+        WHERE id = $11
         RETURNING id
       `,
       [
@@ -750,6 +802,7 @@ export async function upsertApiProduct(
         payload.external_rating_rate ?? null,
         payload.external_rating_count ?? null,
         source,
+        payload.stock_quantity ?? null,
         existing.id,
       ],
     );
@@ -758,6 +811,13 @@ export async function upsertApiProduct(
     if (!updated) {
       throw new Error("Failed to load updated product");
     }
+
+    await handleProductPriceChange(
+      updated.id,
+      updated.name,
+      existing.price,
+      updated.price,
+    );
 
     return { product: updated, action: "updated" };
   }
@@ -776,9 +836,10 @@ export async function upsertApiProduct(
         external_id,
         external_rating_rate,
         external_rating_count,
+        stock_quantity,
         last_synced_at
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW())
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, NOW())
       RETURNING id
     `,
     [
@@ -793,13 +854,16 @@ export async function upsertApiProduct(
       externalId,
       payload.external_rating_rate ?? null,
       payload.external_rating_count ?? null,
+      payload.stock_quantity ?? 1,
     ],
   );
 
   const created = await findProductById(insertResult.rows[0].id);
   if (!created) {
-    throw new Error("Failed to load created product");
+    throw new Error("Failed to load imported product");
   }
+
+  await recordPriceHistory(created.id, created.price);
 
   return { product: created, action: "imported" };
 }

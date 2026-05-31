@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 import type { ReactNode } from "react";
 import AppShell from "../components/AppShell";
 import { WishlistProvider } from "../components/WishlistProvider";
+import { ThemeProvider } from "../components/ThemeProvider";
 import "../styles/globals.css";
 
 const poppins = Poppins({
@@ -10,6 +11,18 @@ const poppins = Poppins({
   variable: "--font-sans",
   weight: ["400", "500", "600", "700"],
 });
+
+// Applied before first paint to avoid a flash of the wrong theme (FOUC).
+const themeInitScript = `
+(function () {
+  try {
+    var stored = localStorage.getItem("aggregator-theme");
+    var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    var theme = stored === "light" || stored === "dark" ? stored : (prefersDark ? "dark" : "light");
+    if (theme === "dark") document.documentElement.classList.add("dark");
+  } catch (e) {}
+})();
+`;
 
 export const metadata: Metadata = {
   title: "Aggregator Market",
@@ -23,13 +36,18 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html lang="en" className={poppins.variable}>
+    <html lang="en" className={poppins.variable} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body>
         <div className="relative min-h-screen overflow-hidden">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.16),transparent_28%),radial-gradient(circle_at_top_right,rgba(15,23,42,0.1),transparent_24%),linear-gradient(180deg,rgba(255,255,255,0.58),rgba(244,239,232,0.42))]" />
-          <WishlistProvider>
-            <AppShell>{children}</AppShell>
-          </WishlistProvider>
+          <ThemeProvider>
+            <WishlistProvider>
+              <AppShell>{children}</AppShell>
+            </WishlistProvider>
+          </ThemeProvider>
         </div>
       </body>
     </html>
