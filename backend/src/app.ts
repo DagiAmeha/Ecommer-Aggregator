@@ -8,6 +8,7 @@ import { storeRouter } from "./modules/store/store.route";
 import { vendorRouter } from "./modules/vendor/vendor.route";
 import { reviewRouter } from "./modules/reviews/review.route";
 import { wishlistRouter } from "./modules/wishlist/wishlist.route";
+import { adminRouter } from "./modules/admin/admin.route";
 import { notFoundMiddleware } from "./middleware/notfound.middleware";
 import { errorMiddleware } from "./middleware/error.middleware";
 import { sendSuccess } from "./utils/api-response";
@@ -29,6 +30,7 @@ app.use("/api/stores", storeRouter);
 app.use("/api/vendor", vendorRouter);
 app.use("/api/reviews", reviewRouter);
 app.use("/api/wishlist", wishlistRouter);
+app.use("/api/admin", adminRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);

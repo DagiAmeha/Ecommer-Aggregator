@@ -119,7 +119,7 @@ export async function updateStoreSource(
   payload: { url?: string; is_active?: boolean },
 ): Promise<StoreSource | null> {
   const fields: string[] = [];
-  const values: Array<string | boolean> = [];
+  const values: Array<string | boolean | number> = [];
 
   if (typeof payload.url !== "undefined") {
     fields.push(`url = $${fields.length + 1}`);
