@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/services/firebase";
+import { fetchMyProfile } from "@/services/user.service";
+import { apiRequest } from "@/services/api";
+import { signInWithGooglePopup } from "@/services/auth.service";
 
 function EyeIcon({ open }: { open: boolean }) {
   return open ? (
@@ -40,8 +43,27 @@ function getAuthMessage(error: unknown, fallback: string): string {
       return "Invalid email or password.";
     case "auth/invalid-email":
       return "Enter a valid email address.";
+    case "auth/popup-closed-by-user":
+      return "Google sign-in was canceled.";
+    case "auth/cancelled-popup-request":
+      return "Google sign-in was canceled.";
+    case "auth/popup-blocked":
+      return "Popup blocked. Please allow popups and try again.";
     default:
-      return error instanceof Error && error.message ? error.message : fallback;
+      if (error instanceof Error && error.message) {
+        const message = error.message.toLowerCase();
+        if (message.includes("unauthorized")) {
+          return "Your session expired. Please sign in again.";
+        }
+        if (message.includes("invalid token")) {
+          return "Your session expired. Please try again.";
+        }
+        if (message.includes("network") || message.includes("failed to fetch")) {
+          return "Network error. Check your connection and try again.";
+        }
+        return error.message;
+      }
+      return fallback;
   }
 }
 
@@ -74,6 +96,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -95,11 +118,51 @@ export default function LoginPage() {
 
     try {
       await signInWithEmailAndPassword(auth, email.trim(), password);
-      router.push("/products");
+      const profile = await fetchMyProfile();
+      const role =
+        typeof profile.role === "string"
+          ? profile.role
+          : (profile.role as { value?: string } | undefined)?.value;
+      router.push(role === "vendor" ? "/vendor/dashboard" : "/products");
     } catch (err) {
       setError(getAuthMessage(err, "Login failed"));
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleGoogleContinue(): Promise<void> {
+    setGoogleLoading(true);
+    setError(null);
+
+    try {
+      await signInWithGooglePopup();
+      const response = await apiRequest<{
+        exists: boolean;
+        user?: { role?: string | { value?: string } };
+        role?: string | { value?: string };
+      }>("/auth/google-login", { method: "POST" });
+
+      if (!response.exists) {
+        router.push("/auth/google-complete-profile");
+        return;
+      }
+
+      const roleValue =
+        typeof response.role === "string"
+          ? response.role
+          : (response.role as { value?: string } | undefined)?.value;
+      const fallbackRole =
+        typeof response.user?.role === "string"
+          ? response.user?.role
+          : (response.user?.role as { value?: string } | undefined)?.value;
+      const role = roleValue ?? fallbackRole;
+
+      router.push(role === "vendor" ? "/vendor/dashboard" : "/products");
+    } catch (err) {
+      setError(getAuthMessage(err, "Google sign-in failed"));
+    } finally {
+      setGoogleLoading(false);
     }
   }
 
@@ -172,10 +235,12 @@ export default function LoginPage() {
           <div className="mt-4 flex justify-center">
             <button
               type="button"
-              aria-label="Continue with Google"
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-black/10 bg-white shadow-[0_8px_20px_rgba(16,35,30,0.08)] transition hover:border-black/20"
+              onClick={handleGoogleContinue}
+              disabled={googleLoading}
+              className="inline-flex items-center gap-3 rounded-2xl border border-black/10 bg-white px-5 py-3 text-sm font-semibold text-slate-800 shadow-[0_8px_20px_rgba(16,35,30,0.08)] transition hover:border-black/20 disabled:cursor-not-allowed disabled:opacity-70"
             >
               <GoogleIcon />
+              {googleLoading ? "Connecting..." : "Continue with Google"}
             </button>
           </div>
         </div>

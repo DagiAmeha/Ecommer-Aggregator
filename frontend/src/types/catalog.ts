@@ -20,6 +20,7 @@ export interface ProductRelation {
 }
 
 export type ProductSource = "manual" | "api";
+export type RatingSource = "internal" | "external";
 
 export interface Product {
   id: number;
@@ -35,6 +36,12 @@ export interface Product {
   category: ProductRelation;
   store: ProductRelation;
   group_id: string;
+  normalized_title: string;
+  product_group_id: string;
+  average_rating: number;
+  review_count: number;
+  rating_source: RatingSource;
+  is_wishlisted: boolean;
 }
 
 export interface ProductListPayload {
@@ -59,6 +66,7 @@ export interface Offer {
 export interface ProductFilters {
   search?: string;
   category?: string;
+  store_id?: number;
   min_price?: number;
   max_price?: number;
   page?: number;

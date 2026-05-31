@@ -16,7 +16,7 @@ export default function CompareClient() {
       .split(",")
       .map((item) => Number(item.trim()))
       .filter((value) => Number.isFinite(value) && value > 0)
-      .slice(0, 3);
+      .slice(0, 4);
   }, [searchParams]);
 
   const [products, setProducts] = useState<CompareProduct[]>([]);
@@ -54,7 +54,9 @@ export default function CompareClient() {
           return;
         }
 
-        setError(err instanceof Error ? err.message : "Failed to load comparison data");
+        setError(
+          err instanceof Error ? err.message : "Failed to load comparison data",
+        );
         setProducts([]);
       } finally {
         if (active) {
@@ -80,7 +82,7 @@ export default function CompareClient() {
       .split(",")
       .map((item) => Number(item.trim()))
       .filter((value) => Number.isFinite(value) && value > 0)
-      .slice(0, 3);
+      .slice(0, 4);
 
     router.push(
       normalizedIds.length > 0
@@ -96,7 +98,8 @@ export default function CompareClient() {
           Compare products
         </p>
         <p className="max-w-3xl text-sm leading-6 text-slate-600 sm:text-base">
-          Enter up to three product ids and compare their price, category, and store information pulled from the live backend.
+          Enter up to four product ids for the same product across different
+          stores to compare price, category, and store information.
         </p>
       </div>
 
@@ -109,7 +112,7 @@ export default function CompareClient() {
           name="ids"
           type="text"
           defaultValue={ids.join(",")}
-          placeholder="1,2,3"
+          placeholder="1,2,3,4"
           className="min-w-0 flex-1 rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-emerald-600"
         />
         <button

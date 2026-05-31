@@ -79,3 +79,73 @@ export async function findActiveApiSources(): Promise<StoreSource[]> {
 
   return result.rows;
 }
+
+export async function findActiveApiSourceByStoreId(
+  storeId: number,
+): Promise<StoreSource | null> {
+  const result = await pool.query<StoreSource>(
+    `
+      SELECT id, store_id, type, url, is_active, created_at::text AS created_at
+      FROM store_sources
+      WHERE store_id = $1 AND type = 'api' AND is_active = true
+      ORDER BY id ASC
+      LIMIT 1
+    `,
+    [storeId],
+  );
+
+  return result.rows[0] ?? null;
+}
+
+export async function findApiSourceByStoreId(
+  storeId: number,
+): Promise<StoreSource | null> {
+  const result = await pool.query<StoreSource>(
+    `
+      SELECT id, store_id, type, url, is_active, created_at::text AS created_at
+      FROM store_sources
+      WHERE store_id = $1 AND type = 'api'
+      ORDER BY id ASC
+      LIMIT 1
+    `,
+    [storeId],
+  );
+
+  return result.rows[0] ?? null;
+}
+
+export async function updateStoreSource(
+  id: number,
+  payload: { url?: string; is_active?: boolean },
+): Promise<StoreSource | null> {
+  const fields: string[] = [];
+  const values: Array<string | boolean> = [];
+
+  if (typeof payload.url !== "undefined") {
+    fields.push(`url = $${fields.length + 1}`);
+    values.push(payload.url);
+  }
+
+  if (typeof payload.is_active !== "undefined") {
+    fields.push(`is_active = $${fields.length + 1}`);
+    values.push(payload.is_active);
+  }
+
+  if (fields.length === 0) {
+    return null;
+  }
+
+  values.push(id);
+
+  const result = await pool.query<StoreSource>(
+    `
+      UPDATE store_sources
+      SET ${fields.join(", ")}
+      WHERE id = $${values.length}
+      RETURNING id, store_id, type, url, is_active, created_at::text AS created_at
+    `,
+    values,
+  );
+
+  return result.rows[0] ?? null;
+}

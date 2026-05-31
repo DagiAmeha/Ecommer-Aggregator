@@ -7,12 +7,16 @@ export function ProductList({
   error,
   compareList,
   onToggleCompare,
+  onToggleWishlist,
+  wishlistLoadingId,
 }: {
   products: Product[];
   loading: boolean;
   error: string | null;
   compareList: number[];
   onToggleCompare: (product: Product) => void;
+  onToggleWishlist?: (product: Product) => void;
+  wishlistLoadingId?: number | null;
 }) {
   if (loading) {
     return (
@@ -51,6 +55,8 @@ export function ProductList({
           product={product}
           isSelected={compareList.includes(product.id)}
           onToggleCompare={onToggleCompare}
+          onToggleWishlist={onToggleWishlist}
+          wishlistLoading={wishlistLoadingId === product.id}
         />
       ))}
     </div>

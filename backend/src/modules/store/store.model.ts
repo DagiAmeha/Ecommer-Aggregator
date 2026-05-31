@@ -78,6 +78,22 @@ export async function findStoreById(id: number): Promise<Store | null> {
   return result.rows[0] ?? null;
 }
 
+export async function findStoreByOwnerId(
+  ownerId: number,
+): Promise<Store | null> {
+  const result = await pool.query<Store>(
+    `
+      SELECT id, owner_id, store_name, description, is_active
+      FROM stores
+      WHERE owner_id = $1
+      LIMIT 1
+    `,
+    [ownerId],
+  );
+
+  return result.rows[0] ?? null;
+}
+
 export async function updateStoreById(
   id: number,
   data: UpdateStoreInput,

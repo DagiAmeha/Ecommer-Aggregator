@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Product } from "@/types/catalog";
+import { StarRatingDisplay } from "./StarRating";
 
 function formatPrice(value: number): string {
   return new Intl.NumberFormat("en-US", {
@@ -13,10 +14,14 @@ export function ProductCard({
   product,
   isSelected,
   onToggleCompare,
+  onToggleWishlist,
+  wishlistLoading,
 }: {
   product: Product;
   isSelected: boolean;
   onToggleCompare: (product: Product) => void;
+  onToggleWishlist?: (product: Product) => void;
+  wishlistLoading?: boolean;
 }) {
   const imageUrl =
     product.image_url ||
@@ -34,6 +39,28 @@ export function ProductCard({
           />
         </Link>
         <div className="absolute inset-0 bg-linear-to-t from-black/25 via-transparent to-transparent" />
+        {onToggleWishlist ? (
+          <button
+            type="button"
+            onClick={() => onToggleWishlist(product)}
+            disabled={wishlistLoading}
+            className={`absolute right-3 top-3 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/60 bg-white/90 text-slate-900 shadow-sm transition hover:scale-105 ${
+              product.is_wishlisted ? "text-rose-600" : "text-slate-700"
+            } ${wishlistLoading ? "opacity-60" : ""}`}
+            aria-label={
+              product.is_wishlisted ? "Remove from wishlist" : "Add to wishlist"
+            }
+          >
+            <svg viewBox="0 0 24 24" className="h-5 w-5">
+              <path
+                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                fill={product.is_wishlisted ? "currentColor" : "none"}
+                stroke="currentColor"
+                strokeWidth="1.6"
+              />
+            </svg>
+          </button>
+        ) : null}
       </div>
       <div className="space-y-4 p-5">
         <div className="space-y-1">
@@ -48,6 +75,10 @@ export function ProductCard({
           <p className="text-sm text-slate-500">
             {product.category?.name ?? ""}
           </p>
+          <StarRatingDisplay
+            rating={product.average_rating ?? 0}
+            count={product.review_count ?? 0}
+          />
         </div>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-xl font-semibold text-emerald-700">

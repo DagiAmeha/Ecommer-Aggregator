@@ -6,6 +6,7 @@ import {
   signUpUser,
 } from "./auth.service";
 import { getUserByFirebaseUid } from "../user/user.service";
+import { firebaseAuth } from "../../config/firebase";
 import { sendError, sendSuccess } from "../../utils/api-response";
 
 export async function signUpHandler(
@@ -51,6 +52,39 @@ export async function signInHandler(
     const user = await signInWithFirebaseIdToken(payload.idToken);
 
     sendSuccess(res, { user });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function googleLoginHandler(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const authorizationHeader = req.headers.authorization;
+
+    if (!authorizationHeader || !authorizationHeader.startsWith("Bearer ")) {
+      sendError(res, "Unauthorized: missing bearer token", 401);
+      return;
+    }
+
+    const token = authorizationHeader.replace("Bearer ", "").trim();
+    const decodedToken = await firebaseAuth.verifyIdToken(token);
+    const user = await getUserByFirebaseUid(decodedToken.uid);
+
+    if (!user) {
+      sendSuccess(res, { exists: false });
+      return;
+    }
+
+    const role =
+      typeof user.role === "string"
+        ? user.role
+        : (user.role as { value?: string } | undefined)?.value;
+
+    sendSuccess(res, { exists: true, user, role });
   } catch (error) {
     next(error);
   }

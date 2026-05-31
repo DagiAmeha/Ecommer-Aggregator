@@ -6,6 +6,7 @@ import type {
   ProductDetail,
   ProductFilters,
   ProductListPayload,
+  Store,
 } from "@/types/catalog";
 
 function toSearchParams(
@@ -38,6 +39,18 @@ export async function fetchCategories(): Promise<Category[]> {
   return response.items;
 }
 
+export async function fetchStores(): Promise<Store[]> {
+  const response =
+    await apiRequest<
+      Array<{ id: number; store_name?: string; storeName?: string }>
+    >("/stores");
+
+  return response.map((store) => ({
+    id: store.id,
+    name: store.store_name ?? store.storeName ?? "",
+  }));
+}
+
 export async function fetchProducts(
   filters: ProductFilters = {},
 ): Promise<ProductListPayload> {
@@ -61,9 +74,12 @@ export async function fetchComparisonProducts(
     return [];
   }
 
-  const response = await apiRequest<ProductListPayload>(
-    `/products?ids=${targetIds.join(",")}`,
-  );
+  return apiRequest<CompareProduct[]>("/products/compare", {
+    method: "POST",
+    body: JSON.stringify({ product_ids: targetIds }),
+  });
+}
 
-  return response.data as CompareProduct[];
+export async function fetchRelatedOffers(id: number): Promise<Product[]> {
+  return apiRequest<Product[]>(`/products/${id}/related-offers`);
 }

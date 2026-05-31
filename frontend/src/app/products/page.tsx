@@ -5,23 +5,33 @@ import { FilterBar } from "@/components/FilterBar";
 import { CompareModal } from "@/components/CompareModal";
 import { ProductList } from "@/components/ProductList";
 import { SearchBar } from "@/components/SearchBar";
+import { useAuth } from "@/hooks/useAuth";
+import { useWishlist } from "@/components/WishlistProvider";
 import {
   fetchCategories,
   fetchComparisonProducts,
   fetchProducts,
+  fetchStores,
 } from "@/services/catalog.service";
+import { addToWishlist, removeFromWishlist } from "@/services/wishlist.service";
+import { fetchVendorStoreSource } from "@/services/vendor.service";
+import { fetchMyProfile } from "@/services/user.service";
 import type {
   Category,
   CompareProduct,
   Pagination,
   Product,
+  Store,
 } from "@/types/catalog";
 
 const PAGE_SIZE = 9;
 
 export default function ProductsPage() {
+  const { user } = useAuth();
+  const { count, setCount } = useWishlist();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
+  const [storeId, setStoreId] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [resetKey, setResetKey] = useState(0);
@@ -33,6 +43,7 @@ export default function ProductsPage() {
     total: 0,
   });
   const [categories, setCategories] = useState<Category[]>([]);
+  const [stores, setStores] = useState<Store[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [compareList, setCompareList] = useState<number[]>([]);
@@ -44,10 +55,55 @@ export default function ProductsPage() {
   const [compareLoading, setCompareLoading] = useState(false);
   const [compareError, setCompareError] = useState<string | null>(null);
   const [compareMessage, setCompareMessage] = useState<string | null>(null);
+  const [vendorStoreId, setVendorStoreId] = useState<number | null>(null);
+  const [wishlistLoadingId, setWishlistLoadingId] = useState<number | null>(
+    null,
+  );
 
   useEffect(() => {
     document.title = "Products | Aggregator Market";
   }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadVendorStore(): Promise<void> {
+      if (!user) {
+        setVendorStoreId(null);
+        return;
+      }
+
+      try {
+        const profile = await fetchMyProfile();
+        const role =
+          typeof profile.role === "string" ? profile.role : profile.role?.value;
+
+        if (!active) {
+          return;
+        }
+
+        if (role !== "vendor") {
+          setVendorStoreId(null);
+          return;
+        }
+
+        const source = await fetchVendorStoreSource();
+        if (active) {
+          setVendorStoreId(source.store_id ?? null);
+        }
+      } catch {
+        if (active) {
+          setVendorStoreId(null);
+        }
+      }
+    }
+
+    loadVendorStore();
+
+    return () => {
+      active = false;
+    };
+  }, [user]);
 
   useEffect(() => {
     let active = true;
@@ -72,6 +128,26 @@ export default function ProductsPage() {
   useEffect(() => {
     let active = true;
 
+    fetchStores()
+      .then((items) => {
+        if (active) {
+          setStores(items);
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setStores([]);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+
     async function loadProducts(): Promise<void> {
       setLoading(true);
       setError(null);
@@ -80,6 +156,7 @@ export default function ProductsPage() {
         const response = await fetchProducts({
           search: search || undefined,
           category: category || undefined,
+          store_id: storeId ? Number(storeId) : undefined,
           min_price: minPrice ? Number(minPrice) : undefined,
           max_price: maxPrice ? Number(maxPrice) : undefined,
           page,
@@ -113,7 +190,7 @@ export default function ProductsPage() {
     return () => {
       active = false;
     };
-  }, [category, maxPrice, minPrice, page, search]);
+  }, [category, maxPrice, minPrice, page, search, storeId]);
 
   useEffect(() => {
     if (!compareModalOpen) {
@@ -186,10 +263,20 @@ export default function ProductsPage() {
       .map((id) => compareItemsById[id])
       .filter(Boolean);
 
-    if (selectedProducts.some((item) => item.group_id === product.group_id)) {
+    const currentGroupId = selectedProducts[0]?.product_group_id;
+    if (currentGroupId && product.product_group_id !== currentGroupId) {
       setCompareMessage(
-        "You cannot compare the same product from different stores",
+        "You can only compare the same product from different stores",
       );
+      return;
+    }
+
+    if (
+      selectedProducts.some(
+        (item) => item.store?.id && item.store.id === product.store?.id,
+      )
+    ) {
+      setCompareMessage("You cannot compare products from the same store");
       return;
     }
 
@@ -198,6 +285,47 @@ export default function ProductsPage() {
       ...current,
       [product.id]: product,
     }));
+  }
+
+  async function handleToggleWishlist(product: Product): Promise<void> {
+    if (!user) {
+      window.location.href = "/login";
+      return;
+    }
+
+    setWishlistLoadingId(product.id);
+
+    const nextWishlisted = !product.is_wishlisted;
+    setProducts((current) =>
+      current.map((item) =>
+        item.id === product.id
+          ? { ...item, is_wishlisted: nextWishlisted }
+          : item,
+      ),
+    );
+
+    try {
+      if (nextWishlisted) {
+        await addToWishlist(product.id);
+        setCount((prev) => prev + 1);
+      } else {
+        await removeFromWishlist(product.id);
+        setCount((prev) => Math.max(0, prev - 1));
+      }
+    } catch (err) {
+      setProducts((current) =>
+        current.map((item) =>
+          item.id === product.id
+            ? { ...item, is_wishlisted: product.is_wishlisted }
+            : item,
+        ),
+      );
+      setError(
+        err instanceof Error ? err.message : "Failed to update wishlist",
+      );
+    } finally {
+      setWishlistLoadingId(null);
+    }
   }
 
   function handleRemoveComparedProduct(id: number): void {
@@ -244,16 +372,21 @@ export default function ProductsPage() {
         <FilterBar
           key={`filters-${resetKey}`}
           categories={categories}
+          stores={stores}
           initialCategory={category}
+          initialStoreId={storeId}
           initialMinPrice={minPrice}
           initialMaxPrice={maxPrice}
+          highlightedStoreId={vendorStoreId}
           onApply={({
             category: nextCategory,
+            storeId: nextStoreId,
             minPrice: nextMin,
             maxPrice: nextMax,
           }) => {
             setPage(1);
             setCategory(nextCategory);
+            setStoreId(nextStoreId);
             setMinPrice(nextMin);
             setMaxPrice(nextMax);
           }}
@@ -261,6 +394,7 @@ export default function ProductsPage() {
             setPage(1);
             setSearch("");
             setCategory("");
+            setStoreId("");
             setMinPrice("");
             setMaxPrice("");
             setResetKey((current) => current + 1);
@@ -302,6 +436,8 @@ export default function ProductsPage() {
         error={error}
         compareList={compareList}
         onToggleCompare={handleToggleCompare}
+        onToggleWishlist={handleToggleWishlist}
+        wishlistLoadingId={wishlistLoadingId}
       />
 
       <div className="flex items-center justify-between gap-3 rounded-3xl border border-black/10 bg-white/75 p-4 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">

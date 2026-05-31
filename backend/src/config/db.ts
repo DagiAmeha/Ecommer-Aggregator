@@ -24,8 +24,16 @@ export async function initDb(): Promise<void> {
       full_name VARCHAR(255),
       phone_number VARCHAR(50),
       role VARCHAR(50) DEFAULT 'user',
+      provider VARCHAR(50) DEFAULT 'password',
+      profile_image TEXT,
       created_at TIMESTAMPTZ DEFAULT NOW()
     );
+  `);
+
+  await pool.query(`
+    ALTER TABLE users
+      ADD COLUMN IF NOT EXISTS provider VARCHAR(50) DEFAULT 'password',
+      ADD COLUMN IF NOT EXISTS profile_image TEXT;
   `);
 
   // 2. Categories Table
@@ -67,6 +75,9 @@ export async function initDb(): Promise<void> {
       ADD COLUMN IF NOT EXISTS product_url TEXT,
       ADD COLUMN IF NOT EXISTS source VARCHAR(20),
       ADD COLUMN IF NOT EXISTS external_id VARCHAR(255),
+      ADD COLUMN IF NOT EXISTS external_rating_rate DOUBLE PRECISION,
+      ADD COLUMN IF NOT EXISTS external_rating_count INTEGER,
+      ADD COLUMN IF NOT EXISTS last_synced_at TIMESTAMPTZ,
       ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ;
 
     UPDATE products
@@ -82,6 +93,45 @@ export async function initDb(): Promise<void> {
       ALTER COLUMN source SET NOT NULL,
       ALTER COLUMN updated_at SET DEFAULT NOW(),
       ALTER COLUMN updated_at SET NOT NULL;
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS reviews (
+      id SERIAL PRIMARY KEY,
+      product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+      comment TEXT,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW(),
+      UNIQUE (product_id, user_id)
+    );
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_reviews_product_id ON reviews(product_id);
+    CREATE INDEX IF NOT EXISTS idx_reviews_user_id ON reviews(user_id);
+  `);
+
+  await pool.query(`
+    WITH ranked AS (
+      SELECT
+        id,
+        ROW_NUMBER() OVER (
+          PARTITION BY store_id, external_id
+          ORDER BY updated_at DESC, created_at DESC, id DESC
+        ) AS row_rank
+      FROM products
+      WHERE source = 'api' AND external_id IS NOT NULL
+    )
+    DELETE FROM products
+    WHERE id IN (SELECT id FROM ranked WHERE row_rank > 1);
+  `);
+
+  await pool.query(`
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_products_store_external_api
+      ON products (store_id, external_id)
+      WHERE source = 'api' AND external_id IS NOT NULL;
   `);
 
   // 5. Store Sources Table (Store can have multiple ingestion sources)
@@ -104,5 +154,20 @@ export async function initDb(): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_products_store ON products(store_id);
     CREATE INDEX IF NOT EXISTS idx_store_sources_store_id ON store_sources(store_id);
     CREATE INDEX IF NOT EXISTS idx_store_sources_type_active ON store_sources(type, is_active);
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS wishlists (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      UNIQUE (user_id, product_id)
+    );
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_wishlists_user_id ON wishlists(user_id);
+    CREATE INDEX IF NOT EXISTS idx_wishlists_product_id ON wishlists(product_id);
   `);
 }

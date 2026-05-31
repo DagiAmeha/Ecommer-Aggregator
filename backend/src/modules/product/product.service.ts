@@ -4,6 +4,7 @@ import {
   CreateProductInput,
   findAllProducts,
   findProductById,
+  findProductsByNormalizedTitle,
   getCategoriesByName,
   findProductsByIds,
   Product,
@@ -23,32 +24,47 @@ export async function createProductRecord(
 
 export async function getAllProducts(
   filters: ProductFilters,
+  userId?: number,
 ): Promise<Product[]> {
-  return findAllProducts(filters);
+  return findAllProducts(filters, userId);
 }
 
-export async function getProductDetails(id: number): Promise<Product | null> {
-  return findProductById(id);
+export async function getProductDetails(
+  id: number,
+  userId?: number,
+): Promise<Product | null> {
+  return findProductById(id, userId);
 }
 
-export async function getProductsByIds(ids: number[]): Promise<Product[]> {
-  const products = await findProductsByIds(ids);
-  const seenGroups = new Set<string>();
-  const uniqueProducts: Product[] = [];
+export async function getProductsByIds(
+  ids: number[],
+  userId?: number,
+): Promise<Product[]> {
+  return findProductsByIds(ids, userId);
+}
 
-  for (const product of products) {
-    if (seenGroups.has(product.group_id)) {
-      continue;
-    }
+export async function getRelatedOffers(
+  productId: number,
+  userId?: number,
+): Promise<Product[] | null> {
+  const product = await findProductById(productId, userId);
 
-    seenGroups.add(product.group_id);
-    uniqueProducts.push(product);
+  if (!product) {
+    return null;
   }
 
-  return uniqueProducts;
+  return findProductsByNormalizedTitle(
+    product.normalized_title,
+    product.id,
+    product.store?.id,
+    userId,
+  );
 }
 
-export async function searchProducts(filters: ProductFilters): Promise<{
+export async function searchProducts(
+  filters: ProductFilters,
+  userId?: number,
+): Promise<{
   data: ProductWithRelations[];
   pagination: { page: number; limit: number; total: number };
 }> {
@@ -57,6 +73,7 @@ export async function searchProducts(filters: ProductFilters): Promise<{
     search: filters.search,
     category: filters.category,
     keywords: filters.keywords,
+    store_id: (filters as any).store_id,
     page: (filters as any).page,
     limit: (filters as any).limit,
     min_price: (filters as any).min_price,
@@ -68,7 +85,7 @@ export async function searchProducts(filters: ProductFilters): Promise<{
   const limit =
     modelFilters.limit && modelFilters.limit > 0 ? modelFilters.limit : 10;
 
-  const result = await searchProductsWithPagination(modelFilters);
+  const result = await searchProductsWithPagination(modelFilters, userId);
 
   return {
     data: result.rows,

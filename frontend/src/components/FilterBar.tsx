@@ -3,18 +3,25 @@ import type { Category } from "@/types/catalog";
 
 export function FilterBar({
   categories,
+  stores,
   initialCategory = "",
+  initialStoreId = "",
   initialMinPrice = "",
   initialMaxPrice = "",
+  highlightedStoreId,
   onApply,
   onReset,
 }: {
   categories: Category[];
+  stores: { id: number; name: string }[];
   initialCategory?: string;
+  initialStoreId?: string;
   initialMinPrice?: string;
   initialMaxPrice?: string;
+  highlightedStoreId?: number | null;
   onApply: (filters: {
     category: string;
+    storeId: string;
     minPrice: string;
     maxPrice: string;
   }) => void;
@@ -22,12 +29,13 @@ export function FilterBar({
 }) {
   return (
     <form
-      className="grid gap-3 rounded-3xl border border-black/10 bg-white/75 p-4 shadow-[0_16px_50px_rgba(16,35,30,0.08)] md:grid-cols-[1.2fr_repeat(2,minmax(0,0.8fr))_auto_auto]"
+      className="grid gap-3 rounded-3xl border border-black/10 bg-white/75 p-4 shadow-[0_16px_50px_rgba(16,35,30,0.08)] md:grid-cols-[1.1fr_1.1fr_repeat(2,minmax(0,0.8fr))_auto_auto]"
       onSubmit={(event) => {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
         onApply({
           category: String(formData.get("category") ?? ""),
+          storeId: String(formData.get("storeId") ?? ""),
           minPrice: String(formData.get("minPrice") ?? ""),
           maxPrice: String(formData.get("maxPrice") ?? ""),
         });
@@ -42,6 +50,21 @@ export function FilterBar({
         {categories.map((item) => (
           <option key={item.id} value={item.name}>
             {item.name}
+          </option>
+        ))}
+      </select>
+      <select
+        name="storeId"
+        defaultValue={initialStoreId}
+        className="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-600"
+      >
+        <option value="">All stores</option>
+        {stores.map((store) => (
+          <option key={store.id} value={store.id}>
+            {store.name}
+            {highlightedStoreId && store.id === highlightedStoreId
+              ? " (Your store)"
+              : ""}
           </option>
         ))}
       </select>

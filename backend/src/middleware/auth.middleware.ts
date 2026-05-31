@@ -36,9 +36,38 @@ export async function authMiddleware(
     }
 
     req.user = user;
+    req.authUser = user;
     next();
   } catch {
     sendError(res, "Unauthorized: invalid token", 401);
+  }
+}
+
+export async function optionalAuthMiddleware(
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const authorizationHeader = req.headers.authorization;
+
+    if (!authorizationHeader || !authorizationHeader.startsWith("Bearer ")) {
+      next();
+      return;
+    }
+
+    const token = authorizationHeader.replace("Bearer ", "").trim();
+    const decoded = await firebaseAuth.verifyIdToken(token);
+    const user = await getUserByFirebaseUid(decoded.uid);
+
+    if (user) {
+      req.user = user;
+      req.authUser = user;
+    }
+
+    next();
+  } catch {
+    next();
   }
 }
 

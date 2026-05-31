@@ -1,10 +1,16 @@
 import { Router } from "express";
 import {
+  compareProductsHandler,
   createProductHandler,
+  getRelatedOffersHandler,
   getProductByIdHandler,
   getProductsHandler,
 } from "./product.controller";
-import { authMiddleware, requireRoles } from "../../middleware/auth.middleware";
+import {
+  authMiddleware,
+  optionalAuthMiddleware,
+  requireRoles,
+} from "../../middleware/auth.middleware";
 import {
   createCategoryHandler,
   deleteCategoryHandler,
@@ -13,7 +19,8 @@ import {
 
 const productRouter = Router();
 
-productRouter.get("/", getProductsHandler);
+productRouter.get("/", optionalAuthMiddleware, getProductsHandler);
+productRouter.post("/compare", optionalAuthMiddleware, compareProductsHandler);
 productRouter.post(
   "/",
   authMiddleware,
@@ -33,6 +40,11 @@ productRouter.delete(
   requireRoles(["admin"]),
   deleteCategoryHandler,
 );
-productRouter.get("/:id", getProductByIdHandler);
+productRouter.get(
+  "/:id/related-offers",
+  optionalAuthMiddleware,
+  getRelatedOffersHandler,
+);
+productRouter.get("/:id", optionalAuthMiddleware, getProductByIdHandler);
 
 export { productRouter };

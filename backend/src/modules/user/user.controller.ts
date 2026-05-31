@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import {
   createUserSchema,
+  googleRegisterSchema,
   registerUserSchema,
   updateMyProfileSchema,
   updateUserRoleSchema,
@@ -8,11 +9,14 @@ import {
 import {
   createUserRecord,
   getAllUsers,
+  getUserByEmail,
+  getUserByFirebaseUid,
   getUserById,
   updateUserProfileRecord,
   updateUserRoleRecord,
 } from "./user.service";
 import { sendError, sendSuccess } from "../../utils/api-response";
+import { firebaseAuth } from "../../config/firebase";
 
 export async function createUserHandler(
   req: Request,
@@ -35,6 +39,54 @@ export async function registerUserHandler(
   next: NextFunction,
 ): Promise<void> {
   try {
+    const authorizationHeader = req.headers.authorization;
+
+    if (authorizationHeader && authorizationHeader.startsWith("Bearer ")) {
+      const token = authorizationHeader.replace("Bearer ", "").trim();
+      const decodedToken = await firebaseAuth.verifyIdToken(token);
+      const provider = decodedToken.firebase?.sign_in_provider;
+
+      if (provider === "google.com") {
+        const payload = googleRegisterSchema.parse(req.body ?? {});
+
+        if (!decodedToken.email) {
+          sendError(res, "Google account email is missing", 400);
+          return;
+        }
+
+        const fullName = decodedToken.name;
+        if (!fullName) {
+          sendError(res, "Google account name is missing", 400);
+          return;
+        }
+
+        const existingUser = await getUserByFirebaseUid(decodedToken.uid);
+        if (existingUser) {
+          sendSuccess(res, existingUser);
+          return;
+        }
+
+        const existingByEmail = await getUserByEmail(decodedToken.email);
+        if (existingByEmail) {
+          sendSuccess(res, existingByEmail);
+          return;
+        }
+
+        const user = await createUserRecord({
+          firebase_uid: decodedToken.uid,
+          email: decodedToken.email,
+          full_name: fullName,
+          phone_number: payload.phone_number,
+          role: payload.role ?? "user",
+          provider: "google",
+          profile_image: decodedToken.picture ?? null,
+        });
+
+        sendSuccess(res, user, 201);
+        return;
+      }
+    }
+
     const payload = registerUserSchema.parse(req.body);
 
     const user = await createUserRecord({
@@ -43,6 +95,7 @@ export async function registerUserHandler(
       full_name: payload.full_name,
       phone_number: payload.phone,
       role: "user",
+      provider: "password",
     });
 
     sendSuccess(res, user, 201);

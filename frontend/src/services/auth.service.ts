@@ -1,6 +1,8 @@
 import {
   User,
   createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
@@ -18,6 +20,13 @@ export async function register(email: string, password: string): Promise<User> {
     email,
     password,
   );
+  return credential.user;
+}
+
+export async function signInWithGooglePopup(): Promise<User> {
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: "select_account" });
+  const credential = await signInWithPopup(auth, provider);
   return credential.user;
 }
 

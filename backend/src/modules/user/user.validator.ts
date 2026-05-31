@@ -20,6 +20,13 @@ export const registerUserSchema = z.object({
     .regex(/^\+2519\d{8}$/, "phone must be a valid Ethiopian mobile number"),
 });
 
+export const googleRegisterSchema = z.object({
+  phone_number: z
+    .string()
+    .regex(/^\+2519\d{8}$/, "phone must be a valid Ethiopian mobile number"),
+  role: userRoleSchema.optional(),
+});
+
 export const updateMyProfileSchema = z
   .object({
     email: z.string().email().optional(),

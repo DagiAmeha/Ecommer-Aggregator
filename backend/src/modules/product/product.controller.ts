@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import {
+  compareProductsSchema,
   createProductSchema,
   productSearchQuerySchema,
 } from "./product.validator";
@@ -8,6 +9,7 @@ import {
   getAllProducts,
   getProductDetails,
   getProductsByIds,
+  getRelatedOffers,
   searchProducts,
 } from "./product.service";
 import { sendError, sendSuccess } from "../../utils/api-response";
@@ -20,6 +22,8 @@ export async function getProductsHandler(
   try {
     const query = productSearchQuerySchema.parse(req.query);
 
+    const userId = req.user?.id;
+
     if (query.ids) {
       const ids = query.ids
         .split(",")
@@ -27,7 +31,7 @@ export async function getProductsHandler(
         .filter((value) => Number.isFinite(value) && value > 0);
 
       const uniqueIds = Array.from(new Set(ids));
-      const products = await getProductsByIds(uniqueIds);
+      const products = await getProductsByIds(uniqueIds, userId);
 
       sendSuccess(res, {
         data: products,
@@ -52,13 +56,14 @@ export async function getProductsHandler(
       search: query.search,
       category: query.category,
       keywords,
+      store_id: query.store_id,
       min_price: query.min_price,
       max_price: query.max_price,
       page: query.page ?? 1,
       limit: query.limit ?? 10,
     } as any;
 
-    const result = await searchProducts(filters as any);
+    const result = await searchProducts(filters as any, userId);
 
     sendSuccess(res, {
       data: result.data,
@@ -96,7 +101,7 @@ export async function getProductByIdHandler(
       return;
     }
 
-    const product = await getProductDetails(id);
+    const product = await getProductDetails(id, req.user?.id);
 
     if (!product) {
       sendError(res, "Product not found", 404);
@@ -105,6 +110,88 @@ export async function getProductByIdHandler(
 
     console.log("getProductByIdHandler product:", product);
     sendSuccess(res, { product });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function compareProductsHandler(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const payload = compareProductsSchema.parse(req.body);
+    const uniqueIds = Array.from(new Set(payload.product_ids));
+
+    if (uniqueIds.length < 2) {
+      sendError(res, "Select at least 2 products to compare.", 400);
+      return;
+    }
+
+    const products = await getProductsByIds(uniqueIds, req.user?.id);
+
+    if (products.length !== uniqueIds.length) {
+      sendError(res, "Some products could not be found.", 400);
+      return;
+    }
+
+    const groupId = products[0]?.product_group_id || products[0]?.group_id;
+    if (!groupId) {
+      sendError(
+        res,
+        "You can only compare the same product from different stores",
+        400,
+      );
+      return;
+    }
+
+    if (products.some((product) => product.product_group_id !== groupId)) {
+      sendError(
+        res,
+        "You can only compare the same product from different stores",
+        400,
+      );
+      return;
+    }
+
+    const storeIds = new Set<number>();
+    for (const product of products) {
+      if (storeIds.has(product.store?.id)) {
+        sendError(res, "You cannot compare products from the same store", 400);
+        return;
+      }
+
+      storeIds.add(product.store?.id);
+    }
+
+    sendSuccess(res, products);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getRelatedOffersHandler(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const id = Number(req.params.id);
+
+    if (Number.isNaN(id)) {
+      sendError(res, "Invalid product id", 400);
+      return;
+    }
+
+    const related = await getRelatedOffers(id, req.user?.id);
+
+    if (!related) {
+      sendError(res, "Product not found", 404);
+      return;
+    }
+
+    sendSuccess(res, related);
   } catch (error) {
     next(error);
   }

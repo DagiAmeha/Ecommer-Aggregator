@@ -1,6 +1,9 @@
 import axios from "axios";
 import { pool } from "../../config/db";
-import { createProductRecord } from "../product/product.service";
+import {
+  normalizeProductTitle,
+  upsertApiProduct,
+} from "../product/product.model";
 import { createStore } from "../store/store.service";
 import {
   activateStoreSource,
@@ -23,6 +26,10 @@ export interface FakeStoreApiProduct {
   description: string;
   category: string;
   image: string;
+  rating?: {
+    rate?: number;
+    count?: number;
+  };
 }
 
 export interface ImportedProduct {
@@ -42,7 +49,9 @@ interface SourceImportError {
 }
 
 interface ImportResult {
-  products_imported: number;
+  imported_products: number;
+  updated_products: number;
+  failed_products: number;
   sources_processed: number;
   sources_failed: number;
   source_errors: SourceImportError[];
@@ -90,22 +99,33 @@ async function getOrCreateDefaultStore(): Promise<{
   };
 }
 
-async function saveImportedProduct(
+async function upsertImportedProduct(
   apiProduct: FakeStoreApiProduct,
   storeId: number,
-): Promise<void> {
-  await createProductRecord({
-    name: apiProduct.title,
+): Promise<"imported" | "updated"> {
+  const normalizedTitle = normalizeProductTitle(apiProduct.title);
+  const externalRatingRate =
+    typeof apiProduct.rating?.rate === "number" ? apiProduct.rating.rate : null;
+  const externalRatingCount =
+    typeof apiProduct.rating?.count === "number"
+      ? apiProduct.rating.count
+      : null;
+
+  const result = await upsertApiProduct({
+    name: normalizedTitle,
     description: apiProduct.description,
     price: apiProduct.price,
     category: apiProduct.category,
     store_id: storeId,
     image_url: apiProduct.image,
-    source: "api",
-    external_id: apiProduct.id,
+    external_id: String(apiProduct.id),
+    external_rating_rate: externalRatingRate,
+    external_rating_count: externalRatingCount,
     product_url:
       "https://jiji.com.et/bole/audio-and-music-equipment/sanen-sa200a-40w-outdoor-indoor-wireless-speaker-dj4rfg5Zcjt2yR32UK1OxWcH.html?page=1&pos=1&cur_pos=1&ads_per_page=23&ads_count=3937&lid=V3KJIBF5o0c6S9Pl&indexPosition=0",
   });
+
+  return result.action;
 }
 
 async function fetchProducts(source: StoreSource): Promise<any[]> {
@@ -145,6 +165,8 @@ export async function importFromActiveSources(): Promise<ImportResult> {
   const sources = await findActiveApiSources();
   const sourceErrors: SourceImportError[] = [];
   let importedCount = 0;
+  let updatedCount = 0;
+  let failedCount = 0;
   let processedSources = 0;
 
   for (const source of sources) {
@@ -156,8 +178,25 @@ export async function importFromActiveSources(): Promise<ImportResult> {
           id: product.id || product._id,
           ...product,
         };
-        await saveImportedProduct(apiProduct, source.store_id);
-        importedCount += 1;
+
+        try {
+          const action = await upsertImportedProduct(
+            apiProduct,
+            source.store_id,
+          );
+
+          if (action === "imported") {
+            importedCount += 1;
+          } else {
+            updatedCount += 1;
+          }
+        } catch (error) {
+          failedCount += 1;
+          console.error(
+            `[aggregation] product upsert failed for source ${source.id} (${source.url}):`,
+            error,
+          );
+        }
       }
 
       processedSources += 1;
@@ -181,7 +220,9 @@ export async function importFromActiveSources(): Promise<ImportResult> {
   }
 
   return {
-    products_imported: importedCount,
+    imported_products: importedCount,
+    updated_products: updatedCount,
+    failed_products: failedCount,
     sources_processed: processedSources,
     sources_failed: sourceErrors.length,
     source_errors: sourceErrors,

@@ -5,6 +5,7 @@ import {
   createStoreRecord,
   deleteStoreById,
   findAllStores,
+  findStoreByOwnerId,
   findStoreById,
   updateStoreById,
 } from "./store.model";
@@ -19,6 +20,12 @@ export async function listStores(): Promise<Store[]> {
 
 export async function getStore(id: number): Promise<Store | null> {
   return findStoreById(id);
+}
+
+export async function getStoreByOwnerId(
+  ownerId: number,
+): Promise<Store | null> {
+  return findStoreByOwnerId(ownerId);
 }
 
 export async function updateStore(

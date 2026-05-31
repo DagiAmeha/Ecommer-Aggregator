@@ -14,8 +14,15 @@ export const productSearchQuerySchema = z.object({
   category: z.string().trim().optional(),
   keywords: z.string().trim().optional(),
   ids: z.string().trim().optional(),
+  store_id: z.coerce.number().int().positive().optional(),
   min_price: z.coerce.number().nonnegative().optional(),
   max_price: z.coerce.number().nonnegative().optional(),
   page: z.coerce.number().int().positive().optional(),
   limit: z.coerce.number().int().positive().optional(),
+});
+
+export const compareProductsSchema = z.object({
+  product_ids: z
+    .array(z.number().int().positive())
+    .min(2, "Select at least 2 products to compare."),
 });

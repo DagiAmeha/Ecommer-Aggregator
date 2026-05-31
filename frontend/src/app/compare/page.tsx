@@ -98,8 +98,8 @@ export default function ComparePage() {
           Compare products
         </p>
         <p className="max-w-3xl text-sm leading-6 text-slate-600 sm:text-base">
-          Enter up to four product ids and compare their price, image, category,
-          store, and description information pulled from the live backend.
+          Enter up to four product ids for the same product across different
+          stores to compare price, store, category, and description details.
         </p>
       </div>
 

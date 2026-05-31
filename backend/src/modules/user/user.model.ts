@@ -10,6 +10,8 @@ export interface User {
   full_name: string | null;
   phone_number: string;
   role: { value: UserRole; default: "user" };
+  provider?: "password" | "google";
+  profile_image?: string | null;
 }
 
 export interface Vendor {
@@ -26,6 +28,8 @@ export interface CreateUserInput {
   full_name: string;
   phone_number: string;
   role?: UserRole;
+  provider?: "password" | "google";
+  profile_image?: string | null;
   store_name?: string;
   description?: string;
   is_active?: boolean;
@@ -38,15 +42,17 @@ export interface UpdateUserProfileInput {
 
 export async function createUser(data: CreateUserInput): Promise<User> {
   const result = await pool.query<User>(
-    `INSERT INTO users (firebase_uid, email, full_name, phone_number, role) 
-     VALUES ($1, $2, $3, $4, $5)
-     RETURNING id, firebase_uid, email, full_name, phone_number, role`,
+    `INSERT INTO users (firebase_uid, email, full_name, phone_number, role, provider, profile_image) 
+     VALUES ($1, $2, $3, $4, $5, $6, $7)
+     RETURNING id, firebase_uid, email, full_name, phone_number, role, provider, profile_image`,
     [
       data.firebase_uid,
       data.email,
       data.full_name,
       data.phone_number,
       data.role,
+      data.provider ?? "password",
+      data.profile_image ?? null,
     ],
   );
 
@@ -57,7 +63,7 @@ export async function findUserByFirebaseUid(
   firebaseUid: string,
 ): Promise<User | null> {
   const result = await pool.query<User>(
-    "SELECT id, firebase_uid, email, full_name, phone_number, role FROM users WHERE firebase_uid = $1 LIMIT 1",
+    "SELECT id, firebase_uid, email, full_name, phone_number, role, provider, profile_image FROM users WHERE firebase_uid = $1 LIMIT 1",
     [firebaseUid],
   );
 
@@ -66,7 +72,7 @@ export async function findUserByFirebaseUid(
 
 export async function findUserByEmail(email: string): Promise<User | null> {
   const result = await pool.query<User>(
-    "SELECT id, firebase_uid, email, full_name, phone_number, role FROM users WHERE email = $1 LIMIT 1",
+    "SELECT id, firebase_uid, email, full_name, phone_number, role, provider, profile_image FROM users WHERE email = $1 LIMIT 1",
     [email],
   );
 
@@ -75,7 +81,7 @@ export async function findUserByEmail(email: string): Promise<User | null> {
 
 export async function findUserById(id: number): Promise<User | null> {
   const result = await pool.query<User>(
-    "SELECT id, firebase_uid, email, full_name, phone_number, role FROM users WHERE id = $1 LIMIT 1",
+    "SELECT id, firebase_uid, email, full_name, phone_number, role, provider, profile_image FROM users WHERE id = $1 LIMIT 1",
     [id],
   );
   return result.rows[0] ?? null;
@@ -83,7 +89,7 @@ export async function findUserById(id: number): Promise<User | null> {
 
 export async function listAllUsers(): Promise<User[]> {
   const result = await pool.query<User>(
-    "SELECT id, firebase_uid, email, full_name, phone_number, role FROM users ORDER BY id ASC",
+    "SELECT id, firebase_uid, email, full_name, phone_number, role, provider, profile_image FROM users ORDER BY id ASC",
   );
 
   return result.rows;
@@ -113,7 +119,7 @@ export async function updateUserProfile(
   values.push(id);
 
   const result = await pool.query<User>(
-    `UPDATE users SET ${fields.join(", ")} WHERE id = $${values.length} RETURNING id, firebase_uid, email, full_name, phone_number,  role`,
+    `UPDATE users SET ${fields.join(", ")} WHERE id = $${values.length} RETURNING id, firebase_uid, email, full_name, phone_number, role, provider, profile_image`,
     values,
   );
 
@@ -125,7 +131,7 @@ export async function updateUserRole(
   role: UserRole,
 ): Promise<User | null> {
   const result = await pool.query<User>(
-    "UPDATE users SET role = $1 WHERE id = $2 RETURNING id, firebase_uid, email, full_name, role",
+    "UPDATE users SET role = $1 WHERE id = $2 RETURNING id, firebase_uid, email, full_name, role, provider, profile_image",
     [role, id],
   );
 
