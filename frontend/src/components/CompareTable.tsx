@@ -1,4 +1,5 @@
 import type { CompareProduct } from "@/types/catalog";
+import { StarRatingDisplay } from "./StarRating";
 
 function formatPrice(value: number): string {
   return new Intl.NumberFormat("en-US", {
@@ -74,6 +75,21 @@ export function CompareTable({
     {
       label: "Store name",
       value: (product: CompareProduct) => product.store?.name ?? "-",
+    },
+    {
+      label: "Rating",
+      value: (product: CompareProduct) => (
+        <StarRatingDisplay
+          rating={product.average_rating ?? 0}
+          count={product.review_count ?? 0}
+          size="sm"
+        />
+      ),
+    },
+    {
+      label: "Stock",
+      value: (product: CompareProduct) =>
+        (product.stock_quantity ?? 0) > 0 ? "In stock" : "Out of stock",
     },
     {
       label: "Category",

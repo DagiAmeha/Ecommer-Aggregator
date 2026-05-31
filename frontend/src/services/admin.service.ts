@@ -72,3 +72,24 @@ export async function createVendorAccount(
     body: JSON.stringify(payload),
   });
 }
+
+export interface AdminReports {
+  total_products: number;
+  products_by_source: Array<{ source: string; count: number }>;
+  recent_import_jobs: Array<{
+    id: number;
+    store_id: number;
+    job_type: string;
+    status: string;
+    imported_count: number;
+    updated_count: number;
+    failed_count: number;
+    started_at: string;
+  }>;
+  top_searches: Array<{ query: string; count: number }>;
+  new_users_last_30_days: number;
+}
+
+export async function fetchAdminReports(): Promise<AdminReports> {
+  return apiRequest<AdminReports>("/admin/reports");
+}

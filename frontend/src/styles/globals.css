@@ -1,9 +1,17 @@
 @import "tailwindcss";
 
+/* Enable class-based dark mode: `dark:` utilities apply when a .dark
+   ancestor is present (toggled on <html> by the ThemeProvider). */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   color-scheme: light;
   --font-body: var(--font-sans, "Trebuchet MS", "Verdana", sans-serif);
   --font-display: var(--font-sans, "Trebuchet MS", "Verdana", sans-serif);
+}
+
+html.dark {
+  color-scheme: dark;
 }
 
 * {
@@ -44,4 +52,99 @@ a {
 
 .display-font {
   font-family: var(--font-display);
+}
+
+/* ---------------------------------------------------------------------------
+   Dark theme.
+
+   The existing components use hard-coded light utility classes (white card
+   surfaces, slate text). Rather than rewrite every component with `dark:`
+   variants, we override the handful of recurring surface/text utilities at the
+   theme level so the whole UI shifts coherently when `.dark` is active.
+   --------------------------------------------------------------------------- */
+html.dark body {
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(16, 185, 129, 0.18),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at top right,
+      rgba(56, 189, 248, 0.08),
+      transparent 26%
+    ),
+    linear-gradient(180deg, #0b1220 0%, #060a13 100%);
+  color: #e2e8f0;
+}
+
+/* The decorative radial overlay rendered in the root layout. */
+html.dark body > div > .pointer-events-none {
+  background: radial-gradient(
+      circle at top left,
+      rgba(16, 185, 129, 0.12),
+      transparent 30%
+    ),
+    radial-gradient(circle at top right, rgba(56, 189, 248, 0.06), transparent 26%);
+}
+
+/* Frosted white card surfaces -> dark slate panels. */
+html.dark .bg-white\/70,
+html.dark .bg-white\/75,
+html.dark .bg-white\/80,
+html.dark .bg-white\/85,
+html.dark .bg-white\/90,
+html.dark .bg-white {
+  background-color: rgba(17, 24, 39, 0.82) !important;
+}
+
+/* Hairline borders need to read against the dark panels. */
+html.dark .border-black\/10,
+html.dark .border-black\/5 {
+  border-color: rgba(148, 163, 184, 0.18) !important;
+}
+
+/* Text colors. */
+html.dark .text-slate-950,
+html.dark .text-slate-900,
+html.dark .text-slate-800 {
+  color: #f1f5f9 !important;
+}
+
+html.dark .text-slate-700,
+html.dark .text-slate-600 {
+  color: #cbd5e1 !important;
+}
+
+html.dark .text-slate-500,
+html.dark .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
+/* Dark inputs/selects. */
+html.dark input,
+html.dark select,
+html.dark textarea {
+  background-color: rgba(15, 23, 42, 0.6);
+  color: #e2e8f0;
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #64748b;
+}
+
+/* Solid dark CTA buttons stay legible (bg-slate-950 -> emerald accent base). */
+html.dark .bg-slate-950 {
+  background-color: #047857 !important;
+}
+
+/* Light amber/emerald notice panels toned down for dark. */
+html.dark .bg-amber-50 {
+  background-color: rgba(120, 53, 15, 0.35) !important;
+}
+
+html.dark .bg-emerald-50 {
+  background-color: rgba(6, 78, 59, 0.4) !important;
 }

@@ -1,6 +1,10 @@
 import axios from "axios";
 import { pool } from "../../config/db";
 import {
+  createImportJob,
+  completeImportJob,
+} from "../importJob/importJob.model";
+import {
   normalizeProductTitle,
   upsertApiProduct,
 } from "../product/product.model";
@@ -172,6 +176,12 @@ export async function importFromActiveSources(): Promise<ImportResult> {
   let processedSources = 0;
 
   for (const source of sources) {
+    const job = await createImportJob({
+      store_id: source.store_id,
+      source_id: source.id,
+      job_type: "api",
+    });
+
     try {
       const products = await fetchProducts(source);
       let sourceImported = 0;
@@ -221,6 +231,13 @@ export async function importFromActiveSources(): Promise<ImportResult> {
         last_failed_count: sourceFailed,
       });
 
+      await completeImportJob(job.id, {
+        status,
+        imported_count: sourceImported,
+        updated_count: sourceUpdated,
+        failed_count: sourceFailed,
+      });
+
       processedSources += 1;
     } catch (error) {
       sourceErrors.push({
@@ -235,6 +252,14 @@ export async function importFromActiveSources(): Promise<ImportResult> {
         last_imported_count: 0,
         last_updated_count: 0,
         last_failed_count: 0,
+      });
+      await completeImportJob(job.id, {
+        status: "failed",
+        imported_count: 0,
+        updated_count: 0,
+        failed_count: 0,
+        error_message:
+          error instanceof Error ? error.message : "Unknown source failure",
       });
       console.error(
         `[aggregation] import failed for source ${source.id} (${source.url}):`,

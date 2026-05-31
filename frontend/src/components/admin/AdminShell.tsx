@@ -9,6 +9,7 @@ const navItems = [
   { href: "/admin", label: "Overview" },
   { href: "/admin/users", label: "Users" },
   { href: "/admin/vendors", label: "Vendors" },
+  { href: "/admin/reports", label: "Reports" },
 ];
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
@@ -68,7 +69,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 Admin Dashboard
               </p>
               <h1 className="mt-2 text-2xl font-semibold text-slate-950">
-                {pathname?.startsWith("/admin/vendors")
+                {pathname?.startsWith("/admin/reports")
+                  ? "Reports"
+                  : pathname?.startsWith("/admin/vendors")
                   ? "Vendors"
                   : pathname?.startsWith("/admin/users")
                     ? "Users"

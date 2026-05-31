@@ -3,6 +3,7 @@ import type { ProductListPayload, Product } from "@/types/catalog";
 import type {
   VendorProductInput,
   VendorStats,
+  VendorStoreProfile,
   VendorStoreSource,
   VendorScrapingSyncResult,
   VendorSyncResult,
@@ -88,5 +89,20 @@ export async function syncScrapingSource(
 ): Promise<VendorScrapingSyncResult> {
   return apiRequest<VendorScrapingSyncResult>(`/scraping/sync/${sourceId}`, {
     method: "POST",
+  });
+}
+
+export async function fetchVendorStoreProfile(): Promise<VendorStoreProfile> {
+  return apiRequest<VendorStoreProfile>("/vendor/store");
+}
+
+export async function updateVendorStoreProfile(payload: {
+  store_name?: string;
+  description?: string;
+  is_active?: boolean;
+}): Promise<VendorStoreProfile> {
+  return apiRequest<VendorStoreProfile>("/vendor/store", {
+    method: "PUT",
+    body: JSON.stringify(payload),
   });
 }

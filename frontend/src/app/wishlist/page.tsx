@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ProductList } from "@/components/ProductList";
 import { useAuth } from "@/hooks/useAuth";
 import { useWishlist } from "@/components/WishlistProvider";
 import { fetchWishlist, removeFromWishlist } from "@/services/wishlist.service";
+import { fetchPriceAlerts, setPriceAlert } from "@/services/priceAlert.service";
 import type { Product } from "@/types/catalog";
 
 export default function WishlistPage() {
@@ -18,6 +18,8 @@ export default function WishlistPage() {
   const [wishlistLoadingId, setWishlistLoadingId] = useState<number | null>(
     null,
   );
+  const [alertLoadingId, setAlertLoadingId] = useState<number | null>(null);
+  const [priceAlerts, setPriceAlerts] = useState<Record<number, boolean>>({});
 
   useEffect(() => {
     document.title = "Wishlist | Aggregator Market";
@@ -42,9 +44,15 @@ export default function WishlistPage() {
 
       try {
         const response = await fetchWishlist();
+        const alerts = await fetchPriceAlerts();
         if (active) {
           setItems(response.items ?? []);
           setCount(response.items?.length ?? 0);
+          setPriceAlerts(
+            Object.fromEntries(
+              alerts.items.map((alert) => [alert.product_id, alert.is_active]),
+            ),
+          );
         }
       } catch (err) {
         if (active) {
@@ -81,6 +89,22 @@ export default function WishlistPage() {
       );
     } finally {
       setWishlistLoadingId(null);
+    }
+  }
+
+  async function handleTogglePriceAlert(product: Product): Promise<void> {
+    setAlertLoadingId(product.id);
+    const nextActive = !priceAlerts[product.id];
+
+    try {
+      await setPriceAlert(product.id, nextActive);
+      setPriceAlerts((current) => ({ ...current, [product.id]: nextActive }));
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to update price alert",
+      );
+    } finally {
+      setAlertLoadingId(null);
     }
   }
 
@@ -125,15 +149,43 @@ export default function WishlistPage() {
           </p>
         </div>
       ) : (
-        <ProductList
-          products={items}
-          loading={loadingItems}
-          error={null}
-          compareList={[]}
-          onToggleCompare={() => undefined}
-          onToggleWishlist={handleToggleWishlist}
-          wishlistLoadingId={wishlistLoadingId}
-        />
+        <div className="space-y-4">
+          {items.map((product) => (
+            <div
+              key={product.id}
+              className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-black/10 bg-white/80 px-4 py-3"
+            >
+              <div>
+                <p className="font-semibold text-slate-950">{product.name}</p>
+                <p className="text-sm text-emerald-700">${product.price}</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleTogglePriceAlert(product)}
+                  disabled={alertLoadingId === product.id}
+                  className={`rounded-full px-4 py-2 text-sm font-semibold ${
+                    priceAlerts[product.id]
+                      ? "bg-emerald-100 text-emerald-800"
+                      : "border border-black/10 text-slate-700"
+                  }`}
+                >
+                  {priceAlerts[product.id]
+                    ? "Price tracking on"
+                    : "Track price"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleToggleWishlist(product)}
+                  disabled={wishlistLoadingId === product.id}
+                  className="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-rose-700"
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       )}
     </section>
   );

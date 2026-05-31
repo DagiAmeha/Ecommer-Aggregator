@@ -4,6 +4,8 @@ import {
   findStoreSourceByStoreAndType,
   updateStoreSource,
 } from "../store/store_source.model";
+import { updateStore } from "../store/store.service";
+import { listImportJobsByStore } from "../importJob/importJob.model";
 import {
   createVendorProduct,
   deleteVendorProduct,
@@ -143,4 +145,47 @@ export async function updateVendorStoreSource(
   }
 
   return getVendorStoreSourceType(userId);
+}
+
+export async function getVendorStoreProfile(userId: number) {
+  const store = await getStoreByOwnerId(userId);
+  if (!store) {
+    throw new Error("Vendor store not found");
+  }
+
+  const importJobs = await listImportJobsByStore(store.id, 5);
+
+  return {
+    id: store.id,
+    store_name: store.store_name,
+    description: store.description,
+    is_active: store.is_active,
+    recent_import_jobs: importJobs,
+  };
+}
+
+export async function updateVendorStoreProfile(
+  userId: number,
+  payload: {
+    store_name?: string;
+    description?: string;
+    is_active?: boolean;
+  },
+) {
+  const store = await getStoreByOwnerId(userId);
+  if (!store) {
+    throw new Error("Vendor store not found");
+  }
+
+  const updated = await updateStore(store.id, payload);
+  if (!updated) {
+    throw new Error("Failed to update store");
+  }
+
+  return {
+    id: updated.id,
+    store_name: updated.store_name,
+    description: updated.description,
+    is_active: updated.is_active,
+  };
 }

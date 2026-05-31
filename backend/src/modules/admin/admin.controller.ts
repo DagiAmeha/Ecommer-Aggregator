@@ -11,6 +11,7 @@ import {
   deleteUserAccount,
   ensureTargetNotSelf,
   getAdminStats,
+  getAdminReports,
   getAdminUserById,
   listAdminUsers,
   reactivateUserAccount,
@@ -218,6 +219,19 @@ export async function getAdminStatsHandler(
   try {
     const stats = await getAdminStats();
     sendSuccess(res, stats);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getAdminReportsHandler(
+  _req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const reports = await getAdminReports();
+    sendSuccess(res, reports);
   } catch (error) {
     next(error);
   }

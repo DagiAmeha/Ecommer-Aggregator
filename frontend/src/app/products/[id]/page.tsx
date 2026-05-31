@@ -19,6 +19,9 @@ import { fetchMyProfile } from "@/services/user.service";
 import type { UserProfile } from "@/services/user.service";
 import { useWishlist } from "@/components/WishlistProvider";
 import { addToWishlist, removeFromWishlist } from "@/services/wishlist.service";
+import { recordProductEvent } from "@/services/analytics.service";
+import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
+import { RecentlyViewed } from "@/components/RecentlyViewed";
 
 function formatPrice(value: number): string {
   return new Intl.NumberFormat("en-US", {
@@ -47,6 +50,7 @@ export default function ProductDetailPage() {
   const productId = Number(params?.id);
   const { user } = useAuth();
   const { setCount } = useWishlist();
+  const { recordView } = useRecentlyViewed();
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedOffers, setRelatedOffers] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -118,6 +122,18 @@ export default function ProductDetailPage() {
         console.log("Fetched product detail:", response);
         setProduct(data);
 
+        recordView({
+          id: data.id,
+          name: data.name,
+          price: data.price,
+          image_url: data.image_url,
+        });
+
+        void recordProductEvent({
+          event_type: "view",
+          product_id: data.id,
+        }).catch(() => undefined);
+
         try {
           const offers = await fetchRelatedOffers(data.id);
 
@@ -147,6 +163,7 @@ export default function ProductDetailPage() {
     return () => {
       active = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productId]);
 
   useEffect(() => {
@@ -321,6 +338,11 @@ export default function ProductDetailPage() {
                   {formatPrice(product.price)}
                 </span>
                 <span className="rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700">
+                  {(product.stock_quantity ?? 0) > 0
+                    ? "In stock"
+                    : "Out of stock"}
+                </span>
+                <span className="rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700">
                   Sold by {product.store?.name ?? "Unknown"}
                 </span>
                 <button
@@ -400,6 +422,12 @@ export default function ProductDetailPage() {
                   href={product.product_url}
                   target="_blank"
                   rel="noreferrer"
+                  onClick={() => {
+                    void recordProductEvent({
+                      event_type: "click",
+                      product_id: product.id,
+                    }).catch(() => undefined);
+                  }}
                   className="inline-flex w-fit items-center justify-center rounded-full bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
                 >
                   Go to Store

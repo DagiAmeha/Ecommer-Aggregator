@@ -31,6 +31,9 @@ export function VendorProductForm({
   const [productUrl, setProductUrl] = useState(
     initialProduct?.product_url ?? "",
   );
+  const [stockQuantity, setStockQuantity] = useState(
+    initialProduct ? String(initialProduct.stock_quantity ?? 0) : "0",
+  );
   const isReady = useMemo(() => {
     return name.trim().length > 0 && price && categoryId;
   }, [categoryId, name, price]);
@@ -46,6 +49,7 @@ export function VendorProductForm({
       name: name.trim(),
       description: description.trim() || undefined,
       price: Number(price),
+      stock_quantity: Number(stockQuantity),
       category_id: Number(categoryId),
       image_url: imageUrl.trim() || undefined,
       product_url: productUrl.trim() || undefined,
@@ -77,6 +81,19 @@ export function VendorProductForm({
             className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-600"
             placeholder="0.00"
             required
+          />
+        </div>
+        <div className="space-y-2">
+          <label className="text-sm font-semibold text-slate-700">
+            Stock quantity
+          </label>
+          <input
+            type="number"
+            value={stockQuantity}
+            onChange={(event) => setStockQuantity(event.target.value)}
+            min={0}
+            step="1"
+            className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-600"
           />
         </div>
       </div>

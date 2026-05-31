@@ -1,4 +1,8 @@
 import axios from "axios";
+import {
+  createImportJob,
+  completeImportJob,
+} from "../importJob/importJob.model";
 import * as cheerio from "cheerio";
 import {
   normalizeProductTitle,
@@ -164,6 +168,12 @@ export async function syncScrapingSourceForVendor(
     throw new Error("Scraping source is disabled");
   }
 
+  const job = await createImportJob({
+    store_id: source.store_id,
+    source_id: source.id,
+    job_type: "scraping",
+  });
+
   const items = await fetchBooksFromSource(source, options);
 
   let importedCount = 0;
@@ -175,7 +185,7 @@ export async function syncScrapingSourceForVendor(
       const normalizedTitle = normalizeProductTitle(item.name);
       const action = await upsertApiProduct({
         name: normalizedTitle,
-        description: item.availability ?? null,
+        description: item.availability ?? undefined,
         price: item.price,
         category: DEFAULT_CATEGORY,
         store_id: source.store_id,
@@ -183,6 +193,8 @@ export async function syncScrapingSourceForVendor(
         product_url: item.product_url,
         external_id: item.external_id,
         source: "scraping",
+        stock_quantity:
+          item.availability?.toLowerCase().includes("in stock") ? 1 : 0,
       });
 
       if (action.action === "imported") {
@@ -211,6 +223,13 @@ export async function syncScrapingSourceForVendor(
     last_imported_count: importedCount,
     last_updated_count: updatedCount,
     last_failed_count: failedCount,
+  });
+
+  await completeImportJob(job.id, {
+    status,
+    imported_count: importedCount,
+    updated_count: updatedCount,
+    failed_count: failedCount,
   });
 
   return {

@@ -9,7 +9,7 @@ import {
   updateAdminUserRole,
 } from "@/services/admin.service";
 import { fetchMyProfile } from "@/services/user.service";
-import type { AdminUser } from "@/types/admin";
+import type { AdminUser, AdminUserRole } from "@/types/admin";
 
 function formatDate(value: string): string {
   const date = new Date(value);
@@ -168,7 +168,7 @@ export default function AdminUsersPage() {
     try {
       const updated = await updateAdminUserRole(
         user.id,
-        nextRole as AdminUser["role"],
+        nextRole as AdminUserRole,
       );
       setUsers((current) =>
         current.map((item) => (item.id === updated.id ? updated : item)),

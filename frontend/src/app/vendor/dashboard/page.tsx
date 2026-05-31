@@ -130,10 +130,37 @@ export default function VendorDashboardPage() {
         </div>
         <div className="rounded-3xl border border-black/10 bg-white p-5 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
           <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
+            Product Views
+          </p>
+          <p className="mt-3 text-3xl font-semibold text-slate-950">
+            {stats?.total_views ?? 0}
+          </p>
+        </div>
+        <div className="rounded-3xl border border-black/10 bg-white p-5 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+          <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
+            Low Stock Items
+          </p>
+          <p className="mt-3 text-3xl font-semibold text-amber-600">
+            {stats?.low_stock_products ?? 0}
+          </p>
+        </div>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-3">
+        <div className="rounded-3xl border border-black/10 bg-white p-5 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+          <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
             Total Categories
           </p>
           <p className="mt-3 text-3xl font-semibold text-slate-950">
             {stats?.total_categories ?? 0}
+          </p>
+        </div>
+        <div className="rounded-3xl border border-black/10 bg-white p-5 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+          <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
+            Store Clicks
+          </p>
+          <p className="mt-3 text-3xl font-semibold text-slate-950">
+            {stats?.total_clicks ?? 0}
           </p>
         </div>
         <div className="rounded-3xl border border-black/10 bg-white p-5 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">

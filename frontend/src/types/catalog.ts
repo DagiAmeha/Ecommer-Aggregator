@@ -42,6 +42,8 @@ export interface Product {
   review_count: number;
   rating_source: RatingSource;
   is_wishlisted: boolean;
+  stock_quantity: number;
+  price_alert_active?: boolean;
 }
 
 export interface ProductListPayload {
@@ -63,6 +65,13 @@ export interface Offer {
   url?: string;
 }
 
+export type ProductSort =
+  | "newest"
+  | "price_asc"
+  | "price_desc"
+  | "rating"
+  | "popularity";
+
 export interface ProductFilters {
   search?: string;
   category?: string;
@@ -71,4 +80,5 @@ export interface ProductFilters {
   max_price?: number;
   page?: number;
   limit?: number;
+  sort?: ProductSort;
 }

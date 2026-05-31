@@ -5,8 +5,10 @@ import {
   deleteVendorProductHandler,
   getVendorDashboardStatsHandler,
   getVendorProductHandler,
+  getVendorStoreProfileHandler,
   getVendorStoreSourceTypeHandler,
   listVendorProductsHandler,
+  updateVendorStoreProfileHandler,
   updateVendorStoreSourceHandler,
   updateVendorProductHandler,
 } from "./vendor.controller";
@@ -21,6 +23,8 @@ vendorRouter.post("/products", createVendorProductHandler);
 vendorRouter.put("/products/:id", updateVendorProductHandler);
 vendorRouter.delete("/products/:id", deleteVendorProductHandler);
 vendorRouter.get("/dashboard/stats", getVendorDashboardStatsHandler);
+vendorRouter.get("/store", getVendorStoreProfileHandler);
+vendorRouter.put("/store", updateVendorStoreProfileHandler);
 vendorRouter.get("/store/source", getVendorStoreSourceTypeHandler);
 vendorRouter.put("/store/source", updateVendorStoreSourceHandler);
 

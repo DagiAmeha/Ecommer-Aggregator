@@ -78,6 +78,7 @@ export async function searchProducts(
     limit: (filters as any).limit,
     min_price: (filters as any).min_price,
     max_price: (filters as any).max_price,
+    sort: (filters as any).sort,
   };
 
   const page =
