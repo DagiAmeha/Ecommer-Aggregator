@@ -181,7 +181,7 @@ export default function VendorDashboardPage() {
             </p>
             <span
               className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                storeSource?.source_type !== "manual" && storeSource.is_active
+                storeSource?.source_type !== "manual" && storeSource?.is_active
                   ? "bg-emerald-100 text-emerald-700"
                   : storeSource?.source_type !== "manual"
                     ? "bg-amber-100 text-amber-700"
@@ -189,11 +189,11 @@ export default function VendorDashboardPage() {
               }`}
             >
               {storeSource?.source_type === "scraping"
-                ? storeSource.is_active
+                ? storeSource?.is_active
                   ? "Scraping Active"
                   : "Scraping Disabled"
                 : storeSource?.source_type === "api"
-                  ? storeSource.is_active
+                  ? storeSource?.is_active
                     ? "API Active"
                     : "API Disabled"
                   : "Manual"}
