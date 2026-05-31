@@ -17,10 +17,17 @@ export interface VendorStats {
 
 export interface VendorStoreSource {
   store_id: number;
-  source_type: "manual" | "api";
+  source_type: "manual" | "api" | "scraping";
+  source_id?: number | null;
+  source_name?: string | null;
   url?: string | null;
   is_active?: boolean;
   created_at?: string | null;
+  last_sync_at?: string | null;
+  last_sync_status?: "idle" | "success" | "partial" | "failed" | null;
+  last_imported_count?: number | null;
+  last_updated_count?: number | null;
+  last_failed_count?: number | null;
 }
 
 export interface VendorSyncResult {
@@ -36,4 +43,10 @@ export interface VendorSyncResult {
     url: string;
     error: string;
   }>;
+}
+
+export interface VendorScrapingSyncResult {
+  imported_products: number;
+  updated_products: number;
+  failed_products: number;
 }

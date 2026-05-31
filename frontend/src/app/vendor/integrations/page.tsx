@@ -4,10 +4,15 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   fetchVendorStoreSource,
+  syncScrapingSource,
   syncVendorProducts,
   updateVendorStoreSource,
 } from "@/services/vendor.service";
-import type { VendorStoreSource, VendorSyncResult } from "@/types/vendor";
+import type {
+  VendorScrapingSyncResult,
+  VendorStoreSource,
+  VendorSyncResult,
+} from "@/types/vendor";
 
 function formatTimestamp(value: string | null | undefined): string {
   if (!value) {
@@ -64,6 +69,24 @@ function isValidUrl(value: string): boolean {
   }
 }
 
+function renderSyncStatus(
+  status: VendorStoreSource["last_sync_status"],
+): string {
+  if (!status || status === "idle") {
+    return "Not run";
+  }
+
+  if (status === "partial") {
+    return "Partial";
+  }
+
+  if (status === "failed") {
+    return "Failed";
+  }
+
+  return "Success";
+}
+
 export default function VendorIntegrationsPage() {
   const [source, setSource] = useState<VendorStoreSource | null>(null);
   const [loading, setLoading] = useState(true);
@@ -71,11 +94,17 @@ export default function VendorIntegrationsPage() {
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [syncing, setSyncing] = useState(false);
-  const [syncResult, setSyncResult] = useState<VendorSyncResult | null>(null);
+  const [syncResult, setSyncResult] = useState<
+    VendorSyncResult | VendorScrapingSyncResult | null
+  >(null);
   const [syncError, setSyncError] = useState<string | null>(null);
-  const [apiUrl, setApiUrl] = useState("");
+  const [sourceUrl, setSourceUrl] = useState("");
   const [isActive, setIsActive] = useState(false);
   const [lastSyncAt, setLastSyncAt] = useState<string | null>(null);
+  const [sourceType, setSourceType] = useState<"manual" | "api" | "scraping">(
+    "manual",
+  );
+  const [sourceName, setSourceName] = useState("");
 
   const statusLabel = useMemo(() => {
     if (!source || source.source_type === "manual") {
@@ -110,8 +139,11 @@ export default function VendorIntegrationsPage() {
         }
 
         setSource(response);
-        setApiUrl(response.url ?? "");
+        setSourceUrl(response.url ?? "");
         setIsActive(Boolean(response.is_active));
+        setSourceType(response.source_type ?? "manual");
+        setSourceName(response.source_name ?? "");
+        setLastSyncAt(response.last_sync_at ?? null);
       } catch (err) {
         if (active) {
           setError(
@@ -127,12 +159,6 @@ export default function VendorIntegrationsPage() {
       }
     }
 
-    const storedSyncAt =
-      typeof window !== "undefined"
-        ? window.localStorage.getItem("vendorLastSyncAt")
-        : null;
-
-    setLastSyncAt(storedSyncAt);
     loadSource();
 
     return () => {
@@ -144,21 +170,32 @@ export default function VendorIntegrationsPage() {
     setSaveMessage(null);
     setError(null);
 
-    const trimmedUrl = apiUrl.trim();
-    if (!trimmedUrl || !isValidUrl(trimmedUrl)) {
-      setError("Please enter a valid API URL before saving.");
-      return;
+    const trimmedUrl = sourceUrl.trim();
+    if (sourceType !== "manual") {
+      if (!trimmedUrl || !isValidUrl(trimmedUrl)) {
+        setError("Please enter a valid URL before saving.");
+        return;
+      }
+
+      const hostname = new URL(trimmedUrl).hostname;
+      if (sourceType === "scraping" && hostname !== "books.toscrape.com") {
+        setError("Scraping is restricted to books.toscrape.com.");
+        return;
+      }
     }
 
     setSaving(true);
 
     try {
       const updated = await updateVendorStoreSource({
-        url: trimmedUrl,
-        is_active: isActive,
+        source_type: sourceType,
+        url: sourceType === "manual" ? undefined : trimmedUrl,
+        is_active: sourceType === "manual" ? false : isActive,
+        source_name: sourceName.trim() || undefined,
       });
 
       setSource(updated);
+      setLastSyncAt(updated.last_sync_at ?? null);
       setSaveMessage("Configuration saved successfully.");
     } catch (err) {
       setError(
@@ -176,17 +213,21 @@ export default function VendorIntegrationsPage() {
     setSyncing(true);
 
     try {
-      const result = await syncVendorProducts();
-      const now = new Date().toISOString();
+      if (!source || source.source_type === "manual") {
+        setSyncError("No active source configured for syncing.");
+        return;
+      }
+
+      const result =
+        source.source_type === "scraping" && source.source_id
+          ? await syncScrapingSource(source.source_id)
+          : await syncVendorProducts();
 
       setSyncResult(result);
-      setLastSyncAt(now);
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem("vendorLastSyncAt", now);
-      }
 
       const refreshed = await fetchVendorStoreSource();
       setSource(refreshed);
+      setLastSyncAt(refreshed.last_sync_at ?? null);
     } catch (err) {
       setSyncError(
         err instanceof Error ? err.message : "Failed to sync products",
@@ -208,13 +249,19 @@ export default function VendorIntegrationsPage() {
     );
   }
 
+  const syncStatusLabel = renderSyncStatus(source?.last_sync_status ?? null);
+  const importedCount = source?.last_imported_count ?? 0;
+  const isManual = sourceType === "manual";
+  const syncActionLabel =
+    sourceType === "scraping" ? "Run Scraper" : "Sync Now";
+
   return (
     <div className="space-y-6">
       <div className="rounded-3xl border border-black/10 bg-white p-6 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
-              API Source Status
+              Ingestion Source Status
             </p>
             <h2 className="mt-2 text-xl font-semibold text-slate-950">
               Integration health and connection details
@@ -227,45 +274,68 @@ export default function VendorIntegrationsPage() {
           </span>
         </div>
 
-        <div className="mt-5 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-5 grid gap-4 md:grid-cols-2 lg:grid-cols-5">
           <div className="rounded-2xl border border-black/5 bg-slate-50 px-4 py-3">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
               Source Type
             </p>
             <p className="mt-2 text-sm font-semibold text-slate-900">
-              {source?.source_type === "api" ? "API" : "Manual"}
+              {source?.source_type === "scraping"
+                ? "Scraping"
+                : source?.source_type === "api"
+                  ? "API"
+                  : "Manual"}
             </p>
           </div>
           <div className="rounded-2xl border border-black/5 bg-slate-50 px-4 py-3">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
-              API URL
+              {source?.source_type === "scraping" ? "Base URL" : "API URL"}
             </p>
             <p className="mt-2 text-sm font-semibold text-slate-900">
               {source?.url ? source.url : "Not configured"}
             </p>
           </div>
-          <div className="rounded-2xl border border-black/5 bg-slate-50 px-4 py-3">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
-              Last Sync
-            </p>
-            <p className="mt-2 text-sm font-semibold text-slate-900">
-              {formatRelativeTime(lastSyncAt)}
-            </p>
-            <p className="mt-1 text-xs text-slate-500">
-              {formatTimestamp(lastSyncAt)}
-            </p>
-          </div>
-          <div className="rounded-2xl border border-black/5 bg-slate-50 px-4 py-3">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
-              Manage Products
-            </p>
-            <Link
-              href="/vendor/products"
-              className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-emerald-700"
-            >
-              View products
-            </Link>
-          </div>
+          {!isManual ? (
+            <>
+              <div className="rounded-2xl border border-black/5 bg-slate-50 px-4 py-3">
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                  {sourceType === "scraping" ? "Scrape Status" : "Sync Status"}
+                </p>
+                <p className="mt-2 text-sm font-semibold text-slate-900">
+                  {syncStatusLabel}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-black/5 bg-slate-50 px-4 py-3">
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                  Imported Count
+                </p>
+                <p className="mt-2 text-sm font-semibold text-slate-900">
+                  {importedCount}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-black/5 bg-slate-50 px-4 py-3">
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                  Last Sync
+                </p>
+                <p className="mt-2 text-sm font-semibold text-slate-900">
+                  {formatRelativeTime(lastSyncAt)}
+                </p>
+                <p className="mt-1 text-xs text-slate-500">
+                  {formatTimestamp(lastSyncAt)}
+                </p>
+              </div>
+            </>
+          ) : null}
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-500">
+          <span>Manage Products:</span>
+          <Link
+            href="/vendor/products"
+            className="font-semibold text-emerald-700"
+          >
+            View products
+          </Link>
         </div>
       </div>
 
@@ -284,10 +354,10 @@ export default function VendorIntegrationsPage() {
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="rounded-3xl border border-black/10 bg-white p-6 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
           <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
-            API Configuration
+            Source Configuration
           </p>
           <h3 className="mt-2 text-lg font-semibold text-slate-950">
-            Configure your API source
+            Configure your ingestion source
           </h3>
           <p className="mt-2 text-sm text-slate-600">
             Provide the endpoint that returns your product feed and control
@@ -297,41 +367,88 @@ export default function VendorIntegrationsPage() {
           <div className="mt-4 space-y-4">
             <div className="space-y-2">
               <label className="text-sm font-semibold text-slate-700">
-                API URL
+                Source type
               </label>
-              <input
-                type="url"
-                value={apiUrl}
-                onChange={(event) => setApiUrl(event.target.value)}
+              <select
+                value={sourceType}
+                onChange={(event) => {
+                  const nextType = event.target.value as
+                    | "manual"
+                    | "api"
+                    | "scraping";
+                  setSourceType(nextType);
+                  if (nextType === "scraping") {
+                    setSourceUrl("https://books.toscrape.com/");
+                    setSourceName("BooksToScrape");
+                  }
+                }}
                 className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-600"
-                placeholder="https://your-store.com/api/products"
-              />
+              >
+                <option value="manual">Manual</option>
+                <option value="api">API feed</option>
+                <option value="scraping">Web scraping</option>
+              </select>
             </div>
 
-            <div className="flex items-center justify-between rounded-2xl border border-black/5 bg-slate-50 px-4 py-3">
-              <div>
-                <p className="text-sm font-semibold text-slate-700">
-                  Source Active
-                </p>
-                <p className="text-xs text-slate-500">
-                  Toggle to enable or disable API synchronization.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsActive((current) => !current)}
-                className={`relative h-8 w-14 rounded-full transition ${
-                  isActive ? "bg-emerald-500" : "bg-slate-300"
-                }`}
-                aria-pressed={isActive}
-              >
-                <span
-                  className={`absolute top-1 h-6 w-6 rounded-full bg-white shadow transition ${
-                    isActive ? "right-1" : "left-1"
-                  }`}
+            {sourceType !== "manual" ? (
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-slate-700">
+                  {sourceType === "scraping" ? "Base URL" : "API URL"}
+                </label>
+                <input
+                  type="url"
+                  value={sourceUrl}
+                  onChange={(event) => setSourceUrl(event.target.value)}
+                  className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-600"
+                  placeholder={
+                    sourceType === "scraping"
+                      ? "https://books.toscrape.com/"
+                      : "https://example.com/products.json"
+                  }
                 />
-              </button>
-            </div>
+              </div>
+            ) : null}
+
+            {sourceType === "scraping" ? (
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-slate-700">
+                  Source name
+                </label>
+                <input
+                  value={sourceName}
+                  onChange={(event) => setSourceName(event.target.value)}
+                  className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-600"
+                  placeholder="BooksToScrape"
+                />
+              </div>
+            ) : null}
+
+            {sourceType !== "manual" ? (
+              <div className="flex items-center justify-between rounded-2xl border border-black/5 bg-slate-50 px-4 py-3">
+                <div>
+                  <p className="text-sm font-semibold text-slate-700">
+                    Source Active
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    Toggle to enable or disable source synchronization.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsActive((current) => !current)}
+                  className={`relative h-8 w-14 rounded-full transition ${
+                    isActive ? "bg-emerald-500" : "bg-slate-300"
+                  }`}
+                  aria-pressed={isActive}
+                >
+                  <span
+                    className={`absolute top-1 h-6 w-6 rounded-full bg-white shadow transition ${
+                      isActive ? "right-1" : "left-1"
+                    }`}
+                  />
+                </button>
+              </div>
+            ) : null}
 
             <button
               type="button"
@@ -345,26 +462,35 @@ export default function VendorIntegrationsPage() {
         </div>
 
         <div className="space-y-4">
-          <div className="rounded-3xl border border-black/10 bg-white p-6 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
-            <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
-              Sync Now
-            </p>
-            <h3 className="mt-2 text-lg font-semibold text-slate-950">
-              Trigger a manual product sync
-            </h3>
-            <p className="mt-2 text-sm text-slate-600">
-              This will fetch products from your configured API and import any
-              updates.
-            </p>
-            <button
-              type="button"
-              onClick={handleSync}
-              disabled={syncing}
-              className="mt-4 w-full rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {syncing ? "Syncing products..." : "Sync Products Now"}
-            </button>
-          </div>
+          {!isManual ? (
+            <div className="rounded-3xl border border-black/10 bg-white p-6 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+              <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
+                {sourceType === "scraping" ? "Run Scraper" : "Sync Now"}
+              </p>
+              <h3 className="mt-2 text-lg font-semibold text-slate-950">
+                {sourceType === "scraping"
+                  ? "Run a scraping sync"
+                  : "Trigger a manual product sync"}
+              </h3>
+              <p className="mt-2 text-sm text-slate-600">
+                This will fetch products from your configured source and import
+                any updates.
+              </p>
+              <button
+                type="button"
+                onClick={handleSync}
+                disabled={syncing}
+                className="mt-4 w-full rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {syncing ? "Syncing products..." : syncActionLabel}
+              </button>
+            </div>
+          ) : (
+            <div className="rounded-3xl border border-black/10 bg-white p-6 text-sm text-slate-600 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+              Manual stores do not use automated sync. Add products directly
+              from the products page.
+            </div>
+          )}
 
           {syncError ? (
             <div className="rounded-3xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
@@ -375,16 +501,23 @@ export default function VendorIntegrationsPage() {
           {syncResult ? (
             <div className="rounded-3xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-700">
               <p className="text-xs uppercase tracking-[0.2em] text-emerald-600">
-                Last Sync Result
+                {sourceType === "scraping"
+                  ? "Last Scrape Result"
+                  : "Last Sync Result"}
               </p>
               <div className="mt-3 grid gap-2 text-sm">
                 <p>Imported Products: {syncResult.imported_products}</p>
                 <p>Updated Products: {syncResult.updated_products}</p>
                 <p>Failed Products: {syncResult.failed_products}</p>
-                <p>Sources Processed: {syncResult.sources_processed}</p>
-                <p>Sources Failed: {syncResult.sources_failed}</p>
+                {"sources_processed" in syncResult ? (
+                  <>
+                    <p>Sources Processed: {syncResult.sources_processed}</p>
+                    <p>Sources Failed: {syncResult.sources_failed}</p>
+                  </>
+                ) : null}
               </div>
-              {syncResult.source_errors.length > 0 ? (
+              {"source_errors" in syncResult &&
+              syncResult.source_errors.length > 0 ? (
                 <div className="mt-3 rounded-2xl border border-emerald-200 bg-white/70 p-3 text-xs text-emerald-700">
                   <p className="font-semibold">Errors</p>
                   <ul className="mt-2 space-y-1">
@@ -401,18 +534,20 @@ export default function VendorIntegrationsPage() {
         </div>
       </div>
 
-      <div className="rounded-3xl border border-black/10 bg-slate-950 px-6 py-5 text-white shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
-        <p className="text-xs uppercase tracking-[0.28em] text-white/60">
-          API Managed Products
-        </p>
-        <h3 className="mt-2 text-lg font-semibold">
-          Products are automatically synced from your API
-        </h3>
-        <p className="mt-2 text-sm text-white/70">
-          This store uses API-based synchronization. Products are imported from
-          the configured endpoint and cannot be manually created.
-        </p>
-      </div>
+      {sourceType !== "manual" ? (
+        <div className="rounded-2xl border border-black/10 bg-slate-950 px-6 py-5 text-white shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+          <p className="text-xs uppercase tracking-[0.28em] text-white/60">
+            Source Managed Products
+          </p>
+          <h3 className="mt-2 text-lg font-semibold">
+            Products are automatically synced from your source
+          </h3>
+          <p className="mt-2 text-sm text-white/70">
+            This store uses automated synchronization. Products are imported
+            from the configured source and cannot be manually created.
+          </p>
+        </div>
+      ) : null}
     </div>
   );
 }

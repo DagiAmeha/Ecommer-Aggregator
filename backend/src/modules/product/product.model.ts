@@ -13,7 +13,7 @@ export interface Vendor {
   store_name: string;
 }
 
-export type ProductSource = "manual" | "api";
+export type ProductSource = "manual" | "api" | "scraping";
 export type RatingSource = "internal" | "external";
 
 export interface ProductRelation {
@@ -685,7 +685,7 @@ export async function findProductByStoreAndExternalId(
   externalId: string,
 ): Promise<Product | null> {
   const result = await buildProductSelectQuery(
-    "WHERE p.store_id = $1 AND p.external_id = $2 AND p.source = 'api'",
+    "WHERE p.store_id = $1 AND p.external_id = $2",
     [storeId, externalId],
   );
 
@@ -703,7 +703,10 @@ async function resolveCategoryId(name: string): Promise<number> {
 }
 
 export async function upsertApiProduct(
-  payload: Omit<CreateProductInput, "source"> & { external_id: string },
+  payload: Omit<CreateProductInput, "source"> & {
+    external_id: string;
+    source?: ProductSource;
+  },
 ): Promise<{ product: Product; action: "imported" | "updated" }> {
   const store = await getStoreById(payload.store_id);
   if (!store) {
@@ -712,6 +715,7 @@ export async function upsertApiProduct(
 
   const categoryId = await resolveCategoryId(payload.category);
   const externalId = String(payload.external_id);
+  const source = payload.source ?? "api";
   const existing = await findProductByStoreAndExternalId(
     payload.store_id,
     externalId,
@@ -730,9 +734,10 @@ export async function upsertApiProduct(
           product_url = $6,
           external_rating_rate = $7,
           external_rating_count = $8,
+          source = $9,
           updated_at = NOW(),
           last_synced_at = NOW()
-        WHERE id = $7
+        WHERE id = $10
         RETURNING id
       `,
       [
@@ -744,6 +749,7 @@ export async function upsertApiProduct(
         payload.product_url ?? "https://jiji.com.et/",
         payload.external_rating_rate ?? null,
         payload.external_rating_count ?? null,
+        source,
         existing.id,
       ],
     );
@@ -772,7 +778,7 @@ export async function upsertApiProduct(
         external_rating_count,
         last_synced_at
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, 'api', $8, $9, $10, NOW())
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW())
       RETURNING id
     `,
     [
@@ -783,6 +789,7 @@ export async function upsertApiProduct(
       payload.store_id,
       payload.image_url ?? null,
       payload.product_url ?? "https://jiji.com.et/",
+      source,
       externalId,
       payload.external_rating_rate ?? null,
       payload.external_rating_count ?? null,

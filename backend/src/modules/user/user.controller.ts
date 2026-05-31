@@ -77,7 +77,7 @@ export async function registerUserHandler(
           email: decodedToken.email,
           full_name: fullName,
           phone_number: payload.phone_number,
-          role: payload.role ?? "user",
+          role: "user",
           provider: "google",
           profile_image: decodedToken.picture ?? null,
         });
@@ -176,7 +176,16 @@ export async function updateMyProfileHandler(
     }
 
     const payload = updateMyProfileSchema.parse(req.body);
-    const updatedUser = await updateUserProfileRecord(currentUser.id, payload);
+    const { password, ...profilePayload } = payload;
+
+    if (password) {
+      await firebaseAuth.updateUser(currentUser.firebase_uid, { password });
+    }
+
+    const updatedUser = await updateUserProfileRecord(
+      currentUser.id,
+      profilePayload,
+    );
 
     if (!updatedUser) {
       sendError(res, "User not found", 404);

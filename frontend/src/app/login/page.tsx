@@ -58,7 +58,10 @@ function getAuthMessage(error: unknown, fallback: string): string {
         if (message.includes("invalid token")) {
           return "Your session expired. Please try again.";
         }
-        if (message.includes("network") || message.includes("failed to fetch")) {
+        if (
+          message.includes("network") ||
+          message.includes("failed to fetch")
+        ) {
           return "Network error. Check your connection and try again.";
         }
         return error.message;
@@ -123,7 +126,13 @@ export default function LoginPage() {
         typeof profile.role === "string"
           ? profile.role
           : (profile.role as { value?: string } | undefined)?.value;
-      router.push(role === "vendor" ? "/vendor/dashboard" : "/products");
+      if (role === "admin") {
+        router.push("/admin");
+      } else if (role === "vendor") {
+        router.push("/vendor/dashboard");
+      } else {
+        router.push("/products");
+      }
     } catch (err) {
       setError(getAuthMessage(err, "Login failed"));
     } finally {
@@ -158,7 +167,13 @@ export default function LoginPage() {
           : (response.user?.role as { value?: string } | undefined)?.value;
       const role = roleValue ?? fallbackRole;
 
-      router.push(role === "vendor" ? "/vendor/dashboard" : "/products");
+      if (role === "admin") {
+        router.push("/admin");
+      } else if (role === "vendor") {
+        router.push("/vendor/dashboard");
+      } else {
+        router.push("/products");
+      }
     } catch (err) {
       setError(getAuthMessage(err, "Google sign-in failed"));
     } finally {

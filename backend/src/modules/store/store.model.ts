@@ -41,10 +41,13 @@ export async function createStoreRecord(
     ],
   );
 
-  if (data.source_type === "api" && data.url) {
+  if (
+    (data.source_type === "api" || data.source_type === "scraping") &&
+    data.url
+  ) {
     await createStoreSource({
       store_id: result.rows[0].id,
-      type: "api",
+      type: data.source_type,
       url: data.url,
       is_active: true,
     });

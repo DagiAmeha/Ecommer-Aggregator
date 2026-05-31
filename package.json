@@ -9,5 +9,8 @@
     "build:backend": "npm --prefix backend run build",
     "typecheck:frontend": "npm --prefix frontend run lint",
     "typecheck:backend": "npm --prefix backend run typecheck"
+  },
+  "dependencies": {
+    "cheerio": "^1.2.0"
   }
 }

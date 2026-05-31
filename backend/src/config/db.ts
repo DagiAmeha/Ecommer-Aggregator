@@ -26,6 +26,8 @@ export async function initDb(): Promise<void> {
       role VARCHAR(50) DEFAULT 'user',
       provider VARCHAR(50) DEFAULT 'password',
       profile_image TEXT,
+      status VARCHAR(20) DEFAULT 'active',
+      deleted_at TIMESTAMPTZ,
       created_at TIMESTAMPTZ DEFAULT NOW()
     );
   `);
@@ -33,7 +35,9 @@ export async function initDb(): Promise<void> {
   await pool.query(`
     ALTER TABLE users
       ADD COLUMN IF NOT EXISTS provider VARCHAR(50) DEFAULT 'password',
-      ADD COLUMN IF NOT EXISTS profile_image TEXT;
+      ADD COLUMN IF NOT EXISTS profile_image TEXT,
+      ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active',
+      ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
   `);
 
   // 2. Categories Table
@@ -122,16 +126,16 @@ export async function initDb(): Promise<void> {
           ORDER BY updated_at DESC, created_at DESC, id DESC
         ) AS row_rank
       FROM products
-      WHERE source = 'api' AND external_id IS NOT NULL
+      WHERE source IN ('api', 'scraping') AND external_id IS NOT NULL
     )
     DELETE FROM products
     WHERE id IN (SELECT id FROM ranked WHERE row_rank > 1);
   `);
 
   await pool.query(`
-    CREATE UNIQUE INDEX IF NOT EXISTS idx_products_store_external_api
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_products_store_external_external
       ON products (store_id, external_id)
-      WHERE source = 'api' AND external_id IS NOT NULL;
+      WHERE external_id IS NOT NULL AND source IN ('api', 'scraping');
   `);
 
   // 5. Store Sources Table (Store can have multiple ingestion sources)
@@ -142,14 +146,33 @@ export async function initDb(): Promise<void> {
       type VARCHAR(50) NOT NULL,
       url TEXT NOT NULL,
       is_active BOOLEAN NOT NULL DEFAULT true,
+      source_name VARCHAR(255),
+      last_sync_at TIMESTAMPTZ,
+      last_sync_status VARCHAR(30),
+      last_imported_count INTEGER,
+      last_updated_count INTEGER,
+      last_failed_count INTEGER,
       created_at TIMESTAMPTZ DEFAULT NOW(),
       UNIQUE (store_id, type, url)
     );
   `);
 
+  await pool.query(`
+    ALTER TABLE store_sources
+      ADD COLUMN IF NOT EXISTS source_name VARCHAR(255),
+      ADD COLUMN IF NOT EXISTS last_sync_at TIMESTAMPTZ,
+      ADD COLUMN IF NOT EXISTS last_sync_status VARCHAR(30),
+      ADD COLUMN IF NOT EXISTS last_imported_count INTEGER,
+      ADD COLUMN IF NOT EXISTS last_updated_count INTEGER,
+      ADD COLUMN IF NOT EXISTS last_failed_count INTEGER;
+  `);
+
   // 6. Performance Indexes
   await pool.query(`
     CREATE INDEX IF NOT EXISTS idx_users_firebase_uid ON users(firebase_uid);
+    CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+    CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
+    CREATE INDEX IF NOT EXISTS idx_users_status ON users(status);
     CREATE INDEX IF NOT EXISTS idx_products_category ON products(category_id);
     CREATE INDEX IF NOT EXISTS idx_products_store ON products(store_id);
     CREATE INDEX IF NOT EXISTS idx_store_sources_store_id ON store_sources(store_id);

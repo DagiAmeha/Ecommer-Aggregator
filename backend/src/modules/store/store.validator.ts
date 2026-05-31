@@ -6,21 +6,21 @@ export const createStoreSchema = z
     store_name: z.string().trim().min(1, "store_name is required"),
     description: z.string().optional(),
     is_active: z.boolean().optional(),
-    source_type: z.enum(["api", "manual"], {
-      message: "source_type must be either 'api' or 'manual'",
+    source_type: z.enum(["api", "manual", "scraping"], {
+      message: "source_type must be either 'api', 'manual', or 'scraping'",
     }),
     url: z.string().url("Invalid URL format").optional(),
   })
   .refine(
     (data) => {
-      if (data.source_type === "api") {
+      if (data.source_type === "api" || data.source_type === "scraping") {
         // Returns true only if url is present and not an empty string
         return !!data.url && data.url.trim().length > 0;
       }
       return true;
     },
     {
-      message: "URL is required when source_type is 'api'",
+      message: "URL is required when source_type is 'api' or 'scraping'",
       path: ["url"], // This attaches the error specifically to the url field
     },
   );

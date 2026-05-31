@@ -11,6 +11,7 @@ import {
   findActiveApiSources,
   findStoreSourceByStoreAndUrl,
   StoreSource,
+  updateStoreSourceSyncStatus,
 } from "../store/store_source.model";
 import { createUserRecord, getUserByEmail } from "../user/user.service";
 
@@ -123,6 +124,7 @@ async function upsertImportedProduct(
     external_rating_count: externalRatingCount,
     product_url:
       "https://jiji.com.et/bole/audio-and-music-equipment/sanen-sa200a-40w-outdoor-indoor-wireless-speaker-dj4rfg5Zcjt2yR32UK1OxWcH.html?page=1&pos=1&cur_pos=1&ads_per_page=23&ads_count=3937&lid=V3KJIBF5o0c6S9Pl&indexPosition=0",
+    source: "api",
   });
 
   return result.action;
@@ -172,6 +174,9 @@ export async function importFromActiveSources(): Promise<ImportResult> {
   for (const source of sources) {
     try {
       const products = await fetchProducts(source);
+      let sourceImported = 0;
+      let sourceUpdated = 0;
+      let sourceFailed = 0;
 
       for (const product of products) {
         const apiProduct: FakeStoreApiProduct = {
@@ -187,17 +192,34 @@ export async function importFromActiveSources(): Promise<ImportResult> {
 
           if (action === "imported") {
             importedCount += 1;
+            sourceImported += 1;
           } else {
             updatedCount += 1;
+            sourceUpdated += 1;
           }
         } catch (error) {
           failedCount += 1;
+          sourceFailed += 1;
           console.error(
             `[aggregation] product upsert failed for source ${source.id} (${source.url}):`,
             error,
           );
         }
       }
+
+      const status =
+        sourceFailed > 0 && sourceImported + sourceUpdated > 0
+          ? "partial"
+          : sourceFailed > 0
+            ? "failed"
+            : "success";
+
+      await updateStoreSourceSyncStatus(source.id, {
+        last_sync_status: status,
+        last_imported_count: sourceImported,
+        last_updated_count: sourceUpdated,
+        last_failed_count: sourceFailed,
+      });
 
       processedSources += 1;
     } catch (error) {
@@ -207,6 +229,12 @@ export async function importFromActiveSources(): Promise<ImportResult> {
         url: source.url,
         error:
           error instanceof Error ? error.message : "Unknown source failure",
+      });
+      await updateStoreSourceSyncStatus(source.id, {
+        last_sync_status: "failed",
+        last_imported_count: 0,
+        last_updated_count: 0,
+        last_failed_count: 0,
       });
       console.error(
         `[aggregation] import failed for source ${source.id} (${source.url}):`,

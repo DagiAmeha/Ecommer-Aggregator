@@ -8,6 +8,8 @@ import {
   updateUserProfile,
   updateUserRole,
   UpdateUserProfileInput,
+  updateUserStatus,
+  softDeleteUser,
   User,
   UserRole,
 } from "./user.model";
@@ -48,4 +50,15 @@ export async function updateUserRoleRecord(
   role: UserRole,
 ): Promise<User | null> {
   return updateUserRole(id, role);
+}
+
+export async function updateUserStatusRecord(
+  id: number,
+  status: "active" | "suspended",
+): Promise<User | null> {
+  return updateUserStatus(id, status);
+}
+
+export async function softDeleteUserRecord(id: number): Promise<User | null> {
+  return softDeleteUser(id);
 }

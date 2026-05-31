@@ -4,6 +4,7 @@ import type {
   VendorProductInput,
   VendorStats,
   VendorStoreSource,
+  VendorScrapingSyncResult,
   VendorSyncResult,
 } from "@/types/vendor";
 
@@ -65,7 +66,10 @@ export async function fetchVendorStoreSource(): Promise<VendorStoreSource> {
 }
 
 export async function updateVendorStoreSource(
-  payload: Pick<VendorStoreSource, "url" | "is_active">,
+  payload: Pick<
+    VendorStoreSource,
+    "source_type" | "url" | "is_active" | "source_name"
+  >,
 ): Promise<VendorStoreSource> {
   return apiRequest<VendorStoreSource>("/vendor/store/source", {
     method: "PUT",
@@ -75,6 +79,14 @@ export async function updateVendorStoreSource(
 
 export async function syncVendorProducts(): Promise<VendorSyncResult> {
   return apiRequest<VendorSyncResult>("/aggregation/import", {
+    method: "POST",
+  });
+}
+
+export async function syncScrapingSource(
+  sourceId: number,
+): Promise<VendorScrapingSyncResult> {
+  return apiRequest<VendorScrapingSyncResult>(`/scraping/sync/${sourceId}`, {
     method: "POST",
   });
 }

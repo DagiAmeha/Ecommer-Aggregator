@@ -19,7 +19,23 @@ export const vendorProductCreateSchema = z.object({
 
 export const vendorProductUpdateSchema = vendorProductCreateSchema.partial();
 
-export const vendorStoreSourceSchema = z.object({
-  url: z.string().url("url must be a valid URL"),
-  is_active: z.boolean(),
-});
+export const vendorStoreSourceSchema = z
+  .object({
+    source_type: z.enum(["manual", "api", "scraping"]),
+    url: z.string().url("url must be a valid URL").optional(),
+    is_active: z.boolean().optional(),
+    source_name: z.string().trim().min(1).optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.source_type === "manual") {
+        return true;
+      }
+
+      return Boolean(data.url && data.url.trim().length > 0);
+    },
+    {
+      message: "URL is required for API or scraping sources",
+      path: ["url"],
+    },
+  );

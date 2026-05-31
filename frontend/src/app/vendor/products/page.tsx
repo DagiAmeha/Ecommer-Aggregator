@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   deleteVendorProduct,
   fetchVendorProducts,
+  fetchVendorStoreSource,
 } from "@/services/vendor.service";
 import type { Product, Pagination } from "@/types/catalog";
 
@@ -39,6 +40,9 @@ export default function VendorProductsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [storeSourceType, setStoreSourceType] = useState<
+    "manual" | "api" | "scraping" | null
+  >(null);
 
   const totalPages = useMemo(() => {
     return Math.max(1, Math.ceil(pagination.total / pagination.limit));
@@ -83,6 +87,31 @@ export default function VendorProductsPage() {
     };
   }, [pagination.page, pagination.limit]);
 
+  useEffect(() => {
+    let active = true;
+
+    async function loadStoreSource() {
+      try {
+        const response = await fetchVendorStoreSource();
+        if (active) {
+          setStoreSourceType(response.source_type ?? null);
+        }
+      } catch {
+        if (active) {
+          setStoreSourceType(null);
+        }
+      }
+    }
+
+    loadStoreSource();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const showManualActions = storeSourceType === "manual";
+
   async function handleDelete(id: number) {
     setDeletingId(id);
 
@@ -120,13 +149,29 @@ export default function VendorProductsPage() {
             Manage your product catalog
           </h2>
         </div>
-        <Link
-          href="/vendor/products/create"
-          className="rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700"
-        >
-          Add product
-        </Link>
+        {showManualActions ? (
+          <Link
+            href="/vendor/products/create"
+            className="rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700"
+          >
+            Add product
+          </Link>
+        ) : (
+          <Link
+            href="/vendor/integrations"
+            className="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-emerald-700 hover:text-emerald-800"
+          >
+            Manage source
+          </Link>
+        )}
       </div>
+
+      {!showManualActions ? (
+        <div className="rounded-3xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-800">
+          Imported products are managed by your connected source. Use the
+          integrations page to run a sync or update configuration.
+        </div>
+      ) : null}
 
       {loading ? (
         <div className="h-64 animate-pulse rounded-3xl border border-black/10 bg-white/70" />
@@ -165,9 +210,11 @@ export default function VendorProductsPage() {
                   <th className="px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em]">
                     Created
                   </th>
-                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em]">
-                    Actions
-                  </th>
+                  {showManualActions ? (
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em]">
+                      Actions
+                    </th>
+                  ) : null}
                 </tr>
               </thead>
               <tbody>
@@ -200,12 +247,17 @@ export default function VendorProductsPage() {
                     <td className="px-4 py-3">
                       <span
                         className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
-                          product.source === "api"
+                          product.source === "api" ||
+                          product.source === "scraping"
                             ? "bg-emerald-100 text-emerald-700"
                             : "bg-slate-200 text-slate-700"
                         }`}
                       >
-                        {product.source === "api" ? "API" : "MANUAL"}
+                        {product.source === "api"
+                          ? "API"
+                          : product.source === "scraping"
+                            ? "SCRAPING"
+                            : "MANUAL"}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-xs text-slate-500">
@@ -214,24 +266,28 @@ export default function VendorProductsPage() {
                     <td className="px-4 py-3 text-slate-500">
                       {formatDate(product.created_at)}
                     </td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-wrap gap-2">
-                        <Link
-                          href={`/vendor/products/${product.id}`}
-                          className="rounded-full border border-black/10 px-3 py-1 text-xs font-semibold text-slate-700 transition hover:border-emerald-700 hover:text-emerald-800"
-                        >
-                          Edit
-                        </Link>
-                        <button
-                          type="button"
-                          disabled={deletingId === product.id}
-                          onClick={() => handleDelete(product.id)}
-                          className="rounded-full border border-rose-200 px-3 py-1 text-xs font-semibold text-rose-600 transition hover:border-rose-400 hover:text-rose-700 disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                          {deletingId === product.id ? "Deleting..." : "Delete"}
-                        </button>
-                      </div>
-                    </td>
+                    {showManualActions ? (
+                      <td className="px-4 py-3">
+                        <div className="flex flex-wrap gap-2">
+                          <Link
+                            href={`/vendor/products/${product.id}`}
+                            className="rounded-full border border-black/10 px-3 py-1 text-xs font-semibold text-slate-700 transition hover:border-emerald-700 hover:text-emerald-800"
+                          >
+                            Edit
+                          </Link>
+                          <button
+                            type="button"
+                            disabled={deletingId === product.id}
+                            onClick={() => handleDelete(product.id)}
+                            className="rounded-full border border-rose-200 px-3 py-1 text-xs font-semibold text-rose-600 transition hover:border-rose-400 hover:text-rose-700 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            {deletingId === product.id
+                              ? "Deleting..."
+                              : "Delete"}
+                          </button>
+                        </div>
+                      </td>
+                    ) : null}
                   </tr>
                 ))}
               </tbody>

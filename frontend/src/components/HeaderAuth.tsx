@@ -9,7 +9,6 @@ import { logout as firebaseLogout } from "@/services/auth.service";
 export default function HeaderAuth() {
   const { user, loading } = useAuth();
   const [fullName, setFullName] = useState<string | null>(null);
-  const [fetchingProfile, setFetchingProfile] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -20,7 +19,6 @@ export default function HeaderAuth() {
         return;
       }
 
-      setFetchingProfile(true);
       try {
         const profile = await apiRequest<{
           full_name?: string;
@@ -32,8 +30,6 @@ export default function HeaderAuth() {
         setFullName(profile.full_name ?? profile.email ?? null);
       } catch {
         if (active) setFullName(null);
-      } finally {
-        if (active) setFetchingProfile(false);
       }
     }
 
@@ -73,7 +69,7 @@ export default function HeaderAuth() {
           Login
         </Link>
         <Link
-          className="rounded-full bg-black px-4 py-2 !text-white transition hover:bg-slate-800"
+          className="rounded-full bg-black px-4 py-2 text-white transition hover:bg-slate-800"
           href="/register"
         >
           Register
@@ -101,13 +97,14 @@ export default function HeaderAuth() {
       >
         Logout
       </button>
-      <button
-        type="button"
+      <Link
         title={fullName ?? user.email ?? "User"}
+        href="/profile"
         className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-emerald-700 text-white"
+        aria-label="Profile"
       >
         {initial}
-      </button>
+      </Link>
     </>
   );
 }

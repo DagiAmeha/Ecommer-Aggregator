@@ -54,7 +54,6 @@ export default function VendorDashboardPage() {
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [lastSyncAt, setLastSyncAt] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -86,12 +85,6 @@ export default function VendorDashboardPage() {
       }
     }
 
-    const storedSyncAt =
-      typeof window !== "undefined"
-        ? window.localStorage.getItem("vendorLastSyncAt")
-        : null;
-
-    setLastSyncAt(storedSyncAt);
     loadStats();
 
     return () => {
@@ -119,6 +112,10 @@ export default function VendorDashboardPage() {
       </div>
     );
   }
+
+  const sourceType = storeSource?.source_type ?? "manual";
+  const isManual = sourceType === "manual";
+  const isScraping = sourceType === "scraping";
 
   return (
     <div className="space-y-6">
@@ -153,46 +150,63 @@ export default function VendorDashboardPage() {
         <div className="rounded-3xl border border-black/10 bg-white p-5 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
           <div className="flex items-center justify-between gap-3">
             <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
-              API Source
+              Ingestion Source
             </p>
             <span
               className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                storeSource?.source_type === "api" && storeSource.is_active
+                storeSource?.source_type !== "manual" && storeSource.is_active
                   ? "bg-emerald-100 text-emerald-700"
-                  : storeSource?.source_type === "api"
+                  : storeSource?.source_type !== "manual"
                     ? "bg-amber-100 text-amber-700"
                     : "bg-slate-200 text-slate-700"
               }`}
             >
-              {storeSource?.source_type === "api"
+              {storeSource?.source_type === "scraping"
                 ? storeSource.is_active
-                  ? "Active"
-                  : "Disabled"
-                : "Manual"}
+                  ? "Scraping Active"
+                  : "Scraping Disabled"
+                : storeSource?.source_type === "api"
+                  ? storeSource.is_active
+                    ? "API Active"
+                    : "API Disabled"
+                  : "Manual"}
             </span>
           </div>
           <p className="mt-3 text-sm font-semibold text-slate-950">
-            {storeSource?.url ? storeSource.url : "No API URL configured"}
+            {storeSource?.url ? storeSource.url : "No source configured"}
           </p>
           <Link
-            href="/vendor/integrations"
+            href={isManual ? "/vendor/products/create" : "/vendor/integrations"}
             className="mt-4 inline-flex items-center text-sm font-semibold text-emerald-700"
           >
-            Manage integration
+            {isManual ? "Add manual product" : "Manage integration"}
           </Link>
         </div>
-        <div className="rounded-3xl border border-black/10 bg-white p-5 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
-          <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
-            Sync Health
-          </p>
-          <p className="mt-3 text-2xl font-semibold text-slate-950">
-            {formatRelativeTime(lastSyncAt)}
-          </p>
-          <p className="mt-2 text-sm text-slate-500">
-            Use the integrations page to trigger a manual sync or review
-            results.
-          </p>
-        </div>
+        {isManual ? (
+          <div className="rounded-3xl border border-black/10 bg-white p-5 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+            <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
+              Manual Management
+            </p>
+            <p className="mt-3 text-2xl font-semibold text-slate-950">
+              Add, edit, and delete products
+            </p>
+            <p className="mt-2 text-sm text-slate-500">
+              Your catalog is managed manually without automated syncing.
+            </p>
+          </div>
+        ) : (
+          <div className="rounded-3xl border border-black/10 bg-white p-5 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+            <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
+              {isScraping ? "Scrape Health" : "Sync Health"}
+            </p>
+            <p className="mt-3 text-2xl font-semibold text-slate-950">
+              {formatRelativeTime(storeSource?.last_sync_at ?? null)}
+            </p>
+            <p className="mt-2 text-sm text-slate-500">
+              Use the integrations page to run a manual sync or review results.
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="rounded-3xl border border-black/10 bg-white p-6 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
@@ -227,12 +241,17 @@ export default function VendorDashboardPage() {
                     </p>
                     <span
                       className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${
-                        product.source === "api"
+                        product.source === "api" ||
+                        product.source === "scraping"
                           ? "bg-emerald-100 text-emerald-700"
                           : "bg-slate-200 text-slate-700"
                       }`}
                     >
-                      {product.source === "api" ? "API" : "MANUAL"}
+                      {product.source === "api"
+                        ? "API"
+                        : product.source === "scraping"
+                          ? "SCRAPING"
+                          : "MANUAL"}
                     </span>
                   </div>
                   <p className="text-xs text-slate-500">
@@ -246,7 +265,9 @@ export default function VendorDashboardPage() {
             ))
           ) : (
             <p className="text-sm text-slate-500">
-              No products yet. Add your first product to get started.
+              {isManual
+                ? "No products yet. Add your first product to get started."
+                : "No imported products yet. Run a sync to fetch items."}
             </p>
           )}
         </div>

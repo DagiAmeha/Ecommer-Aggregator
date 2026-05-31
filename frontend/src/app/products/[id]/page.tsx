@@ -195,8 +195,8 @@ export default function ProductDetailPage() {
       return;
     }
 
-    if (product.source === "api") {
-      setReviewError("Reviews are disabled for API-imported products.");
+    if (product.source !== "manual") {
+      setReviewError("Reviews are disabled for imported products.");
       return;
     }
 

@@ -18,7 +18,7 @@ export default function VendorCreateProductPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [storeSourceType, setStoreSourceType] = useState<
-    "manual" | "api" | null
+    "manual" | "api" | "scraping" | null
   >(null);
 
   useEffect(() => {
@@ -97,12 +97,12 @@ export default function VendorCreateProductPage() {
     );
   }
 
-  if (storeSourceType === "api") {
+  if (storeSourceType === "api" || storeSourceType === "scraping") {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
         <div className="rounded-3xl border border-amber-200 bg-amber-50 px-6 py-5 text-center text-sm text-amber-700 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
-          This store uses API-based product synchronization. Products are
-          managed automatically through the connected API source.
+          This store uses automated product synchronization. Products are
+          managed automatically through the connected source.
         </div>
       </div>
     );

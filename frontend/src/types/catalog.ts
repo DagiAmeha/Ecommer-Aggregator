@@ -19,7 +19,7 @@ export interface ProductRelation {
   name: string;
 }
 
-export type ProductSource = "manual" | "api";
+export type ProductSource = "manual" | "api" | "scraping";
 export type RatingSource = "internal" | "external";
 
 export interface Product {
