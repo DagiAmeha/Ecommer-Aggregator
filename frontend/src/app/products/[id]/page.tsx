@@ -561,30 +561,31 @@ export default function ProductDetailPage() {
                   Reviews
                 </h3>
 
-              {reviewLoading ? (
-                <div className="space-y-3">
-                  {Array.from({ length: 3 }).map((_, index) => (
-                    <div
-                      key={index}
-                      className="h-20 animate-pulse rounded-2xl border border-black/10 bg-white"
-                    />
-                  ))}
-                </div>
-              ) : reviewSummary?.reviews?.length ? (
-                <div className="space-y-4">
-                  {reviewSummary.reviews.map((review) => (
-                    <div
-                      key={review.id}
-                      className="rounded-2xl border border-black/10 bg-white p-4"
-                    >
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <div>
-                          <p className="text-sm font-semibold text-slate-900">
-                            {review.user.full_name || review.user.email}
-                          </p>
-                          <p className="text-xs text-slate-500">
-                            {formatDate(review.created_at)}
-                          </p>
+                {reviewLoading ? (
+                  <div className="space-y-3">
+                    {Array.from({ length: 3 }).map((_, index) => (
+                      <div
+                        key={index}
+                        className="h-20 animate-pulse rounded-2xl border border-black/10 bg-white"
+                      />
+                    ))}
+                  </div>
+                ) : reviewSummary?.reviews?.length ? (
+                  <div className="space-y-4">
+                    {reviewSummary.reviews.map((review) => (
+                      <div
+                        key={review.id}
+                        className="rounded-2xl border border-black/10 bg-white p-4"
+                      >
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div>
+                            <p className="text-sm font-semibold text-slate-900">
+                              {review.user.full_name || review.user.email}
+                            </p>
+                            <p className="text-xs text-slate-500">
+                              {formatDate(review.created_at)}
+                            </p>
+                          </div>
                         </div>
                         {review.comment ? (
                           <p className="mt-3 text-sm text-slate-600">
