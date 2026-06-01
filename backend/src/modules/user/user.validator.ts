@@ -23,7 +23,7 @@ export const registerUserSchema = z.object({
 export const googleRegisterSchema = z.object({
   phone_number: z
     .string()
-    .regex(/\+2519\d{8}/, "phone must be a valid Ethiopian mobile number"),
+    .regex(/^\+2519\d{8}$/, "phone must be a valid Ethiopian mobile number"),
 });
 
 export const updateMyProfileSchema = z
@@ -32,7 +32,7 @@ export const updateMyProfileSchema = z
     full_name: z.string().min(1).optional(),
     phone_number: z
       .string()
-      .regex(/\+2519\d{8}/, "phone must be a valid Ethiopian mobile number")
+      .regex(/^\+2519\d{8}$/, "phone must be a valid Ethiopian mobile number")
       .optional(),
     password: z.string().min(6).optional(),
   })
@@ -44,7 +44,7 @@ export const updateMyProfileSchema = z
       typeof data.password !== "undefined",
     {
       message:
-        "At least one field (email or full_name or phone_number or password) must be provided",
+        "At least one field (email, full_name, phone_number, or password) must be provided",
     },
   );
 

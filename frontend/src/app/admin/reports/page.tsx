@@ -34,13 +34,13 @@ export default function AdminReportsPage() {
 
   if (loading) {
     return (
-      <div className="h-48 animate-pulse rounded-3xl border border-black/10 bg-white/70" />
+      <div className="h-48 animate-pulse rounded-2xl border border-black/10 bg-white/70" />
     );
   }
 
   if (error) {
     return (
-      <div className="rounded-3xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
+      <div className="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
         {error}
       </div>
     );
@@ -49,7 +49,7 @@ export default function AdminReportsPage() {
   return (
     <div className="space-y-6">
       <div className="grid gap-4 lg:grid-cols-2">
-        <div className="rounded-3xl border border-black/10 bg-white p-5 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+        <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
           <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
             Total products
           </p>
@@ -57,7 +57,7 @@ export default function AdminReportsPage() {
             {reports?.total_products ?? 0}
           </p>
         </div>
-        <div className="rounded-3xl border border-black/10 bg-white p-5 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+        <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
           <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
             New users (30 days)
           </p>
@@ -67,7 +67,7 @@ export default function AdminReportsPage() {
         </div>
       </div>
 
-      <div className="rounded-3xl border border-black/10 bg-white p-6 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+      <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
         <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
           Products by source
         </p>
@@ -84,7 +84,7 @@ export default function AdminReportsPage() {
         </div>
       </div>
 
-      <div className="rounded-3xl border border-black/10 bg-white p-6 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+      <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
         <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
           Top searches
         </p>
@@ -105,7 +105,7 @@ export default function AdminReportsPage() {
         </div>
       </div>
 
-      <div className="rounded-3xl border border-black/10 bg-white p-6 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+      <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
         <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
           Recent import jobs
         </p>

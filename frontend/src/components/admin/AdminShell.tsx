@@ -17,7 +17,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
   return (
     <AdminGuard>
-      <div className="min-h-[70vh] rounded-4xl border border-black/10 bg-white/80 shadow-[0_20px_60px_rgba(16,35,30,0.08)]">
+      <div className="min-h-[70vh] rounded-2xl border border-black/10 bg-white/80 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
         <div className="grid gap-0 lg:grid-cols-[260px_1fr]">
           <aside className="border-b border-black/10 bg-slate-950 px-5 py-6 text-white lg:border-b-0 lg:border-r">
             <div className="mb-6">

@@ -23,7 +23,7 @@ export function RecentlyViewed({ excludeId }: { excludeId?: number }) {
   }
 
   return (
-    <section className="space-y-3 rounded-3xl border border-black/10 bg-white/75 p-4 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+    <section className="space-y-3 border-t border-black/10 pt-4">
       <div className="flex items-center justify-between">
         <p className="text-xs font-semibold uppercase tracking-[0.26em] text-slate-500">
           Recently viewed

@@ -3,6 +3,7 @@ import {
   compareProductsSchema,
   createProductSchema,
   productSearchQuerySchema,
+  productSuggestionQuerySchema,
 } from "./product.validator";
 import {
   createProductRecord,
@@ -10,6 +11,7 @@ import {
   getProductDetails,
   getProductsByIds,
   getRelatedOffers,
+  getSearchSuggestions,
   searchProducts,
 } from "./product.service";
 import { recordProductEvent } from "../analytics/analytics.model";
@@ -79,6 +81,20 @@ export async function getProductsHandler(
       data: result.data,
       pagination: result.pagination,
     });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getProductSearchSuggestionsHandler(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const query = productSuggestionQuerySchema.parse(req.query);
+    const result = await getSearchSuggestions(query.q, query.limit ?? 6);
+    sendSuccess(res, result);
   } catch (error) {
     next(error);
   }

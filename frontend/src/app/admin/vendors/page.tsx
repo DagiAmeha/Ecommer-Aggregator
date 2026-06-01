@@ -9,6 +9,11 @@ import {
   suspendAdminUser,
 } from "@/services/admin.service";
 import type { AdminUser, CreateVendorPayload } from "@/types/admin";
+import {
+  notifyError,
+  notifyLoading,
+  notifyUpdate,
+} from "@/utils/notifications";
 
 function formatDate(value: string): string {
   const date = new Date(value);
@@ -69,9 +74,10 @@ export default function AdminVendorsPage() {
         }
       } catch (err) {
         if (active) {
-          setError(
-            err instanceof Error ? err.message : "Failed to load vendors",
-          );
+          const message =
+            err instanceof Error ? err.message : "Failed to load vendors";
+          setError(message);
+          notifyError(err, message);
         }
       } finally {
         if (active) {
@@ -93,13 +99,18 @@ export default function AdminVendorsPage() {
     }
 
     setActionId(vendor.id);
+    const toastId = notifyLoading("Suspending vendor...");
     try {
       const updated = await suspendAdminUser(vendor.id);
       setVendors((current) =>
         current.map((item) => (item.id === updated.id ? updated : item)),
       );
+      notifyUpdate(toastId, "Vendor suspended successfully.");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to suspend vendor");
+      const message =
+        err instanceof Error ? err.message : "Failed to suspend vendor";
+      setError(message);
+      notifyUpdate(toastId, message, true);
     } finally {
       setActionId(null);
     }
@@ -107,15 +118,18 @@ export default function AdminVendorsPage() {
 
   async function handleReactivate(vendor: AdminUser) {
     setActionId(vendor.id);
+    const toastId = notifyLoading("Reactivating vendor...");
     try {
       const updated = await reactivateAdminUser(vendor.id);
       setVendors((current) =>
         current.map((item) => (item.id === updated.id ? updated : item)),
       );
+      notifyUpdate(toastId, "Vendor reactivated successfully.");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to reactivate vendor",
-      );
+      const message =
+        err instanceof Error ? err.message : "Failed to reactivate vendor";
+      setError(message);
+      notifyUpdate(toastId, message, true);
     } finally {
       setActionId(null);
     }
@@ -127,12 +141,17 @@ export default function AdminVendorsPage() {
     }
 
     setActionId(vendor.id);
+    const toastId = notifyLoading("Deleting vendor...");
     try {
       await deleteAdminUser(vendor.id);
       setVendors((current) => current.filter((item) => item.id !== vendor.id));
       setTotal((prev) => Math.max(0, prev - 1));
+      notifyUpdate(toastId, "Vendor deleted successfully.");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete vendor");
+      const message =
+        err instanceof Error ? err.message : "Failed to delete vendor";
+      setError(message);
+      notifyUpdate(toastId, message, true);
     } finally {
       setActionId(null);
     }
@@ -141,6 +160,7 @@ export default function AdminVendorsPage() {
   async function handleCreateVendor() {
     setCreating(true);
     setError(null);
+    const toastId = notifyLoading("Creating vendor...");
 
     try {
       const sourceType = form.source_type ?? "manual";
@@ -148,12 +168,17 @@ export default function AdminVendorsPage() {
       const password = form.password.trim();
 
       if (!password) {
-        setError("Password is required for new vendor accounts.");
+        const message = "Password is required for new vendor accounts.";
+        setError(message);
+        notifyUpdate(toastId, message, true);
         return;
       }
 
       if (sourceType !== "manual" && !sourceUrl) {
-        setError("Source URL is required for API or web scraping vendors.");
+        const message =
+          "Source URL is required for API or web scraping vendors.";
+        setError(message);
+        notifyUpdate(toastId, message, true);
         return;
       }
 
@@ -174,8 +199,12 @@ export default function AdminVendorsPage() {
         source_type: "manual",
         source_url: "",
       });
+      notifyUpdate(toastId, "Vendor created successfully.");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create vendor");
+      const message =
+        err instanceof Error ? err.message : "Failed to create vendor";
+      setError(message);
+      notifyUpdate(toastId, message, true);
     } finally {
       setCreating(false);
     }
@@ -183,7 +212,7 @@ export default function AdminVendorsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-black/10 bg-white p-4 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-black/10 bg-white p-4 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
         <div className="flex flex-1 flex-wrap gap-3">
           <input
             value={search}
@@ -217,12 +246,12 @@ export default function AdminVendorsPage() {
       </div>
 
       {error ? (
-        <div className="rounded-3xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
+        <div className="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
           {error}
         </div>
       ) : null}
 
-      <div className="overflow-hidden rounded-3xl border border-black/10 bg-white shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+      <div className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
         <div className="overflow-x-auto">
           <table className="min-w-full text-left text-sm">
             <thead className="bg-slate-50 text-xs uppercase text-slate-500">
@@ -318,7 +347,7 @@ export default function AdminVendorsPage() {
         </div>
       </div>
 
-      <div className="flex items-center justify-between gap-3 rounded-3xl border border-black/10 bg-white/80 p-4 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+      <div className="flex items-center justify-between gap-3 rounded-2xl border border-black/10 bg-white/80 p-4 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
         <button
           type="button"
           onClick={() => setPage((current) => Math.max(1, current - 1))}
@@ -344,7 +373,7 @@ export default function AdminVendorsPage() {
 
       {showModal ? (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,0.2)]">
+          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,0.2)]">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs uppercase tracking-[0.28em] text-slate-400">

@@ -48,7 +48,7 @@ export default function AdminOverviewPage() {
         {Array.from({ length: 3 }).map((_, index) => (
           <div
             key={index}
-            className="h-32 animate-pulse rounded-3xl border border-black/10 bg-white/70"
+            className="h-32 animate-pulse rounded-2xl border border-black/10 bg-white/70"
           />
         ))}
       </div>
@@ -57,7 +57,7 @@ export default function AdminOverviewPage() {
 
   if (error) {
     return (
-      <div className="rounded-3xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
+      <div className="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
         {error}
       </div>
     );
@@ -66,7 +66,7 @@ export default function AdminOverviewPage() {
   return (
     <div className="space-y-6">
       <div className="grid gap-4 lg:grid-cols-3">
-        <div className="rounded-3xl border border-black/10 bg-white p-5 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+        <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
           <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
             Total Users
           </p>
@@ -74,7 +74,7 @@ export default function AdminOverviewPage() {
             {stats?.total_users ?? 0}
           </p>
         </div>
-        <div className="rounded-3xl border border-black/10 bg-white p-5 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+        <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
           <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
             Total Vendors
           </p>
@@ -82,7 +82,7 @@ export default function AdminOverviewPage() {
             {stats?.total_vendors ?? 0}
           </p>
         </div>
-        <div className="rounded-3xl border border-black/10 bg-white p-5 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+        <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
           <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
             Suspended Accounts
           </p>
@@ -93,7 +93,7 @@ export default function AdminOverviewPage() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <div className="rounded-3xl border border-black/10 bg-white p-6 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+        <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
           <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
             User Management
           </p>
@@ -110,7 +110,7 @@ export default function AdminOverviewPage() {
             Go to Users
           </Link>
         </div>
-        <div className="rounded-3xl border border-black/10 bg-white p-6 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+        <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
           <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
             Vendor Management
           </p>
@@ -129,7 +129,7 @@ export default function AdminOverviewPage() {
         </div>
       </div>
 
-      <div className="rounded-3xl border border-black/10 bg-white p-6 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+      <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
         <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
           System reports
         </p>

@@ -108,8 +108,14 @@ export default function WishlistPage() {
     }
   }
 
-  if (!user && !loading) {
-    return null;
+  // Don't flash protected content before auth resolves; show a spinner while
+  // loading or while the signed-out redirect to /login is in flight.
+  if (loading || !user) {
+    return (
+      <div className="flex min-h-[40vh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-600 border-t-transparent" />
+      </div>
+    );
   }
 
   return (
@@ -124,13 +130,13 @@ export default function WishlistPage() {
       </div>
 
       {error ? (
-        <div className="rounded-3xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
+        <div className="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
           {error}
         </div>
       ) : null}
 
       {!loadingItems && items.length === 0 ? (
-        <div className="flex flex-col items-center gap-4 rounded-4xl border border-black/10 bg-white/80 px-6 py-12 text-center shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+        <div className="flex flex-col items-center gap-4 rounded-2xl border border-black/10 bg-white/80 px-6 py-12 text-center shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-black/5">
             <svg viewBox="0 0 24 24" className="h-7 w-7 text-slate-400">
               <path
@@ -153,7 +159,7 @@ export default function WishlistPage() {
           {items.map((product) => (
             <div
               key={product.id}
-              className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-black/10 bg-white/80 px-4 py-3"
+              className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-black/10 bg-white/80 px-4 py-3"
             >
               <div>
                 <p className="font-semibold text-slate-950">{product.name}</p>

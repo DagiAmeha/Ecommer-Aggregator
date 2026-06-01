@@ -99,6 +99,11 @@ export interface ProductFilters {
   store_id?: number;
 }
 
+export interface SearchSuggestionCandidate {
+  value: string;
+  type: "product" | "category" | "store";
+}
+
 function normalizeGroupSeed(value: string): string {
   return value
     .trim()
@@ -186,15 +191,15 @@ const RATING_SELECT_FIELDS = `
   p.external_rating_rate,
   p.external_rating_count,
   CASE
-    WHEN p.source = 'api' THEN COALESCE(p.external_rating_rate, 0)
+    WHEN p.source IN ('api', 'scraping') THEN COALESCE(p.external_rating_rate, 0)
     ELSE COALESCE(r.avg_rating, 0)
   END AS average_rating,
   CASE
-    WHEN p.source = 'api' THEN COALESCE(p.external_rating_count, 0)
+    WHEN p.source IN ('api', 'scraping') THEN COALESCE(p.external_rating_count, 0)
     ELSE COALESCE(r.review_count, 0)
   END AS review_count,
   CASE
-    WHEN p.source = 'api' THEN 'external'
+    WHEN p.source IN ('api', 'scraping') THEN 'external'
     ELSE 'internal'
   END AS rating_source
 `;
@@ -329,6 +334,42 @@ export async function findAllProducts(
   return result.rows.map(mapProductRow);
 }
 
+export async function listSearchSuggestionCandidates(
+  query: string,
+): Promise<SearchSuggestionCandidate[]> {
+  const likeQuery = `%${query}%`;
+  const result = await pool.query<SearchSuggestionCandidate>(
+    `
+      SELECT DISTINCT p.name AS value, 'product' AS type
+      FROM products p
+      WHERE p.name ILIKE $1
+
+      UNION
+
+      SELECT DISTINCT c.name AS value, 'category' AS type
+      FROM categories c
+      WHERE c.name ILIKE $1
+
+      UNION
+
+      SELECT DISTINCT s.store_name AS value, 'store' AS type
+      FROM stores s
+      WHERE s.store_name ILIKE $1
+
+      UNION
+
+      SELECT DISTINCT p.name AS value, 'product' AS type
+      FROM products p
+
+      ORDER BY type ASC, value ASC
+      LIMIT 300
+    `,
+    [likeQuery],
+  );
+
+  return result.rows.filter((item) => item.value?.trim());
+}
+
 export async function findProductsByIds(
   ids: number[],
   userId?: number,
@@ -454,7 +495,7 @@ function buildSortClause(
       return "p.price DESC, p.created_at DESC";
     case "rating":
       return `CASE
-        WHEN p.source = 'api' THEN COALESCE(p.external_rating_rate, 0)
+        WHEN p.source IN ('api', 'scraping') THEN COALESCE(p.external_rating_rate, 0)
         ELSE COALESCE(r.avg_rating, 0)
       END DESC, p.created_at DESC`;
     case "popularity":

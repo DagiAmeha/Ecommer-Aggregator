@@ -11,7 +11,7 @@ function formatPrice(value: number): string {
 export function OfferList({ offers }: { offers: Offer[] }) {
   if (offers.length === 0) {
     return (
-      <div className="rounded-3xl border border-black/10 bg-white/75 px-5 py-8 text-slate-600 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+      <div className="rounded-2xl border border-black/10 bg-white/75 px-5 py-8 text-slate-600 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
         No offers were returned for this product.
       </div>
     );
@@ -22,7 +22,7 @@ export function OfferList({ offers }: { offers: Offer[] }) {
       {offers.map((offer) => (
         <div
           key={offer.id}
-          className="flex flex-col gap-4 rounded-3xl border border-black/10 bg-white/80 p-5 shadow-[0_16px_50px_rgba(16,35,30,0.08)] sm:flex-row sm:items-center sm:justify-between"
+          className="flex flex-col gap-4 rounded-2xl border border-black/10 bg-white/80 p-5 shadow-[0_4px_16px_rgba(16,35,30,0.05)] sm:flex-row sm:items-center sm:justify-between"
         >
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-500">

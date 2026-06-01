@@ -209,7 +209,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <section className="mx-auto grid max-w-md gap-6 rounded-[32px] border border-black/10 bg-white/80 p-8 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+    <section className="mx-auto grid max-w-md gap-6 rounded-2xl border border-black/10 bg-white/80 p-8 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
       <div>
         <p className="display-font text-3xl font-semibold text-slate-950">
           Create your account
@@ -255,7 +255,7 @@ export default function RegisterPage() {
             Phone Number
           </label>
           <div className="flex overflow-hidden rounded-2xl border border-black/10 bg-white focus-within:border-emerald-600">
-            <span className="flex items-center gap-2 border-r border-black/10 bg-slate-50 px-4 text-sm font-semibold text-slate-700">
+            <span className="flex items-center gap-2 border-r border-black/10 bg-slate-50 px-4 text-sm font-semibold text-slate-700 dark:bg-white/5">
               <span aria-hidden="true">🇪🇹</span>
               +251
             </span>
@@ -338,7 +338,7 @@ export default function RegisterPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-2xl bg-black px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(0,0,0,0.18)] transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70"
+          className="w-full rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(5,150,105,0.25)] transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-70"
         >
           {loading ? "Creating account..." : "Create Account"}
         </button>
@@ -354,7 +354,7 @@ export default function RegisterPage() {
               type="button"
               onClick={handleGoogleContinue}
               disabled={googleLoading}
-              className="inline-flex items-center gap-3 rounded-2xl border border-black/10 bg-white px-5 py-3 text-sm font-semibold text-slate-800 shadow-[0_8px_20px_rgba(16,35,30,0.08)] transition hover:border-black/20 disabled:cursor-not-allowed disabled:opacity-70"
+              className="inline-flex items-center gap-3 rounded-2xl border border-black/10 bg-white px-5 py-3 text-sm font-semibold text-slate-800 shadow-[0_3px_12px_rgba(16,35,30,0.05)] transition hover:border-black/20 disabled:cursor-not-allowed disabled:opacity-70"
             >
               <GoogleIcon />
               {googleLoading ? "Connecting..." : "Continue with Google"}

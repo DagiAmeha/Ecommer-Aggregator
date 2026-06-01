@@ -43,7 +43,7 @@ export function CompareModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/65 px-4 py-6 backdrop-blur-sm">
-      <div className="flex max-h-[92vh] w-full max-w-7xl flex-col overflow-hidden rounded-[32px] border border-white/10 bg-[#f8f4ee] shadow-[0_30px_100px_rgba(15,23,42,0.35)]">
+      <div className="flex max-h-[92vh] w-full max-w-7xl flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#f8f4ee] shadow-[0_30px_100px_rgba(15,23,42,0.35)]">
         <div className="flex items-center justify-between gap-4 border-b border-black/10 px-5 py-4 sm:px-6">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">
@@ -66,10 +66,10 @@ export function CompareModal({
           {loading ? (
             <div className="space-y-4">
               <div className="h-12 animate-pulse rounded-2xl bg-white/80" />
-              <div className="h-[420px] animate-pulse rounded-3xl bg-white/80" />
+              <div className="h-[420px] animate-pulse rounded-2xl bg-white/80" />
             </div>
           ) : error ? (
-            <div className="rounded-3xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
+            <div className="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
               {error}
             </div>
           ) : (

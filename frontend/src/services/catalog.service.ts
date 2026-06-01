@@ -6,6 +6,7 @@ import type {
   ProductDetail,
   ProductFilters,
   ProductListPayload,
+  SearchSuggestionPayload,
   Store,
 } from "@/types/catalog";
 
@@ -55,6 +56,14 @@ export async function fetchProducts(
   filters: ProductFilters = {},
 ): Promise<ProductListPayload> {
   return apiRequest<ProductListPayload>(`/products${toSearchParams(filters)}`);
+}
+
+export async function fetchSearchSuggestions(
+  query: string,
+): Promise<SearchSuggestionPayload> {
+  return apiRequest<SearchSuggestionPayload>(
+    `/products/search-suggestions${toSearchParams({}, { q: query })}`,
+  );
 }
 
 export async function fetchProductById(id: number): Promise<Product> {

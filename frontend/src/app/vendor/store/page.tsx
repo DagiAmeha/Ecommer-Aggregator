@@ -6,6 +6,7 @@ import {
   updateVendorStoreProfile,
 } from "@/services/vendor.service";
 import type { VendorStoreProfile } from "@/types/vendor";
+import { notifyLoading, notifyUpdate } from "@/utils/notifications";
 
 export default function VendorStoreSettingsPage() {
   const [store, setStore] = useState<VendorStoreProfile | null>(null);
@@ -15,7 +16,6 @@ export default function VendorStoreSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -48,7 +48,7 @@ export default function VendorStoreSettingsPage() {
     event.preventDefault();
     setSaving(true);
     setError(null);
-    setSuccess(null);
+    const toastId = notifyLoading("Saving store profile...");
 
     try {
       const updated = await updateVendorStoreProfile({
@@ -57,9 +57,12 @@ export default function VendorStoreSettingsPage() {
         is_active: isActive,
       });
       setStore(updated);
-      setSuccess("Store profile updated.");
+      notifyUpdate(toastId, "Store profile updated successfully.");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to update store");
+      const message =
+        err instanceof Error ? err.message : "Failed to update store";
+      setError(message);
+      notifyUpdate(toastId, message, true);
     } finally {
       setSaving(false);
     }
@@ -67,7 +70,7 @@ export default function VendorStoreSettingsPage() {
 
   if (loading) {
     return (
-      <div className="h-48 animate-pulse rounded-3xl border border-black/10 bg-white/70" />
+      <div className="h-48 animate-pulse rounded-2xl border border-black/10 bg-white/70" />
     );
   }
 
@@ -75,7 +78,7 @@ export default function VendorStoreSettingsPage() {
     <div className="space-y-6">
       <form
         onSubmit={handleSubmit}
-        className="rounded-3xl border border-black/10 bg-white p-6 shadow-[0_16px_50px_rgba(16,35,30,0.08)]"
+        className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_4px_16px_rgba(16,35,30,0.05)]"
       >
         <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
           Store Settings
@@ -116,13 +119,7 @@ export default function VendorStoreSettingsPage() {
           </label>
         </div>
 
-        {error ? (
-          <p className="mt-4 text-sm text-rose-600">{error}</p>
-        ) : null}
-        {success ? (
-          <p className="mt-4 text-sm text-emerald-700">{success}</p>
-        ) : null}
-
+        {error ? <p className="mt-4 text-sm text-rose-600">{error}</p> : null}
         <button
           type="submit"
           disabled={saving}
@@ -133,7 +130,7 @@ export default function VendorStoreSettingsPage() {
       </form>
 
       {store?.recent_import_jobs?.length ? (
-        <div className="rounded-3xl border border-black/10 bg-white p-6 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+        <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
           <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
             Recent import jobs
           </p>
