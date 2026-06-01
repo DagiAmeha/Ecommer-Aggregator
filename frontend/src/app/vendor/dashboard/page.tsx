@@ -98,7 +98,7 @@ export default function VendorDashboardPage() {
         {Array.from({ length: 3 }).map((_, index) => (
           <div
             key={index}
-            className="h-32 animate-pulse rounded-3xl border border-black/10 bg-white/70"
+            className="h-32 animate-pulse rounded-2xl border border-black/10 bg-white/70"
           />
         ))}
       </div>
@@ -107,7 +107,7 @@ export default function VendorDashboardPage() {
 
   if (error) {
     return (
-      <div className="rounded-3xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
+      <div className="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
         {error}
       </div>
     );
@@ -120,7 +120,7 @@ export default function VendorDashboardPage() {
   return (
     <div className="space-y-6">
       <div className="grid gap-4 lg:grid-cols-3">
-        <div className="rounded-3xl border border-black/10 bg-white p-5 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+        <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
           <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
             Total Products
           </p>
@@ -128,7 +128,7 @@ export default function VendorDashboardPage() {
             {stats?.total_products ?? 0}
           </p>
         </div>
-        <div className="rounded-3xl border border-black/10 bg-white p-5 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+        <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
           <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
             Product Views
           </p>
@@ -136,7 +136,7 @@ export default function VendorDashboardPage() {
             {stats?.total_views ?? 0}
           </p>
         </div>
-        <div className="rounded-3xl border border-black/10 bg-white p-5 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+        <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
           <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
             Low Stock Items
           </p>
@@ -147,7 +147,7 @@ export default function VendorDashboardPage() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <div className="rounded-3xl border border-black/10 bg-white p-5 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+        <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
           <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
             Total Categories
           </p>
@@ -155,7 +155,7 @@ export default function VendorDashboardPage() {
             {stats?.total_categories ?? 0}
           </p>
         </div>
-        <div className="rounded-3xl border border-black/10 bg-white p-5 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+        <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
           <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
             Store Clicks
           </p>
@@ -163,7 +163,7 @@ export default function VendorDashboardPage() {
             {stats?.total_clicks ?? 0}
           </p>
         </div>
-        <div className="rounded-3xl border border-black/10 bg-white p-5 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+        <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
           <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
             Latest Products
           </p>
@@ -174,7 +174,7 @@ export default function VendorDashboardPage() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <div className="rounded-3xl border border-black/10 bg-white p-5 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+        <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
           <div className="flex items-center justify-between gap-3">
             <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
               Ingestion Source
@@ -210,7 +210,7 @@ export default function VendorDashboardPage() {
           </Link>
         </div>
         {isManual ? (
-          <div className="rounded-3xl border border-black/10 bg-white p-5 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+          <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
             <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
               Manual Management
             </p>
@@ -222,7 +222,7 @@ export default function VendorDashboardPage() {
             </p>
           </div>
         ) : (
-          <div className="rounded-3xl border border-black/10 bg-white p-5 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+          <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
             <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
               {isScraping ? "Scrape Health" : "Sync Health"}
             </p>
@@ -236,7 +236,7 @@ export default function VendorDashboardPage() {
         )}
       </div>
 
-      <div className="rounded-3xl border border-black/10 bg-white p-6 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+      <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-xs uppercase tracking-[0.28em] text-slate-400">

@@ -22,6 +22,11 @@ export const productSearchQuerySchema = z.object({
   sort: z.enum(["newest", "price_asc", "price_desc", "rating", "popularity"]).optional(),
 });
 
+export const productSuggestionQuerySchema = z.object({
+  q: z.string().trim().min(1).max(80),
+  limit: z.coerce.number().int().positive().max(10).optional(),
+});
+
 export const compareProductsSchema = z.object({
   product_ids: z
     .array(z.number().int().positive())

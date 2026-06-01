@@ -99,6 +99,11 @@ export interface ProductFilters {
   store_id?: number;
 }
 
+export interface SearchSuggestionCandidate {
+  value: string;
+  type: "product" | "category" | "store";
+}
+
 function normalizeGroupSeed(value: string): string {
   return value
     .trim()
@@ -327,6 +332,42 @@ export async function findAllProducts(
     conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
   const result = await buildProductSelectQuery(whereClause, values, userId);
   return result.rows.map(mapProductRow);
+}
+
+export async function listSearchSuggestionCandidates(
+  query: string,
+): Promise<SearchSuggestionCandidate[]> {
+  const likeQuery = `%${query}%`;
+  const result = await pool.query<SearchSuggestionCandidate>(
+    `
+      SELECT DISTINCT p.name AS value, 'product' AS type
+      FROM products p
+      WHERE p.name ILIKE $1
+
+      UNION
+
+      SELECT DISTINCT c.name AS value, 'category' AS type
+      FROM categories c
+      WHERE c.name ILIKE $1
+
+      UNION
+
+      SELECT DISTINCT s.store_name AS value, 'store' AS type
+      FROM stores s
+      WHERE s.store_name ILIKE $1
+
+      UNION
+
+      SELECT DISTINCT p.name AS value, 'product' AS type
+      FROM products p
+
+      ORDER BY type ASC, value ASC
+      LIMIT 300
+    `,
+    [likeQuery],
+  );
+
+  return result.rows.filter((item) => item.value?.trim());
 }
 
 export async function findProductsByIds(

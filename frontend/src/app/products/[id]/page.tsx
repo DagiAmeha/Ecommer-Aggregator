@@ -21,7 +21,6 @@ import { useWishlist } from "@/components/WishlistProvider";
 import { addToWishlist, removeFromWishlist } from "@/services/wishlist.service";
 import { recordProductEvent } from "@/services/analytics.service";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
-import { RecentlyViewed } from "@/components/RecentlyViewed";
 
 function formatPrice(value: number): string {
   return new Intl.NumberFormat("en-US", {
@@ -294,20 +293,20 @@ export default function ProductDetailPage() {
 
       {loading ? (
         <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="h-96 animate-pulse rounded-4xl border border-black/10 bg-white/70" />
+          <div className="h-96 animate-pulse rounded-2xl border border-black/10 bg-white/70" />
           <div className="space-y-4">
-            <div className="h-56 animate-pulse rounded-4xl border border-black/10 bg-white/70" />
-            <div className="h-56 animate-pulse rounded-4xl border border-black/10 bg-white/70" />
+            <div className="h-56 animate-pulse rounded-2xl border border-black/10 bg-white/70" />
+            <div className="h-56 animate-pulse rounded-2xl border border-black/10 bg-white/70" />
           </div>
         </div>
       ) : error ? (
-        <div className="rounded-3xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
+        <div className="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
           {error}
         </div>
       ) : product ? (
         <div className="space-y-8">
           <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-            <div className="overflow-hidden rounded-4xl border border-black/10 bg-white/80 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+            <div className="overflow-hidden rounded-2xl border border-black/10 bg-white/80 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
               <div className="aspect-4/3 bg-slate-100">
                 <img
                   src={
@@ -320,7 +319,7 @@ export default function ProductDetailPage() {
               </div>
             </div>
 
-            <div className="space-y-5 rounded-4xl border border-black/10 bg-white/80 p-7 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+            <div className="space-y-5 rounded-2xl border border-black/10 bg-white/80 p-7 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
               <div className="space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">
                   {product.category?.name ?? ""}
@@ -383,7 +382,7 @@ export default function ProductDetailPage() {
               </div>
 
               <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-3xl border border-black/10 bg-slate-50 p-4">
+                <div className="rounded-2xl border border-black/10 bg-slate-50 p-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
                     Category
                   </p>
@@ -391,7 +390,7 @@ export default function ProductDetailPage() {
                     {product.category?.name ?? ""}
                   </p>
                 </div>
-                <div className="rounded-3xl border border-black/10 bg-slate-50 p-4">
+                <div className="rounded-2xl border border-black/10 bg-slate-50 p-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
                     Store
                   </p>
@@ -399,7 +398,7 @@ export default function ProductDetailPage() {
                     {product.store?.name ?? ""}
                   </p>
                 </div>
-                <div className="rounded-3xl border border-black/10 bg-slate-50 p-4">
+                <div className="rounded-2xl border border-black/10 bg-slate-50 p-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
                     Created at
                   </p>
@@ -407,7 +406,7 @@ export default function ProductDetailPage() {
                     {formatDate(product.created_at)}
                   </p>
                 </div>
-                <div className="rounded-3xl border border-black/10 bg-slate-50 p-4">
+                <div className="rounded-2xl border border-black/10 bg-slate-50 p-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
                     Product url
                   </p>
@@ -441,7 +440,7 @@ export default function ProductDetailPage() {
           </div>
 
           <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
-            <div className="rounded-4xl border border-black/10 bg-white/80 p-6 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+            <div className="rounded-2xl border border-black/10 bg-white/80 p-6 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
               <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">
                 Endpoint
               </p>
@@ -455,7 +454,7 @@ export default function ProductDetailPage() {
               </p>
             </div>
 
-            <div className="rounded-4xl border border-black/10 bg-white/80 p-6 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+            <div className="rounded-2xl border border-black/10 bg-white/80 p-6 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
               <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">
                 Store
               </p>
@@ -470,7 +469,7 @@ export default function ProductDetailPage() {
             </div>
           </div>
 
-          <div className="space-y-6 rounded-4xl border border-black/10 bg-white/80 p-6 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+          <div className="space-y-6 rounded-2xl border border-black/10 bg-white/80 p-6 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">
@@ -488,19 +487,19 @@ export default function ProductDetailPage() {
             </div>
 
             {ratingSource === "external" ? (
-              <div className="rounded-3xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
                 Ratings are imported from the external vendor source.
               </div>
             ) : null}
 
             {reviewError ? (
-              <div className="rounded-3xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+              <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
                 {reviewError}
               </div>
             ) : null}
 
             {ratingSource === "internal" ? (
-              <div className="space-y-4 rounded-3xl border border-black/10 bg-slate-50 p-4">
+              <div className="space-y-4 rounded-2xl border border-black/10 bg-slate-50 p-4">
                 <h3 className="text-sm font-semibold text-slate-800">
                   {currentRating > 0
                     ? "Update your review"
@@ -554,7 +553,7 @@ export default function ProductDetailPage() {
                   {Array.from({ length: 3 }).map((_, index) => (
                     <div
                       key={index}
-                      className="h-20 animate-pulse rounded-3xl border border-black/10 bg-white"
+                      className="h-20 animate-pulse rounded-2xl border border-black/10 bg-white"
                     />
                   ))}
                 </div>
@@ -563,7 +562,7 @@ export default function ProductDetailPage() {
                   {reviewSummary.reviews.map((review) => (
                     <div
                       key={review.id}
-                      className="rounded-3xl border border-black/10 bg-white p-4"
+                      className="rounded-2xl border border-black/10 bg-white p-4"
                     >
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <div>
@@ -593,7 +592,7 @@ export default function ProductDetailPage() {
           </div>
 
           {relatedOffers.length > 0 ? (
-            <div className="space-y-4 rounded-4xl border border-black/10 bg-white/80 p-6 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+            <div className="space-y-4 rounded-2xl border border-black/10 bg-white/80 p-6 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">
                   Available from other stores
@@ -607,7 +606,7 @@ export default function ProductDetailPage() {
                   <Link
                     key={item.id}
                     href={`/products/${item.id}`}
-                    className="rounded-3xl border border-black/10 bg-slate-50 p-4 transition hover:-translate-y-1 hover:bg-white"
+                    className="rounded-2xl border border-black/10 bg-slate-50 p-4 transition hover:-translate-y-1 hover:bg-white"
                   >
                     <p className="text-sm font-semibold text-slate-950">
                       {item.name}

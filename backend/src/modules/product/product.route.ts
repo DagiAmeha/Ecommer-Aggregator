@@ -3,6 +3,7 @@ import {
   compareProductsHandler,
   createProductHandler,
   getRelatedOffersHandler,
+  getProductSearchSuggestionsHandler,
   getProductByIdHandler,
   getProductsHandler,
 } from "./product.controller";
@@ -20,6 +21,7 @@ import {
 const productRouter = Router();
 
 productRouter.get("/", optionalAuthMiddleware, getProductsHandler);
+productRouter.get("/search-suggestions", getProductSearchSuggestionsHandler);
 productRouter.post("/compare", optionalAuthMiddleware, compareProductsHandler);
 productRouter.post(
   "/",

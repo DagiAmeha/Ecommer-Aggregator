@@ -240,10 +240,10 @@ export default function VendorIntegrationsPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div className="h-28 animate-pulse rounded-3xl border border-black/10 bg-white/70" />
+        <div className="h-28 animate-pulse rounded-2xl border border-black/10 bg-white/70" />
         <div className="grid gap-4 lg:grid-cols-2">
-          <div className="h-64 animate-pulse rounded-3xl border border-black/10 bg-white/70" />
-          <div className="h-64 animate-pulse rounded-3xl border border-black/10 bg-white/70" />
+          <div className="h-64 animate-pulse rounded-2xl border border-black/10 bg-white/70" />
+          <div className="h-64 animate-pulse rounded-2xl border border-black/10 bg-white/70" />
         </div>
       </div>
     );
@@ -257,7 +257,7 @@ export default function VendorIntegrationsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-3xl border border-black/10 bg-white p-6 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+      <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
@@ -340,19 +340,19 @@ export default function VendorIntegrationsPage() {
       </div>
 
       {error ? (
-        <div className="rounded-3xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
+        <div className="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
           {error}
         </div>
       ) : null}
 
       {saveMessage ? (
-        <div className="rounded-3xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-700">
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-700">
           {saveMessage}
         </div>
       ) : null}
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <div className="rounded-3xl border border-black/10 bg-white p-6 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+        <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
           <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
             Source Configuration
           </p>
@@ -463,7 +463,7 @@ export default function VendorIntegrationsPage() {
 
         <div className="space-y-4">
           {!isManual ? (
-            <div className="rounded-3xl border border-black/10 bg-white p-6 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+            <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
               <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
                 {sourceType === "scraping" ? "Run Scraper" : "Sync Now"}
               </p>
@@ -486,20 +486,20 @@ export default function VendorIntegrationsPage() {
               </button>
             </div>
           ) : (
-            <div className="rounded-3xl border border-black/10 bg-white p-6 text-sm text-slate-600 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+            <div className="rounded-2xl border border-black/10 bg-white p-6 text-sm text-slate-600 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
               Manual stores do not use automated sync. Add products directly
               from the products page.
             </div>
           )}
 
           {syncError ? (
-            <div className="rounded-3xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
+            <div className="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
               {syncError}
             </div>
           ) : null}
 
           {syncResult ? (
-            <div className="rounded-3xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-700">
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-700">
               <p className="text-xs uppercase tracking-[0.2em] text-emerald-600">
                 {sourceType === "scraping"
                   ? "Last Scrape Result"
@@ -535,7 +535,7 @@ export default function VendorIntegrationsPage() {
       </div>
 
       {sourceType !== "manual" ? (
-        <div className="rounded-2xl border border-black/10 bg-slate-950 px-6 py-5 text-white shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+        <div className="rounded-2xl border border-black/10 bg-slate-950 px-6 py-5 text-white shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
           <p className="text-xs uppercase tracking-[0.28em] text-white/60">
             Source Managed Products
           </p>

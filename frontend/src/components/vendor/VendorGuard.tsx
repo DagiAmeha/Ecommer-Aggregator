@@ -68,7 +68,7 @@ export function VendorGuard({ children }: { children: React.ReactNode }) {
 
   if (loading || checking) {
     return (
-      <div className="rounded-3xl border border-black/10 bg-white/70 px-6 py-8 text-sm text-slate-600 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+      <div className="rounded-2xl border border-black/10 bg-white/70 px-6 py-8 text-sm text-slate-600 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
         Checking vendor access...
       </div>
     );

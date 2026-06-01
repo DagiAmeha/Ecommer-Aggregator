@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { FilterBar } from "@/components/FilterBar";
 import { CompareModal } from "@/components/CompareModal";
 import { ProductList } from "@/components/ProductList";
@@ -13,6 +14,7 @@ import {
   fetchCategories,
   fetchComparisonProducts,
   fetchProducts,
+  fetchSearchSuggestions,
   fetchStores,
 } from "@/services/catalog.service";
 import { addToWishlist, removeFromWishlist } from "@/services/wishlist.service";
@@ -24,15 +26,20 @@ import type {
   Pagination,
   Product,
   ProductSort,
+  SearchSuggestion,
   Store,
 } from "@/types/catalog";
+import { useRecentSearches } from "@/hooks/useRecentSearches";
 
 const PAGE_SIZE = 9;
 
 export default function ProductsPage() {
+  const searchParams = useSearchParams();
   const { user } = useAuth();
-  const { count, setCount } = useWishlist();
-  const [search, setSearch] = useState("");
+  const { setCount } = useWishlist();
+  const initialSearch = searchParams.get("search") ?? "";
+  const [search, setSearch] = useState(initialSearch);
+  const [searchDraft, setSearchDraft] = useState(initialSearch);
   const [category, setCategory] = useState("");
   const [storeId, setStoreId] = useState("");
   const [minPrice, setMinPrice] = useState("");
@@ -63,10 +70,24 @@ export default function ProductsPage() {
   const [wishlistLoadingId, setWishlistLoadingId] = useState<number | null>(
     null,
   );
+  const [searchSuggestions, setSearchSuggestions] = useState<
+    SearchSuggestion[]
+  >([]);
+  const [didYouMean, setDidYouMean] = useState<string | null>(null);
+  const recentSearches = useRecentSearches();
 
   useEffect(() => {
     document.title = "Products | Aggregator Market";
   }, []);
+
+  useEffect(() => {
+    const urlSearch = searchParams.get("search") ?? "";
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSearch(urlSearch);
+    setSearchDraft(urlSearch);
+    setPage(1);
+    setResetKey((current) => current + 1);
+  }, [searchParams]);
 
   useEffect(() => {
     let active = true;
@@ -196,6 +217,35 @@ export default function ProductsPage() {
       active = false;
     };
   }, [category, maxPrice, minPrice, page, search, sort, storeId]);
+
+  useEffect(() => {
+    const query = searchDraft.trim();
+    if (query.length < 2) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSearchSuggestions([]);
+      setDidYouMean(null);
+      return;
+    }
+
+    let active = true;
+    const timeout = window.setTimeout(async () => {
+      try {
+        const response = await fetchSearchSuggestions(query);
+        if (!active) return;
+        setSearchSuggestions(response.suggestions);
+        setDidYouMean(response.didYouMean);
+      } catch {
+        if (!active) return;
+        setSearchSuggestions([]);
+        setDidYouMean(null);
+      }
+    }, 180);
+
+    return () => {
+      active = false;
+      window.clearTimeout(timeout);
+    };
+  }, [searchDraft]);
 
   useEffect(() => {
     if (!compareModalOpen) {
@@ -359,57 +409,93 @@ export default function ProductsPage() {
       </div>
 
       {compareMessage ? (
-        <div className="rounded-3xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-800">
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-800">
           {compareMessage}
         </div>
       ) : null}
 
-      <div className="space-y-4">
+      {/* Search + filters share one container, split by a hairline, rather
+          than two separate cards. */}
+      <div className="space-y-3 rounded-2xl border border-black/10 bg-white/75 p-4 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
         <SearchBar
           key={`search-${resetKey}`}
+          bare
           initialValue={search}
           loading={loading}
+          recentSearches={recentSearches.items}
+          suggestions={searchSuggestions}
+          didYouMean={
+            search.trim() && pagination.total <= 2 ? didYouMean : null
+          }
+          onValueChange={setSearchDraft}
+          onClearRecentSearches={recentSearches.clear}
           onSearch={(value) => {
+            recentSearches.record(value);
             setPage(1);
             setSearch(value);
+            setSearchDraft(value);
           }}
         />
-        <FilterBar
-          key={`filters-${resetKey}`}
-          categories={categories}
-          stores={stores}
-          initialCategory={category}
-          initialStoreId={storeId}
-          initialMinPrice={minPrice}
-          initialMaxPrice={maxPrice}
-          initialSort={sort}
-          highlightedStoreId={vendorStoreId}
-          onApply={({
-            category: nextCategory,
-            storeId: nextStoreId,
-            minPrice: nextMin,
-            maxPrice: nextMax,
-            sort: nextSort,
-          }) => {
-            setPage(1);
-            setCategory(nextCategory);
-            setStoreId(nextStoreId);
-            setMinPrice(nextMin);
-            setMaxPrice(nextMax);
-            setSort((nextSort as ProductSort) || "newest");
-          }}
-          onReset={() => {
-            setPage(1);
+        <div className="border-t border-black/10 pt-3">
+          <FilterBar
+            key={`filters-${resetKey}`}
+            bare
+            categories={categories}
+            stores={stores}
+            initialCategory={category}
+            initialStoreId={storeId}
+            initialMinPrice={minPrice}
+            initialMaxPrice={maxPrice}
+            initialSort={sort}
+            highlightedStoreId={vendorStoreId}
+            onApply={({
+              category: nextCategory,
+              storeId: nextStoreId,
+              minPrice: nextMin,
+              maxPrice: nextMax,
+              sort: nextSort,
+            }) => {
+              setPage(1);
+              setCategory(nextCategory);
+              setStoreId(nextStoreId);
+              setMinPrice(nextMin);
+              setMaxPrice(nextMax);
+              setSort((nextSort as ProductSort) || "newest");
+            }}
+            onReset={() => {
+              setPage(1);
             setSearch("");
+            setSearchDraft("");
             setCategory("");
-            setStoreId("");
-            setMinPrice("");
-            setMaxPrice("");
-            setSort("newest");
-            setResetKey((current) => current + 1);
-          }}
-        />
+              setStoreId("");
+              setMinPrice("");
+              setMaxPrice("");
+              setSort("newest");
+              setResetKey((current) => current + 1);
+            }}
+          />
+        </div>
       </div>
+
+      {search.trim() && pagination.total <= 2 && didYouMean ? (
+        <div className="flex flex-wrap items-center gap-2 text-sm text-slate-600">
+          <span>Did you mean</span>
+          <button
+            type="button"
+            onClick={() => {
+              recentSearches.record(didYouMean);
+              setPage(1);
+              setSearch(didYouMean);
+              setSearchDraft(didYouMean);
+              setResetKey((current) => current + 1);
+            }}
+            className="rounded-full border border-emerald-600/30 px-3 py-1.5 font-semibold text-emerald-700 transition hover:bg-emerald-50"
+          >
+            {didYouMean}
+          </button>
+          <span>?</span>
+        </div>
+      ) : null}
 
       <SavedSearches
         isAuthenticated={Boolean(user)}
@@ -422,6 +508,7 @@ export default function ProductsPage() {
         onApply={(criteria) => {
           setPage(1);
           setSearch(criteria.query);
+          setSearchDraft(criteria.query);
           setCategory(criteria.category ?? "");
           setStoreId("");
           setMinPrice(criteria.minPrice ?? "");
@@ -432,20 +519,19 @@ export default function ProductsPage() {
 
       <RecentlyViewed />
 
-      <div className="flex flex-col gap-3 rounded-3xl border border-black/10 bg-white/75 p-4 shadow-[0_16px_50px_rgba(16,35,30,0.08)] sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.26em] text-slate-500">
-            Comparison
-          </p>
-          <p className="mt-1 text-sm text-slate-600">
-            {compareList.length} of 4 products selected.
-          </p>
-        </div>
+      {/* Compact comparison bar — one slim row, no heavy card. */}
+      <div className="flex items-center justify-between gap-3 rounded-2xl border border-black/10 bg-white/60 px-4 py-2.5">
+        <p className="text-sm text-slate-600">
+          <span className="font-semibold text-slate-900">
+            {compareList.length}
+          </span>{" "}
+          of 4 selected to compare
+        </p>
         <button
           type="button"
           onClick={() => setCompareModalOpen(true)}
           disabled={compareList.length < 2}
-          className="rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Compare ({compareList.length}/4)
         </button>
@@ -470,23 +556,23 @@ export default function ProductsPage() {
         wishlistLoadingId={wishlistLoadingId}
       />
 
-      <div className="flex items-center justify-between gap-3 rounded-3xl border border-black/10 bg-white/75 p-4 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+      <div className="flex items-center justify-between gap-3 border-t border-black/10 pt-4">
         <button
           type="button"
           onClick={() => setPage((current) => Math.max(1, current - 1))}
           disabled={loading || pagination.page <= 1}
-          className="rounded-2xl border border-black/10 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-emerald-700 hover:text-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-emerald-700 hover:text-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Previous
         </button>
-        <span className="text-sm text-slate-600">
+        <span className="text-sm text-slate-500">
           Page {pagination.page} of {totalPages}
         </span>
         <button
           type="button"
           onClick={() => setPage((current) => current + 1)}
           disabled={loading || pagination.page >= totalPages}
-          className="rounded-2xl bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-emerald-700 hover:text-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Next
         </button>

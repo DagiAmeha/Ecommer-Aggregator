@@ -1,7 +1,7 @@
 "use client";
 
 import type { Dispatch, SetStateAction } from "react";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { fetchWishlistCount } from "@/services/wishlist.service";
 
@@ -17,9 +17,9 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const [count, setCount] = useState(0);
 
-  async function refreshCount(): Promise<void> {
+  const refreshCount = useCallback(async (): Promise<void> => {
     if (!user) {
-      setCount(0);
+      setCount((prev) => (prev === 0 ? prev : 0));
       return;
     }
 
@@ -27,14 +27,14 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
       const response = await fetchWishlistCount();
       setCount(response.count ?? 0);
     } catch {
-      setCount(0);
+      setCount((prev) => (prev === 0 ? prev : 0));
     }
-  }
+  }, [user]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refreshCount();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [refreshCount]);
 
   const value = useMemo(
     () => ({
@@ -42,7 +42,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
       setCount,
       refreshCount,
     }),
-    [count],
+    [count, refreshCount],
   );
 
   return (

@@ -183,7 +183,7 @@ export default function AdminVendorsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-black/10 bg-white p-4 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-black/10 bg-white p-4 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
         <div className="flex flex-1 flex-wrap gap-3">
           <input
             value={search}
@@ -217,12 +217,12 @@ export default function AdminVendorsPage() {
       </div>
 
       {error ? (
-        <div className="rounded-3xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
+        <div className="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
           {error}
         </div>
       ) : null}
 
-      <div className="overflow-hidden rounded-3xl border border-black/10 bg-white shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+      <div className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
         <div className="overflow-x-auto">
           <table className="min-w-full text-left text-sm">
             <thead className="bg-slate-50 text-xs uppercase text-slate-500">
@@ -318,7 +318,7 @@ export default function AdminVendorsPage() {
         </div>
       </div>
 
-      <div className="flex items-center justify-between gap-3 rounded-3xl border border-black/10 bg-white/80 p-4 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+      <div className="flex items-center justify-between gap-3 rounded-2xl border border-black/10 bg-white/80 p-4 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
         <button
           type="button"
           onClick={() => setPage((current) => Math.max(1, current - 1))}
@@ -344,7 +344,7 @@ export default function AdminVendorsPage() {
 
       {showModal ? (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,0.2)]">
+          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,0.2)]">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
