@@ -173,6 +173,11 @@ export default function ProductDetailPage() {
         return;
       }
 
+      if (product?.source !== "manual") {
+        setReviewSummary(null);
+        return;
+      }
+
       setReviewLoading(true);
       setReviewError(null);
 
@@ -199,7 +204,7 @@ export default function ProductDetailPage() {
     return () => {
       active = false;
     };
-  }, [productId]);
+  }, [product?.source, productId]);
 
   async function handleReviewSubmit(
     event: FormEvent<HTMLFormElement>,
@@ -270,6 +275,7 @@ export default function ProductDetailPage() {
     }
   }
 
+  const isManualSource = product?.source === "manual";
   const ratingValue = reviewSummary?.average_rating ?? product?.average_rating;
   const ratingCount = reviewSummary?.review_count ?? product?.review_count;
   const ratingSource =
@@ -543,10 +549,17 @@ export default function ProductDetailPage() {
                   </form>
                 )}
               </div>
-            ) : null}
+            ) : (
+              <div className="rounded-3xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+                Reviews are disabled for imported products.
+              </div>
+            )}
 
-            <div className="space-y-4">
-              <h3 className="text-sm font-semibold text-slate-800">Reviews</h3>
+            {isManualSource ? (
+              <div className="space-y-4">
+                <h3 className="text-sm font-semibold text-slate-800">
+                  Reviews
+                </h3>
 
               {reviewLoading ? (
                 <div className="space-y-3">
@@ -573,22 +586,21 @@ export default function ProductDetailPage() {
                             {formatDate(review.created_at)}
                           </p>
                         </div>
-                        <StarRatingDisplay rating={review.rating} />
+                        {review.comment ? (
+                          <p className="mt-3 text-sm text-slate-600">
+                            {review.comment}
+                          </p>
+                        ) : null}
                       </div>
-                      {review.comment ? (
-                        <p className="mt-3 text-sm text-slate-600">
-                          {review.comment}
-                        </p>
-                      ) : null}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-slate-500">
-                  No reviews yet. Be the first to share your experience.
-                </p>
-              )}
-            </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-slate-500">
+                    No reviews yet. Be the first to share your experience.
+                  </p>
+                )}
+              </div>
+            ) : null}
           </div>
 
           {relatedOffers.length > 0 ? (
