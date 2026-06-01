@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { FilterBar } from "@/components/FilterBar";
 import { CompareModal } from "@/components/CompareModal";
 import { ProductList } from "@/components/ProductList";
@@ -33,11 +32,15 @@ import { useRecentSearches } from "@/hooks/useRecentSearches";
 
 const PAGE_SIZE = 9;
 
-export default function ProductsPageClient() {
-  const searchParams = useSearchParams();
+type ProductsPageClientProps = {
+  initialSearch: string;
+};
+
+export default function ProductsPageClient({
+  initialSearch,
+}: ProductsPageClientProps) {
   const { user } = useAuth();
   const { setCount } = useWishlist();
-  const initialSearch = searchParams.get("search") ?? "";
   const [search, setSearch] = useState(initialSearch);
   const [searchDraft, setSearchDraft] = useState(initialSearch);
   const [category, setCategory] = useState("");
@@ -81,13 +84,12 @@ export default function ProductsPageClient() {
   }, []);
 
   useEffect(() => {
-    const urlSearch = searchParams.get("search") ?? "";
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSearch(urlSearch);
-    setSearchDraft(urlSearch);
+    setSearch(initialSearch);
+    setSearchDraft(initialSearch);
     setPage(1);
     setResetKey((current) => current + 1);
-  }, [searchParams]);
+  }, [initialSearch]);
 
   useEffect(() => {
     let active = true;

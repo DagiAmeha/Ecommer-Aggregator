@@ -1,7 +1,15 @@
 import { Suspense } from "react";
 import ProductsPageClient from "./ProductsPageClient";
 
-export default function ProductsPage() {
+type ProductsPageProps = {
+  searchParams?: {
+    search?: string;
+  };
+};
+
+export default function ProductsPage({ searchParams }: ProductsPageProps) {
+  const initialSearch = searchParams?.search ?? "";
+
   return (
     <Suspense
       fallback={
@@ -12,7 +20,7 @@ export default function ProductsPage() {
         </div>
       }
     >
-      <ProductsPageClient />
+      <ProductsPageClient initialSearch={initialSearch} />
     </Suspense>
   );
 }
