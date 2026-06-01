@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import AppShell from "../components/AppShell";
 import { WishlistProvider } from "../components/WishlistProvider";
 import { ThemeProvider } from "../components/ThemeProvider";
+import { ToastProvider } from "../components/ToastProvider";
 import "../styles/globals.css";
 
 const poppins = Poppins({
@@ -59,6 +60,7 @@ export default function RootLayout({
             <WishlistProvider>
               <AppShell>{children}</AppShell>
             </WishlistProvider>
+            <ToastProvider />
           </ThemeProvider>
         </div>
       </body>

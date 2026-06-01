@@ -10,6 +10,7 @@ import {
 import type { Category } from "@/types/catalog";
 import { VendorProductForm } from "@/components/vendor/VendorProductForm";
 import type { VendorProductInput } from "@/types/vendor";
+import { notifyLoading, notifyUpdate } from "@/utils/notifications";
 
 export default function VendorCreateProductPage() {
   const router = useRouter();
@@ -80,12 +81,17 @@ export default function VendorCreateProductPage() {
   async function handleSubmit(payload: VendorProductInput) {
     setSaving(true);
     setError(null);
+    const toastId = notifyLoading("Creating product...");
 
     try {
       await createVendorProduct(payload);
+      notifyUpdate(toastId, "Product added successfully.");
       router.push("/vendor/products");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create product");
+      const message =
+        err instanceof Error ? err.message : "Failed to create product";
+      setError(message);
+      notifyUpdate(toastId, message, true);
     } finally {
       setSaving(false);
     }
