@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { User } from "firebase/auth";
 import { apiRequest } from "@/services/api";
 import { getCurrentUser, subscribeToAuthChanges } from "@/services/auth.service";
+import { ProductImage } from "@/components/ProductImage";
 
 function isValidEthiopianPhone(digits: string): boolean {
   return /^9\d{8}$/.test(digits);
@@ -33,7 +34,7 @@ function getProfileErrorMessage(error: unknown, fallback: string): string {
 
 export default function GoogleCompleteProfilePage() {
   const router = useRouter();
-  const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
+  const [firebaseUser, setFirebaseUser] = useState<User | null>(getCurrentUser);
   const [phoneDigits, setPhoneDigits] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -43,7 +44,6 @@ export default function GoogleCompleteProfilePage() {
   }, []);
 
   useEffect(() => {
-    setFirebaseUser(getCurrentUser());
     return subscribeToAuthChanges((user) => setFirebaseUser(user));
   }, []);
 
@@ -101,10 +101,10 @@ export default function GoogleCompleteProfilePage() {
   const profileImage = firebaseUser?.photoURL ?? "";
 
   return (
-    <section className="mx-auto grid max-w-md gap-6 rounded-[32px] border border-black/10 bg-white/80 p-8 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+    <section className="mx-auto grid max-w-md gap-6 rounded-2xl border border-black/10 bg-white/80 p-8 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
       <div className="flex items-center gap-3">
         {profileImage ? (
-          <img
+          <ProductImage
             src={profileImage}
             alt="Google profile"
             className="h-12 w-12 rounded-full object-cover"

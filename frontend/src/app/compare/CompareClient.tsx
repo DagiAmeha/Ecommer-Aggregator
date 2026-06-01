@@ -105,7 +105,7 @@ export default function CompareClient() {
 
       <form
         key={ids.join(",")}
-        className="flex flex-col gap-3 rounded-3xl border border-black/10 bg-white/75 p-4 shadow-[0_16px_50px_rgba(16,35,30,0.08)] sm:flex-row"
+        className="flex flex-col gap-3 rounded-2xl border border-black/10 bg-white/75 p-4 shadow-[0_4px_16px_rgba(16,35,30,0.05)] sm:flex-row"
         onSubmit={handleSubmit}
       >
         <input
@@ -117,16 +117,16 @@ export default function CompareClient() {
         />
         <button
           type="submit"
-          className="rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700"
+          className="rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700"
         >
           Compare
         </button>
       </form>
 
       {loading ? (
-        <div className="h-[360px] animate-pulse rounded-3xl border border-black/10 bg-white/70" />
+        <div className="h-[360px] animate-pulse rounded-2xl border border-black/10 bg-slate-200/70 dark:bg-white/5" />
       ) : error ? (
-        <div className="rounded-3xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
+        <div className="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
           {error}
         </div>
       ) : (

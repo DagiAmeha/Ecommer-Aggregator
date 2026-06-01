@@ -147,14 +147,14 @@ export default function ProfilePage() {
 
   if (loading || (!user && !error)) {
     return (
-      <section className="mx-auto max-w-xl rounded-4xl border border-black/10 bg-white/80 p-8 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+      <section className="mx-auto max-w-xl rounded-2xl border border-black/10 bg-white/80 p-8 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
         <p className="text-sm text-slate-500">Loading profile...</p>
       </section>
     );
   }
 
   return (
-    <section className="mx-auto max-w-xl rounded-4xl border border-black/10 bg-white/80 p-8 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+    <section className="mx-auto max-w-xl rounded-2xl border border-black/10 bg-white/80 p-8 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
       <div>
         <p className="display-font text-3xl font-semibold text-slate-950">
           Profile settings

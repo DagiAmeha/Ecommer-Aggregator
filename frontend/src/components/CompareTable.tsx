@@ -1,5 +1,6 @@
 import type { CompareProduct } from "@/types/catalog";
 import { StarRatingDisplay } from "./StarRating";
+import { ProductImage } from "./ProductImage";
 
 function formatPrice(value: number): string {
   return new Intl.NumberFormat("en-US", {
@@ -26,7 +27,7 @@ export function CompareTable({
 }) {
   if (products.length === 0) {
     return (
-      <div className="rounded-3xl border border-black/10 bg-white/75 px-5 py-8 text-slate-600 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+      <div className="rounded-2xl border border-black/10 bg-white/75 px-5 py-8 text-slate-600 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
         Select at least 2 products to compare them side by side.
       </div>
     );
@@ -44,11 +45,10 @@ export function CompareTable({
 
         return (
           <div className="flex items-center justify-center rounded-2xl bg-slate-100 p-2">
-            <img
+            <ProductImage
               src={imageUrl}
               alt={product.name}
               className="h-28 w-full max-w-44 rounded-xl object-cover"
-              loading="lazy"
             />
           </div>
         );
@@ -103,7 +103,7 @@ export function CompareTable({
   ];
 
   return (
-    <div className="overflow-hidden rounded-3xl border border-black/10 bg-white/80 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+    <div className="overflow-hidden rounded-2xl border border-black/10 bg-white/80 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
       <div className="overflow-x-auto">
         <table className="min-w-full border-separate border-spacing-0">
           <thead>

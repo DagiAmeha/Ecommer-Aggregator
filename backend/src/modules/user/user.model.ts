@@ -142,7 +142,7 @@ export async function updateUserRole(
   role: UserRole,
 ): Promise<User | null> {
   const result = await pool.query<User>(
-    "UPDATE users SET role = $1 WHERE id = $2 RETURNING id, firebase_uid, email, full_name, role, status, provider, profile_image, deleted_at::text AS deleted_at, created_at::text AS created_at",
+    "UPDATE users SET role = $1 WHERE id = $2 RETURNING id, firebase_uid, email, full_name, phone_number, role, status, provider, profile_image, deleted_at::text AS deleted_at, created_at::text AS created_at",
     [role, id],
   );
 

@@ -182,7 +182,7 @@ export default function LoginPage() {
   }
 
   return (
-    <section className="mx-auto grid max-w-md gap-6 rounded-[32px] border border-black/10 bg-white/80 p-8 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+    <section className="mx-auto grid max-w-md gap-6 rounded-2xl border border-black/10 bg-white/80 p-8 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
       <div>
         <p className="display-font text-3xl font-semibold text-slate-950">
           Welcome back
@@ -236,7 +236,7 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-70"
+          className="w-full rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-70"
         >
           {loading ? "Signing in..." : "Login"}
         </button>
@@ -252,7 +252,7 @@ export default function LoginPage() {
               type="button"
               onClick={handleGoogleContinue}
               disabled={googleLoading}
-              className="inline-flex items-center gap-3 rounded-2xl border border-black/10 bg-white px-5 py-3 text-sm font-semibold text-slate-800 shadow-[0_8px_20px_rgba(16,35,30,0.08)] transition hover:border-black/20 disabled:cursor-not-allowed disabled:opacity-70"
+              className="inline-flex items-center gap-3 rounded-2xl border border-black/10 bg-white px-5 py-3 text-sm font-semibold text-slate-800 shadow-[0_3px_12px_rgba(16,35,30,0.05)] transition hover:border-black/20 disabled:cursor-not-allowed disabled:opacity-70"
             >
               <GoogleIcon />
               {googleLoading ? "Connecting..." : "Continue with Google"}

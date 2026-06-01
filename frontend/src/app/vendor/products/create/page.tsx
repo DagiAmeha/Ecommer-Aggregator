@@ -93,14 +93,14 @@ export default function VendorCreateProductPage() {
 
   if (loading) {
     return (
-      <div className="h-64 animate-pulse rounded-3xl border border-black/10 bg-white/70" />
+      <div className="h-64 animate-pulse rounded-2xl border border-black/10 bg-white/70" />
     );
   }
 
   if (storeSourceType === "api" || storeSourceType === "scraping") {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
-        <div className="rounded-3xl border border-amber-200 bg-amber-50 px-6 py-5 text-center text-sm text-amber-700 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-6 py-5 text-center text-sm text-amber-700 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
           This store uses automated product synchronization. Products are
           managed automatically through the connected source.
         </div>
@@ -111,7 +111,7 @@ export default function VendorCreateProductPage() {
   return (
     <div className="space-y-4">
       {error ? (
-        <div className="rounded-3xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
+        <div className="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
           {error}
         </div>
       ) : null}

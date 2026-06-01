@@ -8,6 +8,7 @@ import {
   fetchVendorStoreSource,
 } from "@/services/vendor.service";
 import type { Product, Pagination } from "@/types/catalog";
+import { ProductImage } from "@/components/ProductImage";
 
 const PAGE_SIZE = 10;
 
@@ -167,24 +168,24 @@ export default function VendorProductsPage() {
       </div>
 
       {!showManualActions ? (
-        <div className="rounded-3xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-800">
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-800">
           Imported products are managed by your connected source. Use the
           integrations page to run a sync or update configuration.
         </div>
       ) : null}
 
       {loading ? (
-        <div className="h-64 animate-pulse rounded-3xl border border-black/10 bg-white/70" />
+        <div className="h-64 animate-pulse rounded-2xl border border-black/10 bg-white/70" />
       ) : error ? (
-        <div className="rounded-3xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
+        <div className="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
           {error}
         </div>
       ) : products.length === 0 ? (
-        <div className="rounded-3xl border border-black/10 bg-white/75 px-5 py-8 text-center text-slate-600 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+        <div className="rounded-2xl border border-black/10 bg-white/75 px-5 py-8 text-center text-slate-600 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
           No products found for this store.
         </div>
       ) : (
-        <div className="overflow-hidden rounded-3xl border border-black/10 bg-white shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+        <div className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
           <div className="overflow-x-auto">
             <table className="min-w-full text-left text-sm">
               <thead className="bg-slate-950 text-white">
@@ -221,7 +222,7 @@ export default function VendorProductsPage() {
                 {products.map((product) => (
                   <tr key={product.id} className="border-t border-black/5">
                     <td className="px-4 py-3">
-                      <img
+                      <ProductImage
                         src={
                           product.image_url ||
                           "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=400&q=80"
@@ -296,7 +297,7 @@ export default function VendorProductsPage() {
         </div>
       )}
 
-      <div className="flex items-center justify-between gap-3 rounded-3xl border border-black/10 bg-white/80 p-4 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+      <div className="flex items-center justify-between gap-3 rounded-2xl border border-black/10 bg-white/80 p-4 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
         <button
           type="button"
           onClick={() =>

@@ -12,6 +12,7 @@ export function FilterBar({
   highlightedStoreId,
   onApply,
   onReset,
+  bare = false,
 }: {
   categories: Category[];
   stores: { id: number; name: string }[];
@@ -29,10 +30,16 @@ export function FilterBar({
   }) => void;
   initialSort?: string;
   onReset: () => void;
+  /** Drop the card chrome so this can sit inside a shared container. */
+  bare?: boolean;
 }) {
   return (
     <form
-      className="grid gap-3 rounded-3xl border border-black/10 bg-white/75 p-4 shadow-[0_16px_50px_rgba(16,35,30,0.08)] md:grid-cols-[1fr_1fr_repeat(2,minmax(0,0.7fr))_1fr_auto_auto]"
+      className={
+        bare
+          ? "grid gap-3 md:grid-cols-[1fr_1fr_repeat(2,minmax(0,0.7fr))_1fr_auto_auto]"
+          : "grid gap-3 rounded-2xl border border-black/10 bg-white/75 p-4 shadow-[0_4px_16px_rgba(16,35,30,0.05)] md:grid-cols-[1fr_1fr_repeat(2,minmax(0,0.7fr))_1fr_auto_auto]"
+      }
       onSubmit={(event) => {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
@@ -103,7 +110,7 @@ export function FilterBar({
       </select>
       <button
         type="submit"
-        className="rounded-2xl bg-emerald-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800"
+        className="rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700"
       >
         Apply
       </button>

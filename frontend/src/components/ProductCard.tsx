@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Product } from "@/types/catalog";
 import { StarRatingDisplay } from "./StarRating";
+import { ProductImage } from "./ProductImage";
 
 function formatPrice(value: number): string {
   return new Intl.NumberFormat("en-US", {
@@ -23,19 +24,14 @@ export function ProductCard({
   onToggleWishlist?: (product: Product) => void;
   wishlistLoading?: boolean;
 }) {
-  const imageUrl =
-    product.image_url ||
-    "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80";
-
   return (
-    <article className="group overflow-hidden rounded-3xl border border-black/10 bg-white/80 shadow-[0_20px_60px_rgba(16,35,30,0.08)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_28px_80px_rgba(16,35,30,0.12)]">
+    <article className="group overflow-hidden rounded-2xl border border-black/10 bg-white/80 shadow-[0_4px_16px_rgba(16,35,30,0.05)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(16,35,30,0.08)]">
       <div className="relative aspect-4/3 overflow-hidden bg-slate-100">
         <Link href={`/products/${product.id}`} className="block h-full w-full">
-          <img
-            src={imageUrl}
+          <ProductImage
+            src={product.image_url}
             alt={product.name}
             className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-            loading="lazy"
           />
         </Link>
         <div className="absolute inset-0 bg-linear-to-t from-black/25 via-transparent to-transparent" />
@@ -90,7 +86,7 @@ export function ProductCard({
             className={
               isSelected
                 ? "rounded-full border border-emerald-700 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800 transition hover:bg-emerald-100"
-                : "rounded-full bg-slate-950 px-3 py-1 text-xs font-medium text-white transition hover:bg-emerald-700"
+                : "rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white transition hover:bg-emerald-700"
             }
           >
             {isSelected ? "Remove from Compare" : "Add to Compare"}
@@ -98,7 +94,7 @@ export function ProductCard({
         </div>
         <Link
           href={`/products/${product.id}`}
-          className="inline-flex rounded-full border border-black/10 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-emerald-700 hover:text-emerald-800"
+          className="inline-flex rounded-full border border-emerald-600/30 px-3 py-1.5 text-xs font-semibold text-emerald-700 transition hover:border-emerald-700 hover:bg-emerald-50 hover:text-emerald-800"
         >
           View details
         </Link>

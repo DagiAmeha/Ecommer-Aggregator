@@ -51,6 +51,16 @@ export interface ProductListPayload {
   pagination: Pagination;
 }
 
+export interface SearchSuggestion {
+  query: string;
+  type: "product" | "category" | "store";
+}
+
+export interface SearchSuggestionPayload {
+  suggestions: SearchSuggestion[];
+  didYouMean: string | null;
+}
+
 export type CompareProduct = Product;
 
 export type ProductDetail = {

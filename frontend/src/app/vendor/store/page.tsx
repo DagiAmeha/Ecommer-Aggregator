@@ -67,7 +67,7 @@ export default function VendorStoreSettingsPage() {
 
   if (loading) {
     return (
-      <div className="h-48 animate-pulse rounded-3xl border border-black/10 bg-white/70" />
+      <div className="h-48 animate-pulse rounded-2xl border border-black/10 bg-white/70" />
     );
   }
 
@@ -75,7 +75,7 @@ export default function VendorStoreSettingsPage() {
     <div className="space-y-6">
       <form
         onSubmit={handleSubmit}
-        className="rounded-3xl border border-black/10 bg-white p-6 shadow-[0_16px_50px_rgba(16,35,30,0.08)]"
+        className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_4px_16px_rgba(16,35,30,0.05)]"
       >
         <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
           Store Settings
@@ -133,7 +133,7 @@ export default function VendorStoreSettingsPage() {
       </form>
 
       {store?.recent_import_jobs?.length ? (
-        <div className="rounded-3xl border border-black/10 bg-white p-6 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+        <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
           <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
             Recent import jobs
           </p>

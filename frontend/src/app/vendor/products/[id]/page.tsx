@@ -84,13 +84,13 @@ export default function VendorEditProductPage() {
 
   if (loading) {
     return (
-      <div className="h-64 animate-pulse rounded-3xl border border-black/10 bg-white/70" />
+      <div className="h-64 animate-pulse rounded-2xl border border-black/10 bg-white/70" />
     );
   }
 
   if (error) {
     return (
-      <div className="rounded-3xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
+      <div className="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
         {error}
       </div>
     );

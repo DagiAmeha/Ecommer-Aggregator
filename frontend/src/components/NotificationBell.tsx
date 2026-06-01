@@ -18,8 +18,9 @@ export default function NotificationBell() {
 
   useEffect(() => {
     if (!user) {
-      setItems([]);
-      setUnreadCount(0);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setItems((prev) => (prev.length === 0 ? prev : []));
+      setUnreadCount((prev) => (prev === 0 ? prev : 0));
       return;
     }
 
@@ -87,7 +88,7 @@ export default function NotificationBell() {
       </button>
 
       {open ? (
-        <div className="absolute right-0 z-50 mt-2 w-80 rounded-3xl border border-black/10 bg-white p-4 shadow-[0_20px_60px_rgba(16,35,30,0.15)]">
+        <div className="absolute right-0 z-50 mt-2 w-80 rounded-2xl border border-black/10 bg-white p-4 shadow-[0_6px_20px_rgba(16,35,30,0.08)]">
           <div className="mb-3 flex items-center justify-between">
             <p className="text-sm font-semibold text-slate-900">Notifications</p>
             {unreadCount > 0 ? (

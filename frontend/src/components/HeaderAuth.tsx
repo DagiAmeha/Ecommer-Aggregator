@@ -69,7 +69,7 @@ export default function HeaderAuth() {
           Login
         </Link>
         <Link
-          className="rounded-full bg-black px-4 py-2 text-white transition hover:bg-slate-800"
+          className="rounded-full bg-emerald-600 px-4 py-2 text-white transition hover:bg-emerald-700"
           href="/register"
         >
           Register

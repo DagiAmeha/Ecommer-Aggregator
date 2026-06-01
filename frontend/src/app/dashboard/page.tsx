@@ -68,8 +68,15 @@ export default function UserDashboardPage() {
     };
   }, [user]);
 
-  if (!user && !loading) {
-    return null;
+  // Don't render protected content until auth is resolved. While loading (or
+  // while the redirect to /login is in flight for a signed-out user) show a
+  // spinner instead of briefly flashing the dashboard.
+  if (loading || !user) {
+    return (
+      <div className="flex min-h-[40vh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-600 border-t-transparent" />
+      </div>
+    );
   }
 
   return (
@@ -86,7 +93,7 @@ export default function UserDashboardPage() {
       <div className="grid gap-4 lg:grid-cols-3">
         <Link
           href="/wishlist"
-          className="rounded-3xl border border-black/10 bg-white p-5 shadow-[0_16px_50px_rgba(16,35,30,0.08)] transition hover:border-emerald-700"
+          className="rounded-2xl border border-black/10 bg-white p-5 shadow-[0_4px_16px_rgba(16,35,30,0.05)] transition hover:border-emerald-700"
         >
           <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
             Wishlist
@@ -95,7 +102,7 @@ export default function UserDashboardPage() {
             {wishlistCount}
           </p>
         </Link>
-        <div className="rounded-3xl border border-black/10 bg-white p-5 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+        <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
           <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
             Active price alerts
           </p>
@@ -103,7 +110,7 @@ export default function UserDashboardPage() {
             {alertCount}
           </p>
         </div>
-        <div className="rounded-3xl border border-black/10 bg-white p-5 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+        <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
           <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
             Unread notifications
           </p>
@@ -113,7 +120,7 @@ export default function UserDashboardPage() {
         </div>
       </div>
 
-      <div className="rounded-3xl border border-black/10 bg-white p-6 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+      <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
         <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
           Recommended
         </p>

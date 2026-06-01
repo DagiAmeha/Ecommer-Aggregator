@@ -24,7 +24,7 @@ export function ProductList({
         {Array.from({ length: 6 }).map((_, index) => (
           <div
             key={index}
-            className="h-[340px] animate-pulse rounded-3xl border border-black/10 bg-white/70"
+            className="h-[340px] animate-pulse rounded-2xl border border-black/10 bg-slate-200/70 dark:bg-white/5"
           />
         ))}
       </div>
@@ -33,7 +33,7 @@ export function ProductList({
 
   if (error) {
     return (
-      <div className="rounded-3xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
+      <div className="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
         {error}
       </div>
     );
@@ -41,7 +41,7 @@ export function ProductList({
 
   if (products.length === 0) {
     return (
-      <div className="rounded-3xl border border-black/10 bg-white/75 px-5 py-8 text-center text-slate-600 shadow-[0_16px_50px_rgba(16,35,30,0.08)]">
+      <div className="rounded-2xl border border-black/10 bg-white/75 px-5 py-8 text-center text-slate-600 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
         No products matched the current filters.
       </div>
     );
