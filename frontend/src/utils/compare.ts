@@ -2,28 +2,28 @@ import type { Product } from "@/types/catalog";
 
 /**
  * From a product list (e.g. search results), pick up to 4 comparable offers:
- * same product group, one listing per store (cheapest per store).
+ * same category, one listing per store (cheapest per store).
  */
 export function getCompareCandidateIds(products: Product[]): number[] {
-  const byGroup = new Map<string, Product[]>();
+  const byCategory = new Map<number, Product[]>();
 
   for (const product of products) {
-    const groupId = product.product_group_id || product.group_id;
-    if (!groupId) {
+    const categoryId = product.category?.id;
+    if (!categoryId) {
       continue;
     }
 
-    const group = byGroup.get(groupId) ?? [];
-    group.push(product);
-    byGroup.set(groupId, group);
+    const category = byCategory.get(categoryId) ?? [];
+    category.push(product);
+    byCategory.set(categoryId, category);
   }
 
   let bestCandidates: Product[] = [];
 
-  for (const group of byGroup.values()) {
+  for (const category of byCategory.values()) {
     const byStore = new Map<number, Product>();
 
-    for (const product of group) {
+    for (const product of category) {
       const storeId = product.store?.id;
       if (!storeId) {
         continue;
@@ -56,5 +56,5 @@ export function getCompareCandidateLabel(
   }
 
   const match = products.find((product) => product.id === candidateIds[0]);
-  return match?.name ?? null;
+  return match?.category?.name ?? null;
 }
