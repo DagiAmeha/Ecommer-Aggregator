@@ -47,7 +47,7 @@ export function CompareModal({
         <div className="flex items-center justify-between gap-4 border-b border-black/10 px-5 py-4 sm:px-6">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">
-              Compare ({compareCount}/4)
+              {compareCount} store{compareCount === 1 ? "" : "s"}
             </p>
             <h2 className="display-font mt-2 text-2xl font-semibold text-slate-950 sm:text-3xl">
               Side-by-side comparison

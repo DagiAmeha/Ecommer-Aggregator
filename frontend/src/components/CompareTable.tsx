@@ -28,7 +28,7 @@ export function CompareTable({
   if (products.length === 0) {
     return (
       <div className="rounded-2xl border border-black/10 bg-white/75 px-5 py-8 text-slate-600 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
-        Select at least 2 products to compare them side by side.
+        No comparison data to display.
       </div>
     );
   }

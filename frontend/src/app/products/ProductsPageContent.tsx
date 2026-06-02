@@ -31,6 +31,10 @@ import {
 import { addToWishlist, removeFromWishlist } from "@/services/wishlist.service";
 import { fetchVendorStoreSource } from "@/services/vendor.service";
 import { fetchMyProfile } from "@/services/user.service";
+import {
+  getCompareCandidateIds,
+  getCompareCandidateLabel,
+} from "@/utils/compare";
 
 const PAGE_SIZE = 9;
 
@@ -67,21 +71,12 @@ export default function ProductsPageContent() {
   const [error, setError] = useState<string | null>(null);
 
   const [compareList, setCompareList] = useState<number[]>([]);
-  const [compareItemsById, setCompareItemsById] = useState<
-    Record<number, Product>
-  >({});
-
   const [compareModalOpen, setCompareModalOpen] = useState(false);
-
   const [compareProducts, setCompareProducts] = useState<CompareProduct[]>(
     [],
   );
-
   const [compareLoading, setCompareLoading] = useState(false);
-
   const [compareError, setCompareError] = useState<string | null>(null);
-
-  const [compareMessage, setCompareMessage] = useState<string | null>(null);
 
   const [vendorStoreId, setVendorStoreId] = useState<number | null>(null);
 
@@ -245,6 +240,26 @@ export default function ProductsPageContent() {
     };
   }, [category, maxPrice, minPrice, page, search, sort, storeId]);
 
+  const hasActiveSearch = search.trim().length > 0;
+
+  const compareCandidateIds = useMemo(
+    () => getCompareCandidateIds(products),
+    [products],
+  );
+
+  const compareCandidateLabel = useMemo(
+    () => getCompareCandidateLabel(products, compareCandidateIds),
+    [products, compareCandidateIds],
+  );
+
+  const canCompareSearchResults =
+    hasActiveSearch && compareCandidateIds.length >= 2;
+
+  useEffect(() => {
+    setCompareModalOpen(false);
+    setCompareList([]);
+  }, [search]);
+
   useEffect(() => {
     const query = searchDraft.trim();
 
@@ -288,7 +303,7 @@ export default function ProductsPageContent() {
     async function loadComparison(): Promise<void> {
       if (compareList.length < 2) {
         setCompareProducts([]);
-        setCompareError("Select at least 2 products to compare them.");
+        setCompareError("Not enough offers to compare.");
         setCompareLoading(false);
         return;
       }
@@ -330,61 +345,13 @@ export default function ProductsPageContent() {
     };
   }, [compareList, compareModalOpen]);
 
-  function handleToggleCompare(product: Product): void {
-    setCompareMessage(null);
-
-    if (compareList.includes(product.id)) {
-      setCompareList((current) =>
-        current.filter((id) => id !== product.id),
-      );
-
-      setCompareItemsById((current) => {
-        const next = { ...current };
-        delete next[product.id];
-        return next;
-      });
-
+  function handleOpenSearchCompare(): void {
+    if (compareCandidateIds.length < 2) {
       return;
     }
 
-    if (compareList.length >= 4) {
-      setCompareMessage("You can compare up to 4 products.");
-      return;
-    }
-
-    const selectedProducts = compareList
-      .map((id) => compareItemsById[id])
-      .filter(Boolean);
-
-    const currentGroupId = selectedProducts[0]?.product_group_id;
-
-    if (currentGroupId && product.product_group_id !== currentGroupId) {
-      setCompareMessage(
-        "You can only compare the same product from different stores",
-      );
-
-      return;
-    }
-
-    if (
-      selectedProducts.some(
-        (item) =>
-          item.store?.id && item.store.id === product.store?.id,
-      )
-    ) {
-      setCompareMessage(
-        "You cannot compare products from the same store",
-      );
-
-      return;
-    }
-
-    setCompareList((current) => [...current, product.id]);
-
-    setCompareItemsById((current) => ({
-      ...current,
-      [product.id]: product,
-    }));
+    setCompareList(compareCandidateIds);
+    setCompareModalOpen(true);
   }
 
   async function handleToggleWishlist(
@@ -434,24 +401,6 @@ export default function ProductsPageContent() {
     }
   }
 
-  function handleRemoveComparedProduct(id: number): void {
-    setCompareList((current) =>
-      current.filter((item) => item !== id),
-    );
-
-    setCompareItemsById((current) => {
-      const next = { ...current };
-      delete next[id];
-      return next;
-    });
-  }
-
-  function handleClearCompare(): void {
-    setCompareList([]);
-    setCompareItemsById({});
-    setCompareMessage(null);
-  }
-
   const totalPages = useMemo(() => {
     return Math.max(
       1,
@@ -467,12 +416,6 @@ export default function ProductsPageContent() {
             Browse Products
           </p>
         </div>
-
-        {compareMessage ? (
-          <div className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-800">
-            {compareMessage}
-          </div>
-        ) : null}
 
         <div className="space-y-3 rounded-2xl border border-black/10 bg-white/75 p-4 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
           <SearchBar
@@ -576,20 +519,34 @@ export default function ProductsPageContent() {
 
       <RecentlyViewed />
 
-      <div className="flex items-center justify-between gap-3 rounded-2xl border border-black/10 bg-white/60 px-4 py-2.5">
-        <p className="text-sm text-slate-600">
-          <span className="font-semibold text-slate-900">{compareList.length}</span>{" "}
-          of 4 selected to compare
-        </p>
-        <button
-          type="button"
-          onClick={() => setCompareModalOpen(true)}
-          disabled={compareList.length < 2}
-          className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          Compare ({compareList.length}/4)
-        </button>
-      </div>
+      {hasActiveSearch && !loading ? (
+        canCompareSearchResults ? (
+          <div className="flex flex-col gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/80 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-emerald-900">
+                Compare prices across stores
+              </p>
+              <p className="mt-1 text-sm text-emerald-800/80">
+                {compareCandidateLabel
+                  ? `Found ${compareCandidateIds.length} offers for “${compareCandidateLabel}” in these results.`
+                  : `Found ${compareCandidateIds.length} comparable offers in these results.`}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleOpenSearchCompare}
+              className="inline-flex shrink-0 items-center justify-center rounded-full bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700"
+            >
+              Compare now
+            </button>
+          </div>
+        ) : (
+          <p className="rounded-2xl border border-black/10 bg-white/60 px-4 py-3 text-sm text-slate-600">
+            No comparable offers across different stores on this page. Try another
+            search term or browse more results.
+          </p>
+        )
+      ) : null}
 
       <div className="flex flex-col gap-2 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">
         <p>
@@ -605,8 +562,6 @@ export default function ProductsPageContent() {
         products={products}
         loading={loading}
         error={error}
-        compareList={compareList}
-        onToggleCompare={handleToggleCompare}
         onToggleWishlist={handleToggleWishlist}
         wishlistLoadingId={wishlistLoadingId}
       />
@@ -644,7 +599,6 @@ export default function ProductsPageContent() {
         loading={compareLoading}
         error={compareError}
         compareCount={compareList.length}
-        onRemoveProduct={handleRemoveComparedProduct}
       />
     </>
   );

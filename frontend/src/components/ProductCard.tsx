@@ -13,14 +13,10 @@ function formatPrice(value: number): string {
 
 export function ProductCard({
   product,
-  isSelected,
-  onToggleCompare,
   onToggleWishlist,
   wishlistLoading,
 }: {
   product: Product;
-  isSelected: boolean;
-  onToggleCompare: (product: Product) => void;
   onToggleWishlist?: (product: Product) => void;
   wishlistLoading?: boolean;
 }) {
@@ -75,22 +71,9 @@ export function ProductCard({
             count={product.review_count ?? 0}
           />
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-xl font-semibold text-emerald-700">
-            {formatPrice(product.price)}
-          </p>
-          <button
-            type="button"
-            onClick={() => onToggleCompare(product)}
-            className={
-              isSelected
-                ? "rounded-full border border-emerald-700 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800 transition hover:bg-emerald-100"
-                : "rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white transition hover:bg-emerald-700"
-            }
-          >
-            {isSelected ? "Remove from Compare" : "Add to Compare"}
-          </button>
-        </div>
+        <p className="text-xl font-semibold text-emerald-700">
+          {formatPrice(product.price)}
+        </p>
         <Link
           href={`/products/${product.id}`}
           className="inline-flex rounded-full border border-emerald-600/30 px-3 py-1.5 text-xs font-semibold text-emerald-700 transition hover:border-emerald-700 hover:bg-emerald-50 hover:text-emerald-800"
