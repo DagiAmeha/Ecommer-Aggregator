@@ -8,7 +8,6 @@ import { useSearchParams } from "next/navigation";
 import ProductsPageClient from "./ProductsPageClient";
 
 import { useAuth } from "@/hooks/useAuth";
-import { useWishlist } from "@/hooks/useWishlist";
 import { useRecentSearches } from "@/hooks/useRecentSearches";
 
 type ProductsPageProps = {
