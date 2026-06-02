@@ -10,6 +10,7 @@ import {
 import type { Category, Product } from "@/types/catalog";
 import { VendorProductForm } from "@/components/vendor/VendorProductForm";
 import type { VendorProductInput } from "@/types/vendor";
+import { notifyLoading, notifyUpdate } from "@/utils/notifications";
 
 export default function VendorEditProductPage() {
   const params = useParams<{ id: string }>();
@@ -71,12 +72,17 @@ export default function VendorEditProductPage() {
 
     setSaving(true);
     setError(null);
+    const toastId = notifyLoading("Updating product...");
 
     try {
       await updateVendorProduct(product.id, payload);
+      notifyUpdate(toastId, "Product updated successfully.");
       router.push("/vendor/products");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to update product");
+      const message =
+        err instanceof Error ? err.message : "Failed to update product";
+      setError(message);
+      notifyUpdate(toastId, message, true);
     } finally {
       setSaving(false);
     }

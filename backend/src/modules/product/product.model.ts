@@ -191,15 +191,15 @@ const RATING_SELECT_FIELDS = `
   p.external_rating_rate,
   p.external_rating_count,
   CASE
-    WHEN p.source = 'api' THEN COALESCE(p.external_rating_rate, 0)
+    WHEN p.source IN ('api', 'scraping') THEN COALESCE(p.external_rating_rate, 0)
     ELSE COALESCE(r.avg_rating, 0)
   END AS average_rating,
   CASE
-    WHEN p.source = 'api' THEN COALESCE(p.external_rating_count, 0)
+    WHEN p.source IN ('api', 'scraping') THEN COALESCE(p.external_rating_count, 0)
     ELSE COALESCE(r.review_count, 0)
   END AS review_count,
   CASE
-    WHEN p.source = 'api' THEN 'external'
+    WHEN p.source IN ('api', 'scraping') THEN 'external'
     ELSE 'internal'
   END AS rating_source
 `;
@@ -495,7 +495,7 @@ function buildSortClause(
       return "p.price DESC, p.created_at DESC";
     case "rating":
       return `CASE
-        WHEN p.source = 'api' THEN COALESCE(p.external_rating_rate, 0)
+        WHEN p.source IN ('api', 'scraping') THEN COALESCE(p.external_rating_rate, 0)
         ELSE COALESCE(r.avg_rating, 0)
       END DESC, p.created_at DESC`;
     case "popularity":

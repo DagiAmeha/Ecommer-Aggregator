@@ -5,6 +5,7 @@ import AppShell from "../components/AppShell";
 import { AuthProvider } from "../components/AuthProvider";
 import { WishlistProvider } from "../components/WishlistProvider";
 import { ThemeProvider } from "../components/ThemeProvider";
+import { ToastProvider } from "../components/ToastProvider";
 import "../styles/globals.css";
 
 const poppins = Poppins({

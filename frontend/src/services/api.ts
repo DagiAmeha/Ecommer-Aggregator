@@ -10,6 +10,18 @@ type ApiEnvelope<T> = {
   details?: string;
 };
 
+export class ApiError extends Error {
+  status: number;
+  payload: unknown;
+
+  constructor(message: string, status: number, payload: unknown) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+    this.payload = payload;
+  }
+}
+
 async function readResponseBody(response: Response): Promise<unknown> {
   const text = await response.text();
 
@@ -44,6 +56,18 @@ function getErrorMessage(payload: unknown, status: number): string {
   return `API request failed with status ${status}`;
 }
 
+export function getApiErrorMessage(error: unknown, fallback: string): string {
+  if (error instanceof ApiError && error.message) {
+    return error.message;
+  }
+
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  return fallback;
+}
+
 export async function apiRequest<T>(
   path: string,
   init?: RequestInit,
@@ -67,7 +91,11 @@ export async function apiRequest<T>(
   const payload = await readResponseBody(response);
 
   if (!response.ok) {
-    throw new Error(getErrorMessage(payload, response.status));
+    throw new ApiError(
+      getErrorMessage(payload, response.status),
+      response.status,
+      payload,
+    );
   }
 
   if (

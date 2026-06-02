@@ -4,7 +4,10 @@ const connectionString = process.env.DATABASE_URL;
 
 export const pool = new Pool(
   connectionString
-    ? { connectionString }
+    ? {
+        connectionString,
+        ssl: { rejectUnauthorized: false },
+      }
     : {
         host: process.env.DB_HOST || "localhost",
         port: Number(process.env.DB_PORT || 5432),

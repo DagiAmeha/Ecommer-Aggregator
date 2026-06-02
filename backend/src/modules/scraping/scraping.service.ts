@@ -27,6 +27,7 @@ interface ScrapedBook {
   product_url: string;
   availability: string | null;
   external_id: string;
+  rating: number | null;
 }
 
 function buildPageUrl(baseUrl: string, page: number): string {
@@ -57,6 +58,28 @@ function parsePrice(value: string): number | null {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+function parseRating(value: string | undefined): number | null {
+  if (!value) {
+    return null;
+  }
+
+  const classes = value.split(/\s+/);
+  const ratingClass = classes.find((item) => item !== "star-rating");
+  if (!ratingClass) {
+    return null;
+  }
+
+  const mapping: Record<string, number> = {
+    One: 1,
+    Two: 2,
+    Three: 3,
+    Four: 4,
+    Five: 5,
+  };
+
+  return mapping[ratingClass] ?? null;
+}
+
 function parseBooksFromHtml(html: string, pageUrl: string): ScrapedBook[] {
   const $ = cheerio.load(html);
   const products: ScrapedBook[] = [];
@@ -68,6 +91,7 @@ function parseBooksFromHtml(html: string, pageUrl: string): ScrapedBook[] {
     const price = parsePrice(priceText);
     const imageSrc = node.find("img").attr("src");
     const linkHref = node.find("h3 a").attr("href");
+    const ratingClass = node.find(".star-rating").attr("class");
     const availability = node
       .find(".availability")
       .text()
@@ -92,6 +116,7 @@ function parseBooksFromHtml(html: string, pageUrl: string): ScrapedBook[] {
       product_url: productUrl,
       availability: availability || null,
       external_id: productUrl,
+      rating: parseRating(ratingClass),
     });
   });
 
@@ -193,8 +218,11 @@ export async function syncScrapingSourceForVendor(
         product_url: item.product_url,
         external_id: item.external_id,
         source: "scraping",
-        stock_quantity:
-          item.availability?.toLowerCase().includes("in stock") ? 1 : 0,
+        external_rating_rate: item.rating,
+        external_rating_count: null,
+        stock_quantity: item.availability?.toLowerCase().includes("in stock")
+          ? 1
+          : 0,
       });
 
       if (action.action === "imported") {

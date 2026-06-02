@@ -10,6 +10,11 @@ import {
 } from "@/services/admin.service";
 import { fetchMyProfile } from "@/services/user.service";
 import type { AdminUser, AdminUserRole } from "@/types/admin";
+import {
+  notifyError,
+  notifyLoading,
+  notifyUpdate,
+} from "@/utils/notifications";
 
 function formatDate(value: string): string {
   const date = new Date(value);
@@ -92,7 +97,10 @@ export default function AdminUsersPage() {
         }
       } catch (err) {
         if (active) {
-          setError(err instanceof Error ? err.message : "Failed to load users");
+          const message =
+            err instanceof Error ? err.message : "Failed to load users";
+          setError(message);
+          notifyError(err, message);
         }
       } finally {
         if (active) {
@@ -114,13 +122,18 @@ export default function AdminUsersPage() {
     }
 
     setActionId(user.id);
+    const toastId = notifyLoading("Suspending user...");
     try {
       const updated = await suspendAdminUser(user.id);
       setUsers((current) =>
         current.map((item) => (item.id === updated.id ? updated : item)),
       );
+      notifyUpdate(toastId, "User suspended successfully.");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to suspend user");
+      const message =
+        err instanceof Error ? err.message : "Failed to suspend user";
+      setError(message);
+      notifyUpdate(toastId, message, true);
     } finally {
       setActionId(null);
     }
@@ -128,15 +141,18 @@ export default function AdminUsersPage() {
 
   async function handleReactivate(user: AdminUser) {
     setActionId(user.id);
+    const toastId = notifyLoading("Reactivating user...");
     try {
       const updated = await reactivateAdminUser(user.id);
       setUsers((current) =>
         current.map((item) => (item.id === updated.id ? updated : item)),
       );
+      notifyUpdate(toastId, "User reactivated successfully.");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to reactivate user",
-      );
+      const message =
+        err instanceof Error ? err.message : "Failed to reactivate user";
+      setError(message);
+      notifyUpdate(toastId, message, true);
     } finally {
       setActionId(null);
     }
@@ -148,12 +164,17 @@ export default function AdminUsersPage() {
     }
 
     setActionId(user.id);
+    const toastId = notifyLoading("Deleting user...");
     try {
       await deleteAdminUser(user.id);
       setUsers((current) => current.filter((item) => item.id !== user.id));
       setTotal((prev) => Math.max(0, prev - 1));
+      notifyUpdate(toastId, "User deleted successfully.");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete user");
+      const message =
+        err instanceof Error ? err.message : "Failed to delete user";
+      setError(message);
+      notifyUpdate(toastId, message, true);
     } finally {
       setActionId(null);
     }
@@ -165,6 +186,7 @@ export default function AdminUsersPage() {
     }
 
     setActionId(user.id);
+    const toastId = notifyLoading("Updating role...");
     try {
       const updated = await updateAdminUserRole(
         user.id,
@@ -173,8 +195,12 @@ export default function AdminUsersPage() {
       setUsers((current) =>
         current.map((item) => (item.id === updated.id ? updated : item)),
       );
+      notifyUpdate(toastId, "Role updated successfully.");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to update role");
+      const message =
+        err instanceof Error ? err.message : "Failed to update role";
+      setError(message);
+      notifyUpdate(toastId, message, true);
     } finally {
       setActionId(null);
     }

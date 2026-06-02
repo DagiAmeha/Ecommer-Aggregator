@@ -13,6 +13,11 @@ import type {
   VendorStoreSource,
   VendorSyncResult,
 } from "@/types/vendor";
+import {
+  notifyError,
+  notifyLoading,
+  notifyUpdate,
+} from "@/utils/notifications";
 
 function formatTimestamp(value: string | null | undefined): string {
   if (!value) {
@@ -92,7 +97,6 @@ export default function VendorIntegrationsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [syncing, setSyncing] = useState(false);
   const [syncResult, setSyncResult] = useState<
     VendorSyncResult | VendorScrapingSyncResult | null
@@ -167,24 +171,28 @@ export default function VendorIntegrationsPage() {
   }, []);
 
   async function handleSave() {
-    setSaveMessage(null);
     setError(null);
 
     const trimmedUrl = sourceUrl.trim();
     if (sourceType !== "manual") {
       if (!trimmedUrl || !isValidUrl(trimmedUrl)) {
-        setError("Please enter a valid URL before saving.");
+        const message = "Please enter a valid URL before saving.";
+        setError(message);
+        notifyError(new Error(message), message);
         return;
       }
 
       const hostname = new URL(trimmedUrl).hostname;
       if (sourceType === "scraping" && hostname !== "books.toscrape.com") {
-        setError("Scraping is restricted to books.toscrape.com.");
+        const message = "Scraping is restricted to books.toscrape.com.";
+        setError(message);
+        notifyError(new Error(message), message);
         return;
       }
     }
 
     setSaving(true);
+    const toastId = notifyLoading("Saving integration settings...");
 
     try {
       const updated = await updateVendorStoreSource({
@@ -196,10 +204,15 @@ export default function VendorIntegrationsPage() {
 
       setSource(updated);
       setLastSyncAt(updated.last_sync_at ?? null);
-      setSaveMessage("Configuration saved successfully.");
+      notifyUpdate(toastId, "Configuration saved successfully.");
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to save configuration",
+      );
+      notifyUpdate(
+        toastId,
+        err instanceof Error ? err.message : "Failed to save configuration",
+        true,
       );
     } finally {
       setSaving(false);
@@ -209,12 +222,14 @@ export default function VendorIntegrationsPage() {
   async function handleSync() {
     setSyncError(null);
     setSyncResult(null);
-    setSaveMessage(null);
     setSyncing(true);
+    const toastId = notifyLoading("Syncing products...");
 
     try {
       if (!source || source.source_type === "manual") {
-        setSyncError("No active source configured for syncing.");
+        const message = "No active source configured for syncing.";
+        setSyncError(message);
+        notifyUpdate(toastId, message, true);
         return;
       }
 
@@ -228,9 +243,15 @@ export default function VendorIntegrationsPage() {
       const refreshed = await fetchVendorStoreSource();
       setSource(refreshed);
       setLastSyncAt(refreshed.last_sync_at ?? null);
+      notifyUpdate(toastId, "Sync completed successfully.");
     } catch (err) {
       setSyncError(
         err instanceof Error ? err.message : "Failed to sync products",
+      );
+      notifyUpdate(
+        toastId,
+        err instanceof Error ? err.message : "Failed to sync products",
+        true,
       );
     } finally {
       setSyncing(false);
@@ -275,7 +296,7 @@ export default function VendorIntegrationsPage() {
         </div>
 
         <div className="mt-5 grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-          <div className="rounded-2xl border border-black/5 bg-slate-50 px-4 py-3">
+          {/* <div className="rounded-2xl border border-black/5 bg-slate-50 px-4 py-3">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
               Source Type
             </p>
@@ -294,7 +315,7 @@ export default function VendorIntegrationsPage() {
             <p className="mt-2 text-sm font-semibold text-slate-900">
               {source?.url ? source.url : "Not configured"}
             </p>
-          </div>
+          </div> */}
           {!isManual ? (
             <>
               <div className="rounded-2xl border border-black/5 bg-slate-50 px-4 py-3">
@@ -342,12 +363,6 @@ export default function VendorIntegrationsPage() {
       {error ? (
         <div className="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
           {error}
-        </div>
-      ) : null}
-
-      {saveMessage ? (
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-700">
-          {saveMessage}
         </div>
       ) : null}
 

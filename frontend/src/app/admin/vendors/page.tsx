@@ -9,6 +9,11 @@ import {
   suspendAdminUser,
 } from "@/services/admin.service";
 import type { AdminUser, CreateVendorPayload } from "@/types/admin";
+import {
+  notifyError,
+  notifyLoading,
+  notifyUpdate,
+} from "@/utils/notifications";
 
 function formatDate(value: string): string {
   const date = new Date(value);
@@ -69,9 +74,10 @@ export default function AdminVendorsPage() {
         }
       } catch (err) {
         if (active) {
-          setError(
-            err instanceof Error ? err.message : "Failed to load vendors",
-          );
+          const message =
+            err instanceof Error ? err.message : "Failed to load vendors";
+          setError(message);
+          notifyError(err, message);
         }
       } finally {
         if (active) {
@@ -93,13 +99,18 @@ export default function AdminVendorsPage() {
     }
 
     setActionId(vendor.id);
+    const toastId = notifyLoading("Suspending vendor...");
     try {
       const updated = await suspendAdminUser(vendor.id);
       setVendors((current) =>
         current.map((item) => (item.id === updated.id ? updated : item)),
       );
+      notifyUpdate(toastId, "Vendor suspended successfully.");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to suspend vendor");
+      const message =
+        err instanceof Error ? err.message : "Failed to suspend vendor";
+      setError(message);
+      notifyUpdate(toastId, message, true);
     } finally {
       setActionId(null);
     }
@@ -107,15 +118,18 @@ export default function AdminVendorsPage() {
 
   async function handleReactivate(vendor: AdminUser) {
     setActionId(vendor.id);
+    const toastId = notifyLoading("Reactivating vendor...");
     try {
       const updated = await reactivateAdminUser(vendor.id);
       setVendors((current) =>
         current.map((item) => (item.id === updated.id ? updated : item)),
       );
+      notifyUpdate(toastId, "Vendor reactivated successfully.");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to reactivate vendor",
-      );
+      const message =
+        err instanceof Error ? err.message : "Failed to reactivate vendor";
+      setError(message);
+      notifyUpdate(toastId, message, true);
     } finally {
       setActionId(null);
     }
@@ -127,12 +141,17 @@ export default function AdminVendorsPage() {
     }
 
     setActionId(vendor.id);
+    const toastId = notifyLoading("Deleting vendor...");
     try {
       await deleteAdminUser(vendor.id);
       setVendors((current) => current.filter((item) => item.id !== vendor.id));
       setTotal((prev) => Math.max(0, prev - 1));
+      notifyUpdate(toastId, "Vendor deleted successfully.");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete vendor");
+      const message =
+        err instanceof Error ? err.message : "Failed to delete vendor";
+      setError(message);
+      notifyUpdate(toastId, message, true);
     } finally {
       setActionId(null);
     }
@@ -141,6 +160,7 @@ export default function AdminVendorsPage() {
   async function handleCreateVendor() {
     setCreating(true);
     setError(null);
+    const toastId = notifyLoading("Creating vendor...");
 
     try {
       const sourceType = form.source_type ?? "manual";
@@ -148,12 +168,17 @@ export default function AdminVendorsPage() {
       const password = form.password.trim();
 
       if (!password) {
-        setError("Password is required for new vendor accounts.");
+        const message = "Password is required for new vendor accounts.";
+        setError(message);
+        notifyUpdate(toastId, message, true);
         return;
       }
 
       if (sourceType !== "manual" && !sourceUrl) {
-        setError("Source URL is required for API or web scraping vendors.");
+        const message =
+          "Source URL is required for API or web scraping vendors.";
+        setError(message);
+        notifyUpdate(toastId, message, true);
         return;
       }
 
@@ -174,8 +199,12 @@ export default function AdminVendorsPage() {
         source_type: "manual",
         source_url: "",
       });
+      notifyUpdate(toastId, "Vendor created successfully.");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create vendor");
+      const message =
+        err instanceof Error ? err.message : "Failed to create vendor";
+      setError(message);
+      notifyUpdate(toastId, message, true);
     } finally {
       setCreating(false);
     }

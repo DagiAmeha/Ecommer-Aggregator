@@ -172,6 +172,11 @@ export default function ProductDetailPage() {
         return;
       }
 
+      if (product?.source !== "manual") {
+        setReviewSummary(null);
+        return;
+      }
+
       setReviewLoading(true);
       setReviewError(null);
 
@@ -198,7 +203,7 @@ export default function ProductDetailPage() {
     return () => {
       active = false;
     };
-  }, [productId]);
+  }, [product?.source, productId]);
 
   async function handleReviewSubmit(
     event: FormEvent<HTMLFormElement>,
@@ -269,6 +274,7 @@ export default function ProductDetailPage() {
     }
   }
 
+  const isManualSource = product?.source === "manual";
   const ratingValue = reviewSummary?.average_rating ?? product?.average_rating;
   const ratingCount = reviewSummary?.review_count ?? product?.review_count;
   const ratingSource =
@@ -477,52 +483,59 @@ export default function ProductDetailPage() {
                   </form>
                 )}
               </div>
-            ) : null}
+            ) : (
+              <div className="rounded-3xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+                Reviews are disabled for imported products.
+              </div>
+            )}
 
-            <div className="space-y-4">
-              <h3 className="text-sm font-semibold text-slate-800">Reviews</h3>
+            {isManualSource ? (
+              <div className="space-y-4">
+                <h3 className="text-sm font-semibold text-slate-800">
+                  Reviews
+                </h3>
 
-              {reviewLoading ? (
-                <div className="space-y-3">
-                  {Array.from({ length: 3 }).map((_, index) => (
-                    <div
-                      key={index}
-                      className="h-20 animate-pulse rounded-2xl border border-black/10 bg-white"
-                    />
-                  ))}
-                </div>
-              ) : reviewSummary?.reviews?.length ? (
-                <div className="space-y-4">
-                  {reviewSummary.reviews.map((review) => (
-                    <div
-                      key={review.id}
-                      className="rounded-2xl border border-black/10 bg-white p-4"
-                    >
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <div>
-                          <p className="text-sm font-semibold text-slate-900">
-                            {review.user.full_name || review.user.email}
-                          </p>
-                          <p className="text-xs text-slate-500">
-                            {formatDate(review.created_at)}
-                          </p>
+                {reviewLoading ? (
+                  <div className="space-y-3">
+                    {Array.from({ length: 3 }).map((_, index) => (
+                      <div
+                        key={index}
+                        className="h-20 animate-pulse rounded-2xl border border-black/10 bg-white"
+                      />
+                    ))}
+                  </div>
+                ) : reviewSummary?.reviews?.length ? (
+                  <div className="space-y-4">
+                    {reviewSummary.reviews.map((review) => (
+                      <div
+                        key={review.id}
+                        className="rounded-2xl border border-black/10 bg-white p-4"
+                      >
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div>
+                            <p className="text-sm font-semibold text-slate-900">
+                              {review.user.full_name || review.user.email}
+                            </p>
+                            <p className="text-xs text-slate-500">
+                              {formatDate(review.created_at)}
+                            </p>
+                          </div>
                         </div>
-                        <StarRatingDisplay rating={review.rating} />
+                        {review.comment ? (
+                          <p className="mt-3 text-sm text-slate-600">
+                            {review.comment}
+                          </p>
+                        ) : null}
                       </div>
-                      {review.comment ? (
-                        <p className="mt-3 text-sm text-slate-600">
-                          {review.comment}
-                        </p>
-                      ) : null}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-slate-500">
-                  No reviews yet. Be the first to share your experience.
-                </p>
-              )}
-            </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-slate-500">
+                    No reviews yet. Be the first to share your experience.
+                  </p>
+                )}
+              </div>
+            ) : null}
           </div>
 
           {relatedOffers.length > 0 ? (
