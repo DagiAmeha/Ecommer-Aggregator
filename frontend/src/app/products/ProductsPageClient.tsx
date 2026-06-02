@@ -544,7 +544,7 @@ export default function ProductsPageClient({
           type="button"
           onClick={() => setPage((current) => Math.max(1, current - 1))}
           disabled={loading || pagination.page <= 1}
-          className="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-emerald-700 hover:text-emerald-800 disabled:cursor-not-allowed disabled:[...]
+          className="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-emerald-700 hover:text-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Previous
         </button>
@@ -555,7 +555,7 @@ export default function ProductsPageClient({
           type="button"
           onClick={() => setPage((current) => current + 1)}
           disabled={loading || pagination.page >= totalPages}
-          className="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-emerald-700 hover:text-emerald-800 disabled:cursor-not-allowed disabled:[...]
+          className="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-emerald-700 hover:text-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Next
         </button>
