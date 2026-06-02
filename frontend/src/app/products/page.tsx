@@ -1,7 +1,5 @@
 "use client";
 
-"use client";
-
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
@@ -9,6 +7,7 @@ import ProductsPageClient from "./ProductsPageClient";
 
 import { useAuth } from "@/hooks/useAuth";
 import { useRecentSearches } from "@/hooks/useRecentSearches";
+import { useWishlist } from "@/components/WishlistProvider";
 
 type ProductsPageProps = {
   searchParams?: {
@@ -502,7 +501,7 @@ export default function ProductsPage() {
             setPage((current) => Math.max(1, current - 1))
           }
           disabled={loading || pagination.page <= 1}
-          className="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-emerald-700 hover:text-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-emerald-700 hover:text-emerald-800 disabled:cursor-not-allowed disabled:[...]
         >
           Previous
         </button>
@@ -515,7 +514,7 @@ export default function ProductsPage() {
           type="button"
           onClick={() => setPage((current) => current + 1)}
           disabled={loading || pagination.page >= totalPages}
-          className="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-emerald-700 hover:text-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-emerald-700 hover:text-emerald-800 disabled:cursor-not-allowed disabled:[...]
         >
           Next
         </button>
@@ -532,7 +531,7 @@ export default function ProductsPage() {
       />
 
       {compareList.length > 0 ? (
-        <div className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-between gap-4 border-t border-white/20 bg-slate-950/75 px-5 py-3 backdrop-blur-lg transition-all duration-300 animate-in slide-in-from-bottom sm:bottom-4 sm:left-1/2 sm:right-auto sm:max-w-lg sm:-translate-x-1/2 sm:rounded-2xl sm:border sm:border-white/10 sm:shadow-[0_20px_60px_rgba(0,0,0,0.4)]">
+        <div className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-between gap-4 border-t border-white/20 bg-slate-950/75 px-5 py-3 backdrop-blur-lg transition-all duration-300 [...]
           <div>
             <p className="text-xs uppercase tracking-[0.22em] text-white/50">
               Comparing
