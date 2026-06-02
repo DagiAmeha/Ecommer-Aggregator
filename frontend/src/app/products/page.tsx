@@ -1,4 +1,7 @@
-import { Suspense } from "react";
+"use client";
+
+import { Suspense, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import ProductsPageClient from "./ProductsPageClient";
 
 type ProductsPageProps = {
@@ -11,9 +14,12 @@ const PAGE_SIZE = 9;
 
 export default function ProductsPage() {
   const searchParams = useSearchParams();
+
   const { user } = useAuth();
   const { setCount } = useWishlist();
+
   const initialSearch = searchParams.get("search") ?? "";
+
   const [search, setSearch] = useState(initialSearch);
   const [searchDraft, setSearchDraft] = useState(initialSearch);
   const [category, setCategory] = useState("");
@@ -23,33 +29,50 @@ export default function ProductsPage() {
   const [sort, setSort] = useState<ProductSort>("newest");
   const [resetKey, setResetKey] = useState(0);
   const [page, setPage] = useState(1);
+
   const [products, setProducts] = useState<Product[]>([]);
+
   const [pagination, setPagination] = useState<Pagination>({
     page: 1,
     limit: PAGE_SIZE,
     total: 0,
   });
+
   const [categories, setCategories] = useState<Category[]>([]);
   const [stores, setStores] = useState<Store[]>([]);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
   const [compareList, setCompareList] = useState<number[]>([]);
   const [compareItemsById, setCompareItemsById] = useState<
     Record<number, Product>
   >({});
+
   const [compareModalOpen, setCompareModalOpen] = useState(false);
-  const [compareProducts, setCompareProducts] = useState<CompareProduct[]>([]);
+
+  const [compareProducts, setCompareProducts] = useState<CompareProduct[]>(
+    [],
+  );
+
   const [compareLoading, setCompareLoading] = useState(false);
+
   const [compareError, setCompareError] = useState<string | null>(null);
+
   const [compareMessage, setCompareMessage] = useState<string | null>(null);
+
   const [vendorStoreId, setVendorStoreId] = useState<number | null>(null);
+
   const [wishlistLoadingId, setWishlistLoadingId] = useState<number | null>(
     null,
   );
+
   const [searchSuggestions, setSearchSuggestions] = useState<
     SearchSuggestion[]
   >([]);
+
   const [didYouMean, setDidYouMean] = useState<string | null>(null);
+
   const recentSearches = useRecentSearches();
 
   useEffect(() => {
@@ -58,10 +81,11 @@ export default function ProductsPage() {
 
   useEffect(() => {
     const urlSearch = searchParams.get("search") ?? "";
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+
     setSearch(urlSearch);
     setSearchDraft(urlSearch);
     setPage(1);
+
     setResetKey((current) => current + 1);
   }, [searchParams]);
 
@@ -76,8 +100,11 @@ export default function ProductsPage() {
 
       try {
         const profile = await fetchMyProfile();
+
         const role =
-          typeof profile.role === "string" ? profile.role : profile.role?.value;
+          typeof profile.role === "string"
+            ? profile.role
+            : profile.role?.value;
 
         if (!active) {
           return;
@@ -89,6 +116,7 @@ export default function ProductsPage() {
         }
 
         const source = await fetchVendorStoreSource();
+
         if (active) {
           setVendorStoreId(source.store_id ?? null);
         }
@@ -179,6 +207,7 @@ export default function ProductsPage() {
         setError(
           err instanceof Error ? err.message : "Failed to load products",
         );
+
         setProducts([]);
       } finally {
         if (active) {
@@ -196,22 +225,26 @@ export default function ProductsPage() {
 
   useEffect(() => {
     const query = searchDraft.trim();
+
     if (query.length < 2) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSearchSuggestions([]);
       setDidYouMean(null);
       return;
     }
 
     let active = true;
+
     const timeout = window.setTimeout(async () => {
       try {
         const response = await fetchSearchSuggestions(query);
+
         if (!active) return;
+
         setSearchSuggestions(response.suggestions);
         setDidYouMean(response.didYouMean);
       } catch {
         if (!active) return;
+
         setSearchSuggestions([]);
         setDidYouMean(null);
       }
@@ -255,8 +288,11 @@ export default function ProductsPage() {
         }
 
         setCompareError(
-          err instanceof Error ? err.message : "Failed to load comparison data",
+          err instanceof Error
+            ? err.message
+            : "Failed to load comparison data",
         );
+
         setCompareProducts([]);
       } finally {
         if (active) {
@@ -276,12 +312,16 @@ export default function ProductsPage() {
     setCompareMessage(null);
 
     if (compareList.includes(product.id)) {
-      setCompareList((current) => current.filter((id) => id !== product.id));
+      setCompareList((current) =>
+        current.filter((id) => id !== product.id),
+      );
+
       setCompareItemsById((current) => {
         const next = { ...current };
         delete next[product.id];
         return next;
       });
+
       return;
     }
 
@@ -295,30 +335,39 @@ export default function ProductsPage() {
       .filter(Boolean);
 
     const currentGroupId = selectedProducts[0]?.product_group_id;
+
     if (currentGroupId && product.product_group_id !== currentGroupId) {
       setCompareMessage(
         "You can only compare the same product from different stores",
       );
+
       return;
     }
 
     if (
       selectedProducts.some(
-        (item) => item.store?.id && item.store.id === product.store?.id,
+        (item) =>
+          item.store?.id && item.store.id === product.store?.id,
       )
     ) {
-      setCompareMessage("You cannot compare products from the same store");
+      setCompareMessage(
+        "You cannot compare products from the same store",
+      );
+
       return;
     }
 
     setCompareList((current) => [...current, product.id]);
+
     setCompareItemsById((current) => ({
       ...current,
       [product.id]: product,
     }));
   }
 
-  async function handleToggleWishlist(product: Product): Promise<void> {
+  async function handleToggleWishlist(
+    product: Product,
+  ): Promise<void> {
     if (!user) {
       window.location.href = "/login";
       return;
@@ -327,6 +376,7 @@ export default function ProductsPage() {
     setWishlistLoadingId(product.id);
 
     const nextWishlisted = !product.is_wishlisted;
+
     setProducts((current) =>
       current.map((item) =>
         item.id === product.id
@@ -351,8 +401,11 @@ export default function ProductsPage() {
             : item,
         ),
       );
+
       setError(
-        err instanceof Error ? err.message : "Failed to update wishlist",
+        err instanceof Error
+          ? err.message
+          : "Failed to update wishlist",
       );
     } finally {
       setWishlistLoadingId(null);
@@ -360,7 +413,10 @@ export default function ProductsPage() {
   }
 
   function handleRemoveComparedProduct(id: number): void {
-    setCompareList((current) => current.filter((item) => item !== id));
+    setCompareList((current) =>
+      current.filter((item) => item !== id),
+    );
+
     setCompareItemsById((current) => {
       const next = { ...current };
       delete next[id];
@@ -375,7 +431,10 @@ export default function ProductsPage() {
   }
 
   const totalPages = useMemo(() => {
-    return Math.max(1, Math.ceil(pagination.total / pagination.limit));
+    return Math.max(
+      1,
+      Math.ceil(pagination.total / pagination.limit),
+    );
   }, [pagination.limit, pagination.total]);
 
   return (
@@ -386,8 +445,8 @@ export default function ProductsPage() {
           <div className="h-28 animate-pulse rounded-2xl bg-slate-100" />
           <div className="h-64 animate-pulse rounded-2xl bg-slate-100" />
         </div>
-      ) : null}
-
+      }
+    >
       <SavedSearches
         isAuthenticated={Boolean(user)}
         current={{
@@ -414,6 +473,7 @@ export default function ProductsPage() {
         <p>
           Showing {products.length} of {pagination.total} products
         </p>
+
         <p>
           Page {pagination.page} of {totalPages}
         </p>
@@ -432,15 +492,19 @@ export default function ProductsPage() {
       <div className="flex items-center justify-between gap-3 border-t border-black/10 pt-4">
         <button
           type="button"
-          onClick={() => setPage((current) => Math.max(1, current - 1))}
+          onClick={() =>
+            setPage((current) => Math.max(1, current - 1))
+          }
           disabled={loading || pagination.page <= 1}
           className="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-emerald-700 hover:text-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Previous
         </button>
+
         <span className="text-sm text-slate-500">
           Page {pagination.page} of {totalPages}
         </span>
+
         <button
           type="button"
           onClick={() => setPage((current) => current + 1)}
@@ -461,18 +525,18 @@ export default function ProductsPage() {
         onRemoveProduct={handleRemoveComparedProduct}
       />
 
-      {/* Floating compare strip — backdrop-blur, dark-border, animates in only
-          when items are selected. */}
       {compareList.length > 0 ? (
         <div className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-between gap-4 border-t border-white/20 bg-slate-950/75 px-5 py-3 backdrop-blur-lg transition-all duration-300 animate-in slide-in-from-bottom sm:bottom-4 sm:left-1/2 sm:right-auto sm:max-w-lg sm:-translate-x-1/2 sm:rounded-2xl sm:border sm:border-white/10 sm:shadow-[0_20px_60px_rgba(0,0,0,0.4)]">
           <div>
             <p className="text-xs uppercase tracking-[0.22em] text-white/50">
               Comparing
             </p>
+
             <p className="text-sm font-semibold text-white">
               {compareList.length} of 4 products
             </p>
           </div>
+
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -481,6 +545,7 @@ export default function ProductsPage() {
             >
               Clear
             </button>
+
             <button
               type="button"
               onClick={() => setCompareModalOpen(true)}
@@ -492,6 +557,6 @@ export default function ProductsPage() {
           </div>
         </div>
       ) : null}
-    </section>
+    </Suspense>
   );
 }
