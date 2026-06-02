@@ -327,6 +327,10 @@ export default function ProductsPageClient({
     setCompareModalOpen(true);
   }
 
+  function handleRemoveProduct(productId: number): void {
+    setCompareList((current) => current.filter((id) => id !== productId));
+  }
+
   async function handleToggleWishlist(product: Product): Promise<void> {
     if (!user) {
       window.location.href = "/login";
@@ -498,7 +502,7 @@ export default function ProductsPageClient({
               </p>
               <p className="mt-1 text-sm text-emerald-800/80">
                 {compareCandidateLabel
-                  ? `Found ${compareCandidateIds.length} offers for “${compareCandidateLabel}” in these results.`
+                  ? `Found ${compareCandidateIds.length} offers for "${compareCandidateLabel}" in these results.`
                   : `Found ${compareCandidateIds.length} comparable offers in these results.`}
               </p>
             </div>
@@ -563,6 +567,7 @@ export default function ProductsPageClient({
         products={compareProducts}
         loading={compareLoading}
         error={compareError}
+        onRemoveProduct={handleRemoveProduct}
         compareCount={compareList.length}
       />
     </section>
