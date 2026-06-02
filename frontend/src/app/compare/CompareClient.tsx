@@ -98,8 +98,8 @@ export default function CompareClient() {
           Compare products
         </p>
         <p className="max-w-3xl text-sm leading-6 text-slate-600 sm:text-base">
-          Enter up to four product ids for the same product across different
-          stores to compare price, category, and store information.
+          Enter up to four product ids from the same category across different
+          stores to compare price, ratings, and store information.
         </p>
       </div>
 

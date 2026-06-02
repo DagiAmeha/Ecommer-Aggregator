@@ -162,20 +162,20 @@ export async function compareProductsHandler(
       return;
     }
 
-    const groupId = products[0]?.product_group_id || products[0]?.group_id;
-    if (!groupId) {
+    const categoryId = products[0]?.category?.id;
+    if (!categoryId) {
       sendError(
         res,
-        "You can only compare the same product from different stores",
+        "You can only compare products from the same category",
         400,
       );
       return;
     }
 
-    if (products.some((product) => product.product_group_id !== groupId)) {
+    if (products.some((product) => product.category?.id !== categoryId)) {
       sendError(
         res,
-        "You can only compare the same product from different stores",
+        "You can only compare products from the same category",
         400,
       );
       return;
