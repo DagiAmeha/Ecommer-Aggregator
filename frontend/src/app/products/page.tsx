@@ -392,6 +392,12 @@ export default function ProductsPage() {
     });
   }
 
+  function handleClearCompare(): void {
+    setCompareList([]);
+    setCompareItemsById({});
+    setCompareMessage(null);
+  }
+
   const totalPages = useMemo(() => {
     return Math.max(1, Math.ceil(pagination.total / pagination.limit));
   }, [pagination.limit, pagination.total]);
@@ -519,24 +525,6 @@ export default function ProductsPage() {
 
       <RecentlyViewed />
 
-      {/* Compact comparison bar — one slim row, no heavy card. */}
-      <div className="flex items-center justify-between gap-3 rounded-2xl border border-black/10 bg-white/60 px-4 py-2.5">
-        <p className="text-sm text-slate-600">
-          <span className="font-semibold text-slate-900">
-            {compareList.length}
-          </span>{" "}
-          of 4 selected to compare
-        </p>
-        <button
-          type="button"
-          onClick={() => setCompareModalOpen(true)}
-          disabled={compareList.length < 2}
-          className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          Compare ({compareList.length}/4)
-        </button>
-      </div>
-
       <div className="flex flex-col gap-2 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">
         <p>
           Showing {products.length} of {pagination.total} products
@@ -587,6 +575,38 @@ export default function ProductsPage() {
         compareCount={compareList.length}
         onRemoveProduct={handleRemoveComparedProduct}
       />
+
+      {/* Floating compare strip — backdrop-blur, dark-border, animates in only
+          when items are selected. */}
+      {compareList.length > 0 ? (
+        <div className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-between gap-4 border-t border-white/20 bg-slate-950/75 px-5 py-3 backdrop-blur-lg transition-all duration-300 animate-in slide-in-from-bottom sm:bottom-4 sm:left-1/2 sm:right-auto sm:max-w-lg sm:-translate-x-1/2 sm:rounded-2xl sm:border sm:border-white/10 sm:shadow-[0_20px_60px_rgba(0,0,0,0.4)]">
+          <div>
+            <p className="text-xs uppercase tracking-[0.22em] text-white/50">
+              Comparing
+            </p>
+            <p className="text-sm font-semibold text-white">
+              {compareList.length} of 4 products
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleClearCompare}
+              className="rounded-full border border-white/20 px-3 py-1.5 text-xs font-medium text-white/60 transition hover:border-white/40 hover:text-white"
+            >
+              Clear
+            </button>
+            <button
+              type="button"
+              onClick={() => setCompareModalOpen(true)}
+              disabled={compareList.length < 2}
+              className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Compare now
+            </button>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }

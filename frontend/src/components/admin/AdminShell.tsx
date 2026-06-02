@@ -17,9 +17,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
   return (
     <AdminGuard>
-      <div className="min-h-[70vh] rounded-2xl border border-black/10 bg-white/80 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
-        <div className="grid gap-0 lg:grid-cols-[260px_1fr]">
-          <aside className="border-b border-black/10 bg-slate-950 px-5 py-6 text-white lg:border-b-0 lg:border-r">
+      <div className="flex min-h-[calc(100vh-8rem)] flex-col overflow-hidden rounded-2xl border border-black/10 bg-white/80 shadow-[0_4px_16px_rgba(16,35,30,0.05)] lg:h-[calc(100vh-8rem)] dark:border-white/10 dark:bg-white/5">
+        <div className="grid min-h-0 flex-1 gap-0 lg:grid-cols-[260px_1fr]">
+          <aside className="border-b border-black/10 bg-slate-950 px-5 py-6 text-white lg:border-b-0 lg:border-r lg:overflow-y-auto">
             <div className="mb-6">
               <p className="text-xs uppercase tracking-[0.28em] text-white/60">
                 Admin Panel
@@ -63,8 +63,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               Logout
             </button>
           </aside>
-          <div className="flex min-h-[70vh] flex-col">
-            <div className="border-b border-black/10 px-6 py-5">
+          <div className="flex min-h-0 flex-col lg:h-full">
+            <div className="border-b border-black/10 px-6 py-5 dark:border-white/10">
               <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
                 Admin Dashboard
               </p>
@@ -78,7 +78,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                     : "Overview"}
               </h1>
             </div>
-            <div className="flex-1 px-6 py-6">{children}</div>
+            <div className="flex-1 overflow-y-auto px-6 py-6">{children}</div>
           </div>
         </div>
       </div>

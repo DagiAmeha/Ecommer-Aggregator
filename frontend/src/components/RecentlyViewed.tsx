@@ -42,23 +42,23 @@ export function RecentlyViewed({ excludeId }: { excludeId?: number }) {
           <Link
             key={item.id}
             href={`/products/${item.id}`}
-            className="group flex w-40 shrink-0 flex-col gap-2 rounded-2xl border border-black/10 bg-white/80 p-3 transition hover:border-emerald-700"
+            className="group flex w-40 shrink-0 flex-col gap-2 rounded-2xl border border-black/10 bg-white/80 p-3 transition hover:border-emerald-700 dark:border-white/10 dark:bg-white/5 dark:hover:border-emerald-500"
           >
-            <div className="flex h-24 items-center justify-center overflow-hidden rounded-xl bg-slate-100/70">
+            <div className="flex aspect-square items-center justify-center overflow-hidden rounded-xl bg-white dark:bg-white/5">
               {item.image_url ? (
                 <img
                   src={item.image_url}
                   alt={item.name}
-                  className="h-full w-full object-contain transition group-hover:scale-105"
+                  className="h-full w-full object-contain p-2 transition group-hover:scale-105"
                 />
               ) : (
                 <span className="text-xs text-slate-400">No image</span>
               )}
             </div>
-            <p className="line-clamp-2 text-sm font-medium text-slate-800">
+            <p className="line-clamp-2 text-sm font-medium text-slate-800 dark:text-slate-200">
               {item.name}
             </p>
-            <p className="text-sm font-semibold text-emerald-700">
+            <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
               {formatPrice(item.price)}
             </p>
           </Link>

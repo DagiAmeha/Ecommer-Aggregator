@@ -1,61 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { apiRequest } from "@/services/api";
 import { logout as firebaseLogout } from "@/services/auth.service";
 
 export default function HeaderAuth() {
-  const { user, loading } = useAuth();
-  const [fullName, setFullName] = useState<string | null>(null);
-
-  useEffect(() => {
-    let active = true;
-
-    async function loadProfile() {
-      if (!user) {
-        setFullName(null);
-        return;
-      }
-
-      try {
-        const profile = await apiRequest<{
-          full_name?: string;
-          email?: string;
-        }>("/users/me");
-
-        if (!active) return;
-
-        setFullName(profile.full_name ?? profile.email ?? null);
-      } catch {
-        if (active) setFullName(null);
-      }
-    }
-
-    loadProfile();
-
-    return () => {
-      active = false;
-    };
-  }, [user]);
+  const { user, loading, profile } = useAuth();
+  const fullName = profile?.full_name ?? profile?.email ?? null;
 
   if (loading) {
+    // Neutral placeholder while auth resolves — avoids flashing role-specific
+    // links (e.g. showing "Compare" to an admin) before the role is known.
     return (
-      <>
-        <Link
-          className="rounded-full border border-black/10 px-4 py-2 transition hover:border-emerald-700 hover:text-emerald-800"
-          href="/products"
-        >
-          Products
-        </Link>
-        <Link
-          className="rounded-full border border-black/10 px-4 py-2 transition hover:border-emerald-700 hover:text-emerald-800"
-          href="/compare"
-        >
-          Compare
-        </Link>
-      </>
+      <span className="h-10 w-24 animate-pulse rounded-full bg-black/5 dark:bg-white/10" />
     );
   }
 
