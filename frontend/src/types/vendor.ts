@@ -70,3 +70,11 @@ export interface VendorScrapingSyncResult {
   updated_products: number;
   failed_products: number;
 }
+
+export interface VendorSourceSyncResult {
+  message?: string;
+  source_type: "api" | "scraping";
+  imported_products: number;
+  updated_products: number;
+  failed_products: number;
+}

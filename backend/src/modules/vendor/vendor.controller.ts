@@ -18,6 +18,8 @@ import {
   vendorStoreSourceSchema,
 } from "./vendor.validator";
 import { vendorStoreProfileSchema } from "./vendorStore.validator";
+import { syncVendorStoreSourceForUser } from "./vendorSync.service";
+import { vendorStoreSourceSyncQuerySchema } from "./vendor.validator";
 import { sendError, sendSuccess } from "../../utils/api-response";
 
 function handleVendorError(
@@ -220,6 +222,31 @@ export async function getVendorStoreSourceTypeHandler(
 
     const source = await getVendorStoreSourceType(user.id);
     sendSuccess(res, source);
+  } catch (error) {
+    handleVendorError(error, res, next);
+  }
+}
+
+export async function syncVendorStoreSourceHandler(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const user = req.authUser;
+
+    if (!user) {
+      sendError(res, "Unauthorized", 401);
+      return;
+    }
+
+    const query = vendorStoreSourceSyncQuerySchema.parse(req.query);
+    const result = await syncVendorStoreSourceForUser(user.id, query);
+
+    sendSuccess(res, {
+      message: "Store source synced successfully",
+      ...result,
+    });
   } catch (error) {
     handleVendorError(error, res, next);
   }

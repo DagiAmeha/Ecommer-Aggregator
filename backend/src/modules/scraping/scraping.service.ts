@@ -117,6 +117,7 @@ function parseBooksFromHtml(html: string, pageUrl: string): ScrapedBook[] {
       name: title,
       price,
       image_url: imageUrl,
+      description: description || null,
       product_url: productUrl,
       availability: availability || null,
       external_id: productUrl,

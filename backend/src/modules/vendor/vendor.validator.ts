@@ -40,3 +40,8 @@ export const vendorStoreSourceSchema = z
       path: ["url"],
     },
   );
+
+export const vendorStoreSourceSyncQuerySchema = z.object({
+  pages: z.coerce.number().int().min(1).max(5).optional(),
+  limit: z.coerce.number().int().min(1).max(50).optional(),
+});

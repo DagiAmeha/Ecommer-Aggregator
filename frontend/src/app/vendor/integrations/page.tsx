@@ -4,15 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   fetchVendorStoreSource,
-  syncScrapingSource,
-  syncVendorProducts,
+  syncVendorStoreSource,
   updateVendorStoreSource,
 } from "@/services/vendor.service";
-import type {
-  VendorScrapingSyncResult,
-  VendorStoreSource,
-  VendorSyncResult,
-} from "@/types/vendor";
+import type { VendorSourceSyncResult, VendorStoreSource } from "@/types/vendor";
 import {
   notifyError,
   notifyLoading,
@@ -98,9 +93,9 @@ export default function VendorIntegrationsPage() {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [syncing, setSyncing] = useState(false);
-  const [syncResult, setSyncResult] = useState<
-    VendorSyncResult | VendorScrapingSyncResult | null
-  >(null);
+  const [syncResult, setSyncResult] = useState<VendorSourceSyncResult | null>(
+    null,
+  );
   const [syncError, setSyncError] = useState<string | null>(null);
   const [sourceUrl, setSourceUrl] = useState("");
   const [isActive, setIsActive] = useState(false);
@@ -233,11 +228,7 @@ export default function VendorIntegrationsPage() {
         return;
       }
 
-      const result =
-        source.source_type === "scraping" && source.source_id
-          ? await syncScrapingSource(source.source_id)
-          : await syncVendorProducts();
-
+      const result = await syncVendorStoreSource();
       setSyncResult(result);
 
       const refreshed = await fetchVendorStoreSource();
@@ -273,8 +264,7 @@ export default function VendorIntegrationsPage() {
   const syncStatusLabel = renderSyncStatus(source?.last_sync_status ?? null);
   const importedCount = source?.last_imported_count ?? 0;
   const isManual = sourceType === "manual";
-  const syncActionLabel =
-    sourceType === "scraping" ? "Run Scraper" : "Sync Now";
+  const syncActionLabel = "Sync Now";
 
   return (
     <div className="space-y-6">
@@ -516,34 +506,14 @@ export default function VendorIntegrationsPage() {
           {syncResult ? (
             <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-700">
               <p className="text-xs uppercase tracking-[0.2em] text-emerald-600">
-                {sourceType === "scraping"
-                  ? "Last Scrape Result"
-                  : "Last Sync Result"}
+                Last Sync Result
               </p>
               <div className="mt-3 grid gap-2 text-sm">
+                <p>Source: {syncResult.source_type}</p>
                 <p>Imported Products: {syncResult.imported_products}</p>
                 <p>Updated Products: {syncResult.updated_products}</p>
                 <p>Failed Products: {syncResult.failed_products}</p>
-                {"sources_processed" in syncResult ? (
-                  <>
-                    <p>Sources Processed: {syncResult.sources_processed}</p>
-                    <p>Sources Failed: {syncResult.sources_failed}</p>
-                  </>
-                ) : null}
               </div>
-              {"source_errors" in syncResult &&
-              syncResult.source_errors.length > 0 ? (
-                <div className="mt-3 rounded-2xl border border-emerald-200 bg-white/70 p-3 text-xs text-emerald-700">
-                  <p className="font-semibold">Errors</p>
-                  <ul className="mt-2 space-y-1">
-                    {syncResult.source_errors.map((item) => (
-                      <li key={`${item.source_id}-${item.store_id}`}>
-                        {item.url}: {item.error}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
             </div>
           ) : null}
         </div>

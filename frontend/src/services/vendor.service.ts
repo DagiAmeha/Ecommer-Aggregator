@@ -5,8 +5,7 @@ import type {
   VendorStats,
   VendorStoreProfile,
   VendorStoreSource,
-  VendorScrapingSyncResult,
-  VendorSyncResult,
+  VendorSourceSyncResult,
 } from "@/types/vendor";
 
 export async function fetchVendorProducts(
@@ -78,16 +77,9 @@ export async function updateVendorStoreSource(
   });
 }
 
-export async function syncVendorProducts(): Promise<VendorSyncResult> {
-  return apiRequest<VendorSyncResult>("/aggregation/import", {
-    method: "POST",
-  });
-}
-
-export async function syncScrapingSource(
-  sourceId: number,
-): Promise<VendorScrapingSyncResult> {
-  return apiRequest<VendorScrapingSyncResult>(`/scraping/sync/${sourceId}`, {
+/** Sync the logged-in vendor's configured API or scraping source. */
+export async function syncVendorStoreSource(): Promise<VendorSourceSyncResult> {
+  return apiRequest<VendorSourceSyncResult>("/vendor/store/source/sync", {
     method: "POST",
   });
 }
