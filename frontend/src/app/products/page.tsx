@@ -17,6 +17,16 @@ import type {
   SearchSuggestion,
   CompareProduct,
 } from "@/types/catalog";
+import {
+  fetchCategories,
+  fetchComparisonProducts,
+  fetchProducts,
+  fetchSearchSuggestions,
+  fetchStores,
+} from "@/services/catalog.service";
+import { addToWishlist, removeFromWishlist } from "@/services/wishlist.service";
+import { fetchVendorStoreSource } from "@/services/vendor.service";
+import { fetchMyProfile } from "@/services/user.service";
 
 type ProductsPageProps = {
   searchParams?: {
