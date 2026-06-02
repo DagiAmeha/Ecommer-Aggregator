@@ -8,6 +8,10 @@ import ProductsPageClient from "./ProductsPageClient";
 import { useAuth } from "@/hooks/useAuth";
 import { useRecentSearches } from "@/hooks/useRecentSearches";
 import { useWishlist } from "@/components/WishlistProvider";
+import { SavedSearches } from "@/components/SavedSearches";
+import { RecentlyViewed } from "@/components/RecentlyViewed";
+import { ProductList } from "@/components/ProductList";
+import { CompareModal } from "@/components/CompareModal";
 import type {
   Product,
   Pagination,
