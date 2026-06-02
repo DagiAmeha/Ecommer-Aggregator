@@ -501,7 +501,7 @@ export default function ProductsPage() {
             setPage((current) => Math.max(1, current - 1))
           }
           disabled={loading || pagination.page <= 1}
-          className="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-emerald-700 hover:text-emerald-800 disabled:cursor-not-allowed disabled:[...]
+          className="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-emerald-700 hover:text-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Previous
         </button>
@@ -514,7 +514,7 @@ export default function ProductsPage() {
           type="button"
           onClick={() => setPage((current) => current + 1)}
           disabled={loading || pagination.page >= totalPages}
-          className="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-emerald-700 hover:text-emerald-800 disabled:cursor-not-allowed disabled:[...]
+          className="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-emerald-700 hover:text-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Next
         </button>
@@ -531,7 +531,7 @@ export default function ProductsPage() {
       />
 
       {compareList.length > 0 ? (
-        <div className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-between gap-4 border-t border-white/20 bg-slate-950/75 px-5 py-3 backdrop-blur-lg transition-all duration-300 [...]
+        <div className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-between gap-4 border-t border-white/20 bg-slate-950/75 px-5 py-3 backdrop-blur-lg transition-all duration-300">
           <div>
             <p className="text-xs uppercase tracking-[0.22em] text-white/50">
               Comparing
