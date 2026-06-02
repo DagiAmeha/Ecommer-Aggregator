@@ -105,7 +105,7 @@ export function CompareTable({
   return (
     <div className="overflow-hidden rounded-2xl border border-black/10 bg-white/80 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
       <div className="overflow-x-auto">
-        <table className="min-w-full border-separate border-spacing-0">
+        <table className="w-full border-separate border-spacing-0 table-fixed">
           <thead>
             <tr className="bg-slate-950 text-white">
               <th className="sticky left-0 bg-slate-950 px-5 py-4 text-left text-sm font-semibold uppercase tracking-[0.24em]">
@@ -114,7 +114,7 @@ export function CompareTable({
               {products.map((product) => (
                 <th
                   key={product.id}
-                  className="min-w-64 px-5 py-4 text-left text-sm font-semibold align-top"
+                  className="px-5 py-4 text-left text-sm font-semibold align-top"
                 >
                   <div className="space-y-3">
                     <div>
