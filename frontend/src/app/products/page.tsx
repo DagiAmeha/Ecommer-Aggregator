@@ -8,6 +8,15 @@ import ProductsPageClient from "./ProductsPageClient";
 import { useAuth } from "@/hooks/useAuth";
 import { useRecentSearches } from "@/hooks/useRecentSearches";
 import { useWishlist } from "@/components/WishlistProvider";
+import type {
+  Product,
+  Pagination,
+  Category,
+  Store,
+  ProductSort,
+  SearchSuggestion,
+  CompareProduct,
+} from "@/types/catalog";
 
 type ProductsPageProps = {
   searchParams?: {
