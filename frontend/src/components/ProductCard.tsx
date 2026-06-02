@@ -25,16 +25,15 @@ export function ProductCard({
   wishlistLoading?: boolean;
 }) {
   return (
-    <article className="group overflow-hidden rounded-2xl border border-black/10 bg-white/80 shadow-[0_4px_16px_rgba(16,35,30,0.05)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(16,35,30,0.08)]">
-      <div className="relative aspect-4/3 overflow-hidden bg-slate-100">
+    <article className="group overflow-hidden rounded-2xl border border-black/10 bg-white/80 shadow-[0_4px_16px_rgba(16,35,30,0.05)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(16,35,30,0.08)] dark:border-white/10 dark:bg-white/5">
+      <div className="relative aspect-4/5 overflow-hidden bg-slate-50 dark:bg-white/5">
         <Link href={`/products/${product.id}`} className="block h-full w-full">
           <ProductImage
             src={product.image_url}
             alt={product.name}
-            className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+            className="h-full w-full object-contain p-3 transition duration-500 group-hover:scale-105"
           />
         </Link>
-        <div className="absolute inset-0 bg-linear-to-t from-black/25 via-transparent to-transparent" />
         {onToggleWishlist ? (
           <button
             type="button"
@@ -64,7 +63,7 @@ export function ProductCard({
             {product.store?.name ?? `Store`}
           </p>
           <Link href={`/products/${product.id}`} className="block">
-            <h3 className="line-clamp-2 text-lg font-semibold text-slate-950 transition group-hover:text-emerald-800">
+            <h3 className="line-clamp-2 text-lg font-semibold text-slate-950 transition group-hover:text-emerald-800 dark:text-white dark:group-hover:text-emerald-300">
               {product.name}
             </h3>
           </Link>

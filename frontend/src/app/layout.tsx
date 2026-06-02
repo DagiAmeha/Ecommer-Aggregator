@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Poppins, Space_Grotesk } from "next/font/google";
 import type { ReactNode } from "react";
 import AppShell from "../components/AppShell";
+import { AuthProvider } from "../components/AuthProvider";
 import { WishlistProvider } from "../components/WishlistProvider";
 import { ThemeProvider } from "../components/ThemeProvider";
 import { ToastProvider } from "../components/ToastProvider";
@@ -57,10 +58,11 @@ export default function RootLayout({
         <div className="relative min-h-screen overflow-hidden">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.1),transparent_30%),radial-gradient(circle_at_top_right,rgba(15,23,42,0.06),transparent_26%),linear-gradient(180deg,rgba(255,255,255,0.5),rgba(244,239,232,0.36))]" />
           <ThemeProvider>
-            <WishlistProvider>
-              <AppShell>{children}</AppShell>
-            </WishlistProvider>
-            <ToastProvider />
+            <AuthProvider>
+              <WishlistProvider>
+                <AppShell>{children}</AppShell>
+              </WishlistProvider>
+            </AuthProvider>
           </ThemeProvider>
         </div>
       </body>
