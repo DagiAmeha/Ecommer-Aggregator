@@ -1,5 +1,11 @@
 "use client";
 
+import { Suspense, useState, useEffect, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
+import ProductsPageClient from "./ProductsPageClient";
+import { useAuth } from "@/hooks/useAuth";
+import { useWishlist } from "@/hooks/useWishlist";
+import { useRecentSearches } from "@/hooks/useRecentSearches";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import ProductsPageClient from "./ProductsPageClient";
