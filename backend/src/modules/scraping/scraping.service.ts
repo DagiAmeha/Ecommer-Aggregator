@@ -24,6 +24,7 @@ interface ScrapedBook {
   name: string;
   price: number;
   image_url: string | null;
+  description: string | null;
   product_url: string;
   availability: string | null;
   external_id: string;
@@ -63,21 +64,23 @@ function parseRating(value: string | undefined): number | null {
     return null;
   }
 
-  const classes = value.split(/\s+/);
-  const ratingClass = classes.find((item) => item !== "star-rating");
-  if (!ratingClass) {
-    return null;
-  }
-
   const mapping: Record<string, number> = {
-    One: 1,
-    Two: 2,
-    Three: 3,
-    Four: 4,
-    Five: 5,
+    one: 1,
+    two: 2,
+    three: 3,
+    four: 4,
+    five: 5,
   };
 
-  return mapping[ratingClass] ?? null;
+  const classes = value.split(/\s+/);
+  for (const cls of classes) {
+    const normalized = cls.toLowerCase();
+    if (normalized in mapping) {
+      return mapping[normalized];
+    }
+  }
+
+  return null;
 }
 
 function parseBooksFromHtml(html: string, pageUrl: string): ScrapedBook[] {
@@ -87,6 +90,7 @@ function parseBooksFromHtml(html: string, pageUrl: string): ScrapedBook[] {
   $("article.product_pod").each((_index, element) => {
     const node = $(element);
     const title = node.find("h3 a").attr("title")?.trim();
+    const description = node.find("p.description").text().trim();
     const priceText = node.find(".price_color").text().trim();
     const price = parsePrice(priceText);
     const imageSrc = node.find("img").attr("src");
@@ -210,7 +214,7 @@ export async function syncScrapingSourceForVendor(
       const normalizedTitle = normalizeProductTitle(item.name);
       const action = await upsertApiProduct({
         name: normalizedTitle,
-        description: item.availability ?? undefined,
+        description: item.description ?? undefined,
         price: item.price,
         category: DEFAULT_CATEGORY,
         store_id: source.store_id,

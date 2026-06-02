@@ -6,6 +6,8 @@ import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useRecentSearches } from "@/hooks/useRecentSearches";
 import { useWishlist } from "@/components/WishlistProvider";
+import { FilterBar } from "@/components/FilterBar";
+import { SearchBar } from "@/components/SearchBar";
 import { SavedSearches } from "@/components/SavedSearches";
 import { RecentlyViewed } from "@/components/RecentlyViewed";
 import { ProductList } from "@/components/ProductList";
@@ -459,6 +461,99 @@ export default function ProductsPageContent() {
 
   return (
     <>
+      <section className="space-y-6">
+        <div className="space-y-3">
+          <p className="display-font text-4xl font-semibold text-slate-950 sm:text-5xl">
+            Browse Products
+          </p>
+        </div>
+
+        {compareMessage ? (
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-800">
+            {compareMessage}
+          </div>
+        ) : null}
+
+        <div className="space-y-3 rounded-2xl border border-black/10 bg-white/75 p-4 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
+          <SearchBar
+            key={`search-${resetKey}`}
+            bare
+            initialValue={search}
+            loading={loading}
+            recentSearches={recentSearches.items}
+            suggestions={searchSuggestions}
+            didYouMean={search.trim() && pagination.total <= 2 ? didYouMean : null}
+            onValueChange={setSearchDraft}
+            onClearRecentSearches={recentSearches.clear}
+            onSearch={(value) => {
+              recentSearches.record(value);
+              setPage(1);
+              setSearch(value);
+              setSearchDraft(value);
+            }}
+          />
+          <div className="border-t border-black/10 pt-3">
+            <FilterBar
+              key={`filters-${resetKey}`}
+              bare
+              categories={categories}
+              stores={stores}
+              initialCategory={category}
+              initialStoreId={storeId}
+              initialMinPrice={minPrice}
+              initialMaxPrice={maxPrice}
+              initialSort={sort}
+              highlightedStoreId={vendorStoreId}
+              onApply={({
+                category: nextCategory,
+                storeId: nextStoreId,
+                minPrice: nextMin,
+                maxPrice: nextMax,
+                sort: nextSort,
+              }) => {
+                setPage(1);
+                setCategory(nextCategory);
+                setStoreId(nextStoreId);
+                setMinPrice(nextMin);
+                setMaxPrice(nextMax);
+                setSort((nextSort as ProductSort) || "newest");
+              }}
+              onReset={() => {
+                setPage(1);
+                setSearch("");
+                setSearchDraft("");
+                setCategory("");
+                setStoreId("");
+                setMinPrice("");
+                setMaxPrice("");
+                setSort("newest");
+                setResetKey((current) => current + 1);
+              }}
+            />
+          </div>
+        </div>
+
+        {search.trim() && pagination.total <= 2 && didYouMean ? (
+          <div className="flex flex-wrap items-center gap-2 text-sm text-slate-600">
+            <span>Did you mean</span>
+            <button
+              type="button"
+              onClick={() => {
+                recentSearches.record(didYouMean);
+                setPage(1);
+                setSearch(didYouMean);
+                setSearchDraft(didYouMean);
+                setResetKey((current) => current + 1);
+              }}
+              className="rounded-full border border-emerald-600/30 px-3 py-1.5 font-semibold text-emerald-700 transition hover:bg-emerald-50"
+            >
+              {didYouMean}
+            </button>
+            <span>?</span>
+          </div>
+        ) : null}
+      </section>
+
       <SavedSearches
         isAuthenticated={Boolean(user)}
         current={{
@@ -480,6 +575,21 @@ export default function ProductsPageContent() {
       />
 
       <RecentlyViewed />
+
+      <div className="flex items-center justify-between gap-3 rounded-2xl border border-black/10 bg-white/60 px-4 py-2.5">
+        <p className="text-sm text-slate-600">
+          <span className="font-semibold text-slate-900">{compareList.length}</span>{" "}
+          of 4 selected to compare
+        </p>
+        <button
+          type="button"
+          onClick={() => setCompareModalOpen(true)}
+          disabled={compareList.length < 2}
+          className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Compare ({compareList.length}/4)
+        </button>
+      </div>
 
       <div className="flex flex-col gap-2 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">
         <p>
@@ -536,39 +646,6 @@ export default function ProductsPageContent() {
         compareCount={compareList.length}
         onRemoveProduct={handleRemoveComparedProduct}
       />
-
-      {compareList.length > 0 ? (
-        <div className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-between gap-4 border-t border-white/20 bg-slate-950/75 px-5 py-3 backdrop-blur-lg transition-all duration-300">
-          <div>
-            <p className="text-xs uppercase tracking-[0.22em] text-white/50">
-              Comparing
-            </p>
-
-            <p className="text-sm font-semibold text-white">
-              {compareList.length} of 4 products
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleClearCompare}
-              className="rounded-full border border-white/20 px-3 py-1.5 text-xs font-medium text-white/60 transition hover:border-white/40 hover:text-white"
-            >
-              Clear
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setCompareModalOpen(true)}
-              disabled={compareList.length < 2}
-              className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Compare now
-            </button>
-          </div>
-        </div>
-      ) : null}
     </>
   );
 }

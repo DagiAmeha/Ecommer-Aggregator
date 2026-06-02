@@ -20,13 +20,13 @@ export default function HeaderAuth() {
     return (
       <>
         <Link
-          className="rounded-full border border-black/10 px-4 py-2 transition hover:border-emerald-700 hover:text-emerald-800"
+          className="rounded-full border border-black/10 px-3 py-2 text-sm text-slate-700 transition hover:border-emerald-700 hover:text-emerald-800 sm:px-4 dark:border-white/10 dark:text-slate-200 dark:hover:border-emerald-400 dark:hover:text-white"
           href="/login"
         >
           Login
         </Link>
         <Link
-          className="rounded-full bg-emerald-600 px-4 py-2 text-white transition hover:bg-emerald-700"
+          className="rounded-full bg-emerald-600 px-3 py-2 text-sm text-white transition hover:bg-emerald-700 sm:px-4"
           href="/register"
         >
           Register
@@ -50,7 +50,7 @@ export default function HeaderAuth() {
           // reload to update header state
           window.location.href = "/";
         }}
-        className="rounded-full border border-black/10 px-4 py-2 transition hover:border-emerald-700 hover:text-emerald-800"
+        className="rounded-full border border-black/10 px-3 py-2 text-sm text-slate-700 transition hover:border-emerald-700 hover:text-emerald-800 sm:px-4 dark:border-white/10 dark:text-slate-200 dark:hover:border-emerald-400 dark:hover:text-white"
       >
         Logout
       </button>

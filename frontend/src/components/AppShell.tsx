@@ -16,7 +16,6 @@ type NavLink = { href: string; label: string };
 // meaningful for shoppers, so they are scoped to the regular-user role below.
 const USER_NAV: NavLink[] = [
   { href: "/products", label: "Products" },
-  { href: "/compare", label: "Compare" },
   { href: "/dashboard", label: "Dashboard" },
 ];
 
@@ -44,19 +43,8 @@ export default function AppShell({ children }: { children: ReactNode }) {
     return pathname === href || pathname.startsWith(`${href}/`);
   }
 
-  // Admin and vendor areas have their own dedicated sidebar/header chrome.
-  // Rendering the full consumer nav on top of them produced two competing
-  // navigation systems and let a single click strand the user outside their
-  // panel. Inside those areas we collapse to a slim header (brand + account)
-  // so the in-panel sidebar is the single source of navigation.
-  const inAdminArea = pathname === "/admin" || pathname.startsWith("/admin/");
-  const inVendorArea =
-    pathname === "/vendor" || pathname.startsWith("/vendor/");
-  const slimHeader = inAdminArea || inVendorArea;
-
-  // Outside those areas, the nav is role-aware: an admin/vendor browsing the
-  // storefront always has a clear button back to their dashboard, and never
-  // sees shopper-only links that don't apply to them.
+  // Role-aware navigation: admin/vendor users always see their dashboard
+  // and products links; shoppers see the consumer navigation.
   const navLinks: NavLink[] = loading
     ? []
     : role === "admin"
@@ -66,8 +54,8 @@ export default function AppShell({ children }: { children: ReactNode }) {
         : USER_NAV;
 
   const showShopperActions =
-    !loading && !slimHeader && role !== "admin" && role !== "vendor";
-  const showNav = !slimHeader && navLinks.length > 0;
+    !loading && role !== "admin" && role !== "vendor";
+  const showNav = navLinks.length > 0;
 
   function navLinkClass(href: string): string {
     return isActive(href)
@@ -82,7 +70,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
           <HeaderBrandLink />
 
           {/* Desktop / tablet navigation. */}
-          <nav className="hidden flex-wrap items-center gap-2 text-sm font-medium sm:flex">
+          <nav className="hidden flex-wrap items-center gap-2 text-sm font-medium md:flex">
             {showNav ? (
               <div className="flex flex-wrap items-center gap-1">
                 {navLinks.map((link) => (
@@ -98,7 +86,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
               </div>
             ) : null}
             {showNav ? (
-              <span className="mx-1 hidden h-6 w-px bg-black/10 sm:block dark:bg-white/10" />
+              <span className="mx-1 hidden h-6 w-px bg-black/10 md:block dark:bg-white/10" />
             ) : null}
             <div className="flex items-center gap-2">
               {showShopperActions ? (
@@ -114,7 +102,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
 
           {/* Mobile controls: theme toggle stays inline, everything else lives
               behind the hamburger so the bar never wraps or breaks. */}
-          <div className="flex items-center gap-2 sm:hidden">
+          <div className="flex items-center gap-2 md:hidden">
             <ThemeToggle />
             <button
               type="button"
@@ -140,7 +128,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
 
         {/* Mobile dropdown panel. */}
         {mobileOpen ? (
-          <div className="mt-4 flex flex-col gap-3 border-t border-black/10 pt-4 sm:hidden dark:border-white/10">
+          <div className="mt-4 flex flex-col gap-3 border-t border-black/10 pt-4 md:hidden dark:border-white/10">
             {showNav ? (
               <div className="flex flex-col gap-1">
                 {navLinks.map((link) => (
@@ -155,7 +143,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
                 ))}
               </div>
             ) : null}
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               {showShopperActions ? (
                 <>
                   <WishlistLink />

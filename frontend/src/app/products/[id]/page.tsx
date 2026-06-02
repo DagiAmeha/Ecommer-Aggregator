@@ -319,17 +319,17 @@ export default function ProductDetailPage() {
                     "https://images.unsplash.com/photo-1513708927688-89046b44c3f9?auto=format&fit=crop&w=1400&q=80"
                   }
                   alt={product.name}
-                  className="max-h-full max-w-full object-contain"
+                  className="w-full h-full object-contain"
                 />
               </div>
             </div>
 
-            <div className="space-y-5 rounded-2xl border border-black/10 bg-white/80 p-7 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">
+            <div className="space-y-5 rounded-2xl border border-black/10 bg-white/80 p-5 shadow-[0_4px_16px_rgba(16,35,30,0.05)] sm:p-6 lg:p-7">
               <div className="space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">
                   {product.category?.name ?? ""}
                 </p>
-                <h1 className="display-font text-4xl font-semibold text-slate-950">
+                <h1 className="display-font text-3xl font-semibold text-slate-950 sm:text-4xl">
                   {product.name}
                 </h1>
               </div>
@@ -353,9 +353,8 @@ export default function ProductDetailPage() {
                   type="button"
                   onClick={handleToggleWishlist}
                   disabled={wishlistLoading}
-                  className={`inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/10 bg-white text-slate-700 transition hover:border-emerald-600 ${
-                    product.is_wishlisted ? "text-rose-600" : ""
-                  } ${wishlistLoading ? "opacity-60" : ""}`}
+                  className={`inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/10 bg-white text-slate-700 transition hover:border-emerald-600 ${product.is_wishlisted ? "text-rose-600" : ""
+                    } ${wishlistLoading ? "opacity-60" : ""}`}
                   aria-label={
                     product.is_wishlisted
                       ? "Remove from wishlist"
@@ -397,8 +396,7 @@ export default function ProductDetailPage() {
                       product_id: product.id,
                     }).catch(() => undefined);
                   }}
-                  className="inline-flex w-fit items-center justify-center rounded-full bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
-                >
+                  className="inline-flex w-fit items-center justify-center rounded-full bg-black px-5 py-3 text-sm font-semibold !text-white transition hover:bg-slate-800 dark:bg-white dark:text-black dark:hover:bg-slate-200"                >
                   Go to Store
                 </a>
               ) : (
@@ -407,6 +405,15 @@ export default function ProductDetailPage() {
                 </span>
               )}
             </div>
+          </div>
+
+          <div className="space-y-4 rounded-2xl border border-black/10 bg-white/80 p-6 shadow-[0_4px_16px_rgba(16,35,30,0.05)] dark:border-white/10 dark:bg-white/5">
+            <h2 className="display-font text-2xl font-semibold text-slate-950 dark:text-white">
+              Product Description
+            </h2>
+            <p className="text-sm leading-6 text-slate-600 dark:text-slate-300 whitespace-pre-line">
+              {product.description || "No description was provided for this item."}
+            </p>
           </div>
 
           <div className="space-y-6 rounded-2xl border border-black/10 bg-white/80 p-6 shadow-[0_4px_16px_rgba(16,35,30,0.05)]">

@@ -37,8 +37,8 @@ export function FilterBar({
     <form
       className={
         bare
-          ? "grid gap-3 md:grid-cols-[1fr_1fr_repeat(2,minmax(0,0.7fr))_1fr_auto_auto]"
-          : "grid gap-3 rounded-2xl border border-black/10 bg-white/75 p-4 shadow-[0_4px_16px_rgba(16,35,30,0.05)] md:grid-cols-[1fr_1fr_repeat(2,minmax(0,0.7fr))_1fr_auto_auto]"
+          ? "grid gap-3 sm:grid-cols-2 xl:grid-cols-[1fr_1fr_repeat(2,minmax(0,0.7fr))_1fr_auto_auto]"
+          : "grid gap-3 rounded-2xl border border-black/10 bg-white/75 p-4 shadow-[0_4px_16px_rgba(16,35,30,0.05)] sm:grid-cols-2 xl:grid-cols-[1fr_1fr_repeat(2,minmax(0,0.7fr))_1fr_auto_auto]"
       }
       onSubmit={(event) => {
         event.preventDefault();
@@ -110,14 +110,14 @@ export function FilterBar({
       </select>
       <button
         type="submit"
-        className="rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700"
+        className="rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 sm:col-span-1 xl:col-span-1"
       >
         Apply
       </button>
       <button
         type="button"
         onClick={onReset}
-        className="rounded-2xl border border-black/10 bg-transparent px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-emerald-700 hover:text-emerald-800"
+        className="rounded-2xl border border-black/10 bg-transparent px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-emerald-700 hover:text-emerald-800 sm:col-span-1 xl:col-span-1"
       >
         Reset
       </button>
