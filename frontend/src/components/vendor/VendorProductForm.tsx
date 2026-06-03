@@ -140,7 +140,18 @@ export function VendorProductForm({
             placeholder="https://"
           />
         </div>
-        
+        <div className="space-y-2">
+          <label className="text-sm font-semibold text-slate-700">
+            Product URL
+          </label>
+          <input
+            type="url"
+            value={productUrl}
+            onChange={(event) => setProductUrl(event.target.value)}
+            className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-600"
+            placeholder="https://example.com/product"
+          />
+        </div>
       </div>
 
       <div className="flex justify-end">

@@ -7,6 +7,7 @@ export const createProductSchema = z.object({
   category: z.string().trim(),
   store_id: z.number().int().positive("store_id must be a positive integer"),
   image_url: z.string().url("image_url must be a valid URL").optional(),
+  product_url: z.string().url("product_url must be a valid URL").optional(),
 });
 
 export const productSearchQuerySchema = z.object({
