@@ -102,6 +102,19 @@ export async function initDb(): Promise<void> {
       ALTER COLUMN updated_at SET NOT NULL;
   `);
 
+  // Stores re-hosted product image bytes. Vendor-supplied image URLs are
+  // downloaded server-side and saved here, then served from our own API, so
+  // they survive remote hotlink/mixed-content blocks and ephemeral hosts.
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS product_images (
+      id VARCHAR(64) PRIMARY KEY,
+      data BYTEA NOT NULL,
+      content_type VARCHAR(100) NOT NULL,
+      byte_size INTEGER NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+  `);
+
   await pool.query(`
     CREATE TABLE IF NOT EXISTS reviews (
       id SERIAL PRIMARY KEY,

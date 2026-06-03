@@ -1,0 +1,1906 @@
+ADDIS ABABA UNIVERSITY
+
+COLLEGE OF NATURAL AND COMPUTATIONAL
+                            SCIENCE
+
+DEPARTMENT OF COMPUTER SCIENCE
+        E-Commerce Aggregator System
+
+GROUP MEMBERS                         ID
+
+1. DAGIM AMEHA     .................  UGR/9384/15
+2. DESALEGNDERIBE
+3. EYOB ARAYA      ...............    UGR/3992/15
+4. KALABTADESSE 
+                   ...............    UGR/8387/15
+
+                   ...............    UGR/1277/15
+
+                    Project Advisor: Mr. Mohammed A.
+
+
+                                                      JAN 2026
+                             DECLARATION
+
+This is to declare that this project work which is done under the supervision of Mr.
+Mohammed A and having the title E-Commerce Aggregator System is the sole contribution
+of students mentioned below . No part of the project work has been reproduced illegally
+(copy and paste) which can be considered as Plagiarism. All referenced parts have been used
+to argue the idea and have been cited properly. We will be responsible and liable for any
+consequence if violation of this declaration is proven.
+
+Date: _____________________
+
+Group Members:
+
+Full Name                                 Signature
+
+1. DAGIM AMEHA                   ________________________________
+
+2. DESALEGNDERIBE                ________________________________
+
+3. EYOB ARAYA                  ________________________________
+
+4. KALABTADESSE                  ________________________________
+
+                                                                                             i
+                                      CERTIFICATE
+
+I certify that this BSc final project report entitled E-Commerce Aggregator System by group
+listed above is approved by me for submission. I certify further that, to the best of my
+knowledge, the report represents work carried out by the students.
+
+_____________________________  _____________________________
+
+                      Date        Name and Signature of Supervisor
+
+                                                                                             ii
+                               ACKNOWLEDGEMENT
+
+We would like to thank everyone who contributed in some way to this project, especially our
+advisor, Mr. Mohammed A., who has helped us all the way.
+
+                                                                                                                         iii
+                                        ABSTRACT
+
+The rapid growth of e-commerce platforms has resulted in it becoming increasingly difficult
+for customers to efficiently compare products, prices, and vendors from multiple online
+marketplaces. The E-Commerce Aggregator System project proposes the design and
+implementation of an E-Commerce Aggregator System, which simplifies the online shopping
+experience for the customer by aggregating the products of multiple vendors on a single
+platform.
+
+The E-Commerce Aggregator System allows the customer to search for products, view
+product information, compare product prices from multiple vendors, maintain wishlists, and
+view trending products. The system also allows the vendors to manage their products and
+view their product analytics. The system also allows the administrators to manage the users,
+vendors, and system reports. The E-Commerce Aggregator System is designed using
+standard software engineering principles and uses UML diagrams like use case, class,
+sequence, component, and deployment diagrams.
+
+The System proposed in this project focuses on the modularity, scalability, and security
+aspects of the system, as it uses a well-defined subsystem architecture and role-based access
+control. The system also uses a relational database design for the efficient management of
+data, thus providing the E-Commerce Aggregator System with the capability to enhance the
+online shopping experience for the customer.
+
+                                                                                                                         iv
+                                                                        CHAPTER ONE: PROJECT PROPOSAL
+
+                                    LIST OF TABLES
+
+Table 2.1 Scenario for User Registration and Login ............................ 14
+Table 2.2 Scenario: Product Search, Details, and Comparison ................. 15
+Table 2.3 Scenario for Wishlist Management and Price Alerts ................ 16
+Table 2.4 Scenario: Vendor Product and Analytics Management ................. 16
+Table 2.5 Scenario: System Administration and Reporting ..................... 17
+Table 2.6 Sign Up Use Case Description ................................................. 18
+Table 2.7 Login Use Case Description ..................................................... 19
+Table 2.8 Manage Profile Use Case Description ...................................... 19
+Table 2.9 Search Products Use Case Description ..................................... 20
+Table 2.10 View Product Details Use Case Description ............................. 21
+Table 2.11 Compare Product Prices Use Case Description ....................... 21
+Table 2.12 View Trending & Recommended Products Use Case Description ......... 22
+Table 2.13 Manage Wishlist Use Case Description .............................. 23
+Table 2.14 Receive Price Alerts Use Case Description .......................... 24
+Table 2.15 Share Product Use Case Description ...................................... 24
+Table 2.16 Manage Product Listings Use Case Description ...................... 25
+Table 2.17 View Vendor Store Page Use Case Description ....................... 25
+Table 2.18 View Vendor Analytics Use Case Description ........................ 26
+Table 2.19 Manage Users & Vendors Use Case Description ....................... 26
+Table 2.20 Show Reports Use Case Description .......................................... 27
+Table 2.21 Import Product Data Use Case Description ................................ 28
+Table 2.22 User Data Dictionary .................................................................. 28
+Table 2.23 Product Data Dictionary ............................................................. 29
+Table 2.24 Category Data Dictionary ........................................................... 30
+Table 2.25 Product Category Data Dictionary ...............................................30
+Table 2.26 Wishlist Data Dictionary ............................................................. 31
+Table 2.27 Alert Data Dictionary .................................................................. 31
+Table 2.28 Review Data Dictionary .............................................................. 32
+
+                                                                                                                          v
+Table 2.29 Report Data Dictionary  ........................................... 32
+Table 3.1 Access Control and Security Overview .............................. 48
+Table 3.2 Description of Attributes of User Class ........................... 51
+Table 3.3 Description of Operations of User Class ........................... 51
+Table 3.4 Description of Attributes of Product Class ........................ 52
+Table 3.5 Description of Operations of Product Class ........................ 52
+Table 3.6 Description of Attributes of Category Class ....................... 54
+Table 3.7 Description of Operations of Category Class ....................... 54
+Table 3.8 Description of Operations of ProductCategory Class ................. 54
+Table 3.9 Description of Operations of Wishlist Class ....................... 55
+Table 3.10 Description of Operations of WishlistItem Class ................... 55
+Table 3.11 Description of Operations of Review Class ......................... 55
+Table 3.12 Description of Operations of PriceAlert Class ..................... 56
+Table 3.13 Description of Operations of Report Class ......................... 56
+
+                                                                                                                         vi
+                                                                        CHAPTER ONE: PROJECT PROPOSAL
+                                           LIST OF FIGURES
+
+Figure 1.1 Gantt Chart ................................................................................ 5
+Figure 2.1 Use Case Diagram .................................................................... 18
+Figure 2.2 Class Diagram .......................................................................... 33
+Figure 2.3 Sequence Diagram for Sign up ................................................. 34
+Figure 2.4 Sequence Diagram for Sign in .................................................. 35
+Figure 2.5 Sequence Diagram for Wishlist Management .............................35
+Figure 2.6 Sequence Diagram for Alerting Price Change ............................36
+Figure 2.7 Sequence Diagram for Product Comparison ...............................36
+Figure 2.8 Sequence Diagram for Product Search and Aggregation ............. 37
+Figure 2.9 Sequence Diagram for Admin Analytics .................................... 37
+Figure 2.10 Activity Diagram for Authentication .......................................... 38
+Figure 2.11 Activity Diagram for Searching and Viewing Product Details ...... 38
+Figure 2.12 Activity Diagram for Wishlist Management ....................... 39
+Figure 2.13 Activity Diagram for Price Alert ........................................ 40
+Figure 2.14 Activity Diagram for Product Comparison ......................... 40
+Figure 2.15 Activity Diagram for Vendor Product Management .................. 41
+Figure 2.16 Activity Diagram for Admin Report Generation .................... 41
+Figure 3.1 Subsystem Decomposition Component Diagram ....................... 43
+Figure 3.2 Hardware/Software Mapping Deployment Diagram .................... 45
+Figure 3.3 ER Diagram ...................................................................................46
+
+                                                                                                                         vii
+LIST OF ACRONYMS AND ABBREVIATIONS
+
+No. Acronym / Abbreviation  Full Form
+1 AAU                       Addis Ababa University
+2 BSc                       Bachelor of Science
+3 CSS                       Cascading Style Sheets
+4 ER                        Entity Relationship
+5 ERD                       Entity Relationship Diagram
+6 HTML5                     HyperText Markup Language version 5
+7 ID                        Identification
+8 JWT                       JSON Web Token
+9 OMG                       Object Management Group
+10 OWASP                    Open Web Application Security Project
+11 PCID                     Product Category Identifier
+12 PID                      Product Identifier
+13 RBAC                     Role-Based Access Control
+14 RDBMS                    Relational Database Management System
+15 REST                     Representational State Transfer
+16 SC                       Scenario
+17 SQL                      Structured Query Language
+18 UC                       Use Case
+19 UID                      User Identifier
+20 UML                      Unified Modeling Language
+21 URL                      Uniform Resource Locator
+22 VS Code                  Visual Studio Code
+23 API                      Application Programming Interface
+24 UI                       User Interface
+25 UX                       User Experience
+26 DB                       Database
+27 JSON                     JavaScript Object Notation
+28 HTTP                     HyperText Transfer Protocol
+
+                                                                   viii
+29 HTTPS                            CHAPTER ONE: PROJECT PROPOSAL
+30 CRUD   HyperText Transfer Protocol Secure
+          Create, Read, Update, Delete
+
+          ix
+                                     Table of Content
+
+DECLARATION........................................................................................................................2
+CERTIFICATE...........................................................................................................................3
+ACKNOWLEDGEMENT......................................................................................................... 4
+ABSTRACT...............................................................................................................................5
+LIST OF TABLES..................................................................................................................... 6
+LIST OF FIGURES................................................................................................................... 8
+LIST OF ACRONYMS AND ABBREVIATIONS...................................................................9
+CHAPTER ONE: PROJECT PROPOSAL................................................................................1
+
+    1.1 Introduction....................................................................................................................1
+    1.2 Statement of the Problem and Justification................................................................... 1
+    1.3 Project Objectives.......................................................................................................... 2
+
+         1.3.1 General Objective................................................................................................. 2
+         1.3.2 Specific Objectives............................................................................................... 2
+    1.4 Scope of the Project....................................................................................................... 3
+    1.5 System Development Methodology...............................................................................3
+         1.5.1 Investigation (Fact-Finding) Methods.................................................................. 3
+         1.5.2 System Development Tools.................................................................................. 3
+    1.6 Significance of the Project............................................................................................. 4
+    1.7 Beneficiaries.................................................................................................................. 4
+    1.8 Time Schedule................................................................................................................5
+CHAPTER TWO: REQUIREMENT ANALYSIS.................................................................... 6
+     2.1 Introduction...................................................................................................................6
+     2.2 Current System..............................................................................................................6
+          2.2.1 Major Function of the Current System / Current System Description................6
+          2.2.2 Problems of the Existing System........................................................................ 7
+     2.3 Requirement Gathering.................................................................................................7
+          2.3.1 Requirement Gathering Methodologies..............................................................7
+          2.3.2 Results Found..................................................................................................... 8
+     2.4 Proposed System...........................................................................................................9
+          2.4.1. Overview............................................................................................................9
+          2.4.2 Functional Requirements.................................................................................... 9
+          2.4.3 Non-Functional Requirements.......................................................................... 11
+
+                  2.4.3.1. User Interface and Human Factors......................................................11
+                  2.4.3.2. Documentation.................................................................................... 11
+                  2.4.3.3. Hardware Consideration..................................................................... 11
+                                                                        CHAPTER ONE: PROJECT PROPOSAL
+
+                  2.4.3.4. Performance Characteristics............................................................... 12
+                  2.4.3.5. Error Handling and Extreme Conditions............................................ 12
+                  2.4.3.6. Quality Issues......................................................................................12
+                  2.4.3.7. System Modifications......................................................................... 12
+                  2.4.3.8. Physical Environment......................................................................... 12
+                  2.4.3.9. Security Issues.................................................................................... 13
+                  2.4.3.10. Resource Issues.................................................................................13
+    2.5 Constraints / Pseudo Requirements............................................................................. 13
+    2.6 System Model.............................................................................................................. 14
+         2.6.1 Actors and Scenario............................................................................................ 14
+         2.6.2 Use Case Model.................................................................................................. 18
+             2.6.2.1. Use Case Diagram.....................................................................................18
+             2.6.2.2. Description of Use-Case Model................................................................19
+         2.6.3. Object Model..................................................................................................... 29
+             2.6.3.1. Data Dictionary.........................................................................................29
+             2.6.3.2. Class Modeling......................................................................................... 33
+         2.6.4 Dynamic Modeling............................................................................................. 34
+             2.6.4.1 Sequence diagram...................................................................................... 34
+             2.6.4.2. Activity Diagrams.....................................................................................38
+             2.6.4.3 State Machine Diagram..............................................................................42
+         2.6.5 User Interfaces.................................................................................................... 43
+CHAPTER THREE: SYSTEM DESIGN................................................................................47
+    3.1 Introduction..................................................................................................................47
+    3.2 Current Software Architecture.....................................................................................47
+    3.3 Proposed Software Architecture................................................................................. 47
+         3.3.1 Overview.............................................................................................................47
+         3.3.2 Subsystem Decomposition..................................................................................48
+         3.3.3 Hardware/Software Mapping..............................................................................49
+         3.3.4. Persistent Data Management..............................................................................51
+         3.3.5. Access Control and Security..............................................................................52
+         3.3.6. Subsystem Services............................................................................................54
+    3.4. Detailed Class Diagram.............................................................................................. 56
+    3.5. Packages......................................................................................................................62
+REFERENCES........................................................................................................................ 63
+
+                                                                                                                        12
+                      CHAPTER ONE
+                  PROJECT PROPOSAL
+
+1.1 Introduction
+
+Information technology development has transformed modern business in our time. In
+Ethiopia we have seen the growth of the internet which in turn has supported the rise of
+e-commerce via websites, mobile apps and other digital platforms. Also which we note is that
+these systems' introduction has improved access for our users to products which they in turn
+can view and research online. Despite that growth in the field we see that eCommerce
+platforms in Ethiopia still operate in silos. Users have to visit many different sites in which
+they search for products, compare prices, and check out stock. This which we term a
+fragmented market that in turn makes online shopping an inefficient and protracted
+experience. While in other parts of the world we have seen the implementation of aggregate
+solutions to put an end to this issue, in the Ethiopian digital space these are few and far
+between. This project is on the development of an Ethiopian eCommerce Aggregator Web
+Application which we have put together from information we got from many online retailers
+and digital platforms which we present via one platform. We are aiming to make product
+discovery and comparison easier for the users as well as to improve overall transparency.
+Also we are putting forward local vendors' products to increase their reach across digital
+spaces. This project does not support a single organization but is to be used by many
+Ethiopian eCommerce players.
+
+1.2 Statement of the Problem and Justification
+
+Even with the presence of different marketplaces available online in Ethiopia, there is a lack
+of an integrated system that enables users to search and compare products offered in these
+marketplaces through a central location. This hampers efficiency since consumers search
+through different websites and applications manually.
+
+                                                1
+                                                                        CHAPTER ONE: PROJECT PROPOSAL
+Further, the product information on various platforms may differ, causing a problem for the
+customers in making a purchasing decision. The small and medium-sized sellers may face
+challenges in reaching their targeted customers.
+The reason why this project is worth undertaking is because there is a need for a holistic
+aggregation platform that puts together all the necessary data about the products offered by
+different eCommerce sites. The new platform will be beneficial to the users, the vendors, and
+the growth of the digital commerce site in Ethiopia.
+
+1.3 Project Objectives
+
+1.3.1 General Objective
+The general objective of this project is to design and develop a web-based Ethiopian
+eCommerce aggregator system that enables users to search and compare products from
+multiple online vendors through a single platform.
+
+1.3.2 Specific Objectives
+The specific objectives of the project are:
+
+          Gather requirements through stakeholder interviews and market review.
+          Organize the requirements in the form of functional and non-functional
+
+             requirements.
+          Design a web application that will meet the requirements we gathered during the
+
+             requirement analysis.
+          Implement the design using chosen programming tools and programming
+
+             languages.
+          Testing and evaluating the system against a few test cases using testing tools.
+
+                                                                                                                          2
+                                                                                   ECOMMERCE AGGREGATOR
+
+1.4 Scope of the Project
+
+This project will encompass the development of a web-based system that entails the
+aggregation and comparison of products from various eCommerce platforms based in
+Ethiopia. This web-based system will provide capabilities for users to search for products,
+perform comparisons, and redirect users to platforms for purchase.
+
+This project does not include the payment process, the delivery process, and the inventory
+process. This project will work as a comparison and aggregator only.
+
+1.5 System Development Methodology
+
+The project would adopt an iterative method of developing a system, whereby the system
+would be developed incrementally. This ensures that the system could be developed in
+stages.
+
+1.5.1 Investigation (Fact-Finding) Methods
+
+The following methods will be used to gather system requirements:
+
+     Review of existing Ethiopian eCommerce platforms
+     Observation of user interaction with online shopping systems
+     Informal discussions with online shoppers and vendors
+     Analysis of publicly available product information
+
+1.5.2 System Development Tools
+
+    A. Frontend Technologies
+
+          Next.js (React): A React-based framework used for building the user interface.
+          Tailwind CSS: A utility-first CSS framework used for rapid UI development.
+          TypeScript: Used as the primary programming language to add static typing to
+
+             JavaScript.
+          HTML5: The core markup language used to create the semantic structure of the
+
+             web application.
+
+                                                                                                                          3
+                                  CHAPTER ONE: PROJECT PROPOSAL
+
+B. Backend & Database
+
+ Node.js & Express.js: handle server-side logic and routing.
+ RESTful API: facilitate communication between the frontend and backend.
+ PostgreSQL: open-source relational database used to store structured data.
+
+C. Development & Version Control
+
+ Visual Studio Code (VS Code): for writing and debugging code.
+ Git & GitHub: version control to track changes.
+
+1.6 Significance of the Project
+
+The importance and application of this project include improved efficiency in e-commerce in
+terms of time and effort in looking for products in various platforms. Additionally, this
+project has improved transparency in product details and has also enhanced the internet
+presence of local vendors.
+
+From the technological standpoint, the report shows the applicability of contemporary web
+technology tools and approaches to solving practical problems within the context of the
+Ethiopian setting.
+
+1.7 Beneficiaries
+
+The beneficiaries of this project include:
+
+     Online consumers in Ethiopia
+     Local eCommerce vendors and small businesses
+     System administrators
+     Students and researchers
+     The Ethiopian digital commerce sector
+
+                                                                             4
+                                           ECOMMERCE AGGREGATOR
+
+1.8 Time Schedule
+
+                   Figure 1.1 Gantt Chart
+
+                                           5
+                                     CHAPTER TWO
+                             REQUIREMENT ANALYSIS
+
+2.1 Introduction
+
+This chapter presents the requirement analysis of the Ethiopian eCommerce Aggregator Web
+Application. It identifies and documents the functional and non-functional requirements
+necessary to develop a system that aggregates product information from multiple Ethiopian
+online stores and provides unified search, comparison, and analytics services. It also
+examines the existing eCommerce environment, highlights its limitations, and defines the
+proposed system's requirements based on user needs, vendor expectations, and system
+constraints. The documented requirements serve as a foundation for system modeling,
+design, and implementation in subsequent chapters.
+
+2.2 Current System
+
+At present, Ethiopia's e-Commerce ecosystem is fragmented and largely decentralized.
+Buyers and sellers interact through multiple independent platforms, websites, and social
+media channels, with limited standardization or integration.
+
+2.2.1 Major Function of the Current System / Current System Description
+
+The current system can be described as a collection of independent e-Commerce and online
+selling platforms that operate in isolation. Its major functions include:
+
+     Individual e-Commerce websites listing and selling products directly to consumers.
+     Social media­based selling (e.g., Facebook, Telegram, Instagram), where products
+
+         are advertised through posts and messages.
+     Manual price discovery by consumers through searching multiple platforms.
+     Vendor-managed inventory, pricing, and delivery information without centralized
+
+         visibility.
+     Limited or no automated comparison of products, prices, or delivery options across
+
+         stores.
+
+                                                                                                                          6
+                                                                                   ECOMMERCE AGGREGATOR
+
+     Independent management of product catalogs, pricing, and customer interactions,
+         with no shared infrastructure for aggregation or analytics.
+
+2.2.2 Problems of the Existing System
+
+Despite supporting basic online selling, the current system suffers from several limitations:
+
+     Lack of Centralization: Consumers must visit multiple websites or social media
+         pages to compare products and prices.
+
+     Time Inefficiency: Manual searching and comparison lead to wasted time and poor
+         user experience.
+
+     Low Price Transparency: Buyers cannot easily determine the best price or delivery
+         option.
+
+     Inconsistent Product Information: Product details, availability, and pricing are
+         often outdated or unclear.
+
+     Absence of Analytics: Vendors lack insights into customer behavior, pricing
+         competitiveness, and traffic performance.
+
+     Language and Accessibility Barriers: Many platforms lack local language support
+         and user-friendly interfaces.
+
+These problems highlight the need for an integrated and intelligent aggregation system.
+
+2.3 Requirement Gathering
+
+Requirement gathering was conducted to understand user needs, market gaps, and technical
+feasibility within the Ethiopian context.
+
+2.3.1 Requirement Gathering Methodologies
+
+The following methodologies were used to collect system requirements:
+
+     Stakeholder Analysis: Identification of key stakeholders, including consumers,
+         vendors, and administrators.
+
+     User Observation: Analysis of how users currently search for and purchase products
+         online.
+
+                                                                                                                          7
+                                                               CHAPTER TWO: REQUIREMENT ANALYSIS
+
+     Market and Platform Review: Study of existing Ethiopian and international
+         e-Commerce platforms to identify best practices and gaps.
+
+     Informal Interviews and Discussions: Conversations with online sellers and buyers
+         to understand their challenges and expectations.
+
+     Document and Content Analysis: Review of existing online stores, product listings,
+         and social media selling patterns.
+
+These methods ensured that both functional and non-functional requirements were captured
+accurately.
+
+2.3.2 Results Found
+The requirement gathering process produced the following key findings:
+
+     Users require a single platform to search and compare products from multiple
+         Ethiopian online stores.
+
+     Accurate and frequently updated price, stock, and delivery information is essential.
+     Vendors need improved visibility, traffic redirection, and performance analytics.
+     The system must support multiple data collection methods, including APIs, web
+
+         scraping, and manual vendor input.
+     Advanced filtering, categorization, and search capabilities are critical for usability.
+     Support for local languages is necessary to improve accessibility.
+     Both consumers and vendors value price tracking, alerts, and analytics features.
+     Administrative tools are required for data management, moderation, and system
+
+         monitoring.
+These results directly inform the functional and non-functional requirements of the proposed
+Ethiopian e-Commerce Aggregator Web Application.
+
+                                                                                                                          8
+                                                                                   ECOMMERCE AGGREGATOR
+
+2.4 Proposed System
+
+2.4.1. Overview
+
+The proposed system is a web-based eCommerce aggregator platform designed to collect and
+present product information from multiple Ethiopian online stores within a single interface.
+The system enables users to search, compare prices, and evaluate delivery options across
+different vendors, thereby reducing the need to visit multiple websites.
+
+2.4.2 Functional Requirements
+1) Registration and Authentication
+
+          The system shall allow users to create an account and role based authentication
+             using an email and password or through third-party services such as Google or
+             Facebook.
+
+          The system shall provide a secure mechanism for users to log out of the system.
+
+2) Profile management
+          The system shall allow authenticated end users, vendors and admins to view and
+             modify their personal profile information.
+
+3) Product Search
+          The system shall allow end users to search for products across all aggregated
+             stores through a single search interface.
+
+4) View product details
+          The system shall allow users to view detailed product information, including
+             price, images, vendor name, availability, and delivery options.
+
+5) Product Comparison
+          The system shall enable users to compare prices of identical or similar products
+             offered by different vendors.
+
+                                                                                                                          9
+                                                               CHAPTER TWO: REQUIREMENT ANALYSIS
+6) Manage Wishlist
+
+          The system shall allow authenticated users to add products to, view, and remove
+             products from a personal wishlist.
+
+7) Product sharing
+          The system shall allow users to share product links through supported social
+             media platforms.
+
+8) View trending and recommended products
+          The system shall recommend popular or similar products based on user activity.
+
+9) Manage Vendor
+          The system shall allow vendors to register and manage their store profiles.
+
+10) Manage Store
+          The system shall allow vendors to add and update product listings through a
+             dashboard.
+          The system shall provide vendors with analytics for their products.
+
+11) Manage users and vendors
+          The system shall allow administrators to approve, suspend, or remove users and
+             vendors.
+
+12) View Reporting
+          The system shall allow administrators to generate reports related to platform
+             usage and performance.
+
+                                                                                                                        10
+                                                                                   ECOMMERCE AGGREGATOR
+2.4.3 Non-Functional Requirements
+2.4.3.1. User Interface and Human Factors
+The system shall provide a simple, intuitive, and responsive web-based user interface. The
+interface shall be designed to accommodate users with basic computer and internet literacy,
+including general consumers, vendors, and administrators.
+The system shall support multiple devices such as smartphones, tablets, and desktop
+computers providing clear navigation, readable layouts, and consistent design elements.
+Support local language options, such as Amharic, to improve accessibility for Ethiopian
+users.
+2.4.3.2. Documentation
+The system shall be accompanied by adequate documentation at different levels.
+
+     User documentation shall be provided to guide end users and vendors on how to use
+         system features.
+
+     Technical documentation shall be provided for developers and system maintainers,
+         including system architecture, database design, and deployment procedures.
+
+The system development process shall be documented to support maintenance, evaluation,
+and future enhancements.
+2.4.3.3. Hardware Consideration
+The system shall be compatible with standard server and cloud infrastructure.No specialized
+hardware shall be required on the client side.Users shall access the system using commonly
+available devices with web browsers.
+
+                                                                                                                        11
+                                                               CHAPTER TWO: REQUIREMENT ANALYSIS
+2.4.3.4. Performance Characteristics
+The system shall be designed to deliver acceptable performance under normal and peak
+usage conditions. it shall respond to user search and comparison requests within a reasonable
+time and support multiple concurrent users without significant performance degradation.
+
+2.4.3.5. Error Handling and Extreme Conditions
+The system shall handle network failures, unavailable vendor websites, and incomplete
+product data. User-friendly error messages shall be displayed when failures occur. The
+system shall continue to function under poor network conditions common in the deployment
+environment.
+2.4.3.6. Quality Issues
+The system shall meet acceptable standards of reliability, availability, and robustness.It
+ensures data consistency and accuracy across aggregated sources. Administrators and
+stakeholders shall be involved in validating system functionality and data quality during
+development and testing.
+2.4.3.7. System Modifications
+The system shall be designed to support future modifications and enhancements.Anticipated
+changes include adding new vendors, data sources, features, and analytics capabilities. The
+modular design shall minimize the impact of changes on existing system components.
+2.4.3.8. Physical Environment
+The system shall be deployed on cloud-based or institutional servers. Users shall access the
+system remotely through the internet without location-specific constraints.
+
+                                                                                                                        12
+                                                                                   ECOMMERCE AGGREGATOR
+
+2.4.3.9. Security Issues
+The system shall be protected against unauthorized access and malicious activities.
+Authentication and authorization mechanisms shall be implemented for users, vendors, and
+administrators.
+
+2.4.3.10. Resource Issues
+The system shall efficiently manage computational and storage resources.Server storage and
+processing power shall be optimized to handle large volumes of product data.
+
+2.5 Constraints / Pseudo Requirements
+
+Technical Constraints
+     The system depends on third-party eCommerce websites for product data, whose
+         availability, structure, and data accuracy are beyond the control of the system.
+     Changes in vendor website layouts or APIs may affect data aggregation processes
+         such as web scraping and API integration.
+
+Operational Constraints
+     The accuracy and freshness of product information depend on the frequency of data
+         updates from vendors and external sources.
+     The system shall operate under varying internet connectivity conditions, which may
+         affect real-time data retrieval and user access.
+     Vendor participation is voluntary, which may limit the completeness of aggregated
+         data.
+
+Legal and Ethical Constraints
+     The system shall respect website access policies, terms of service, and applicable
+         laws during data collection.
+
+                                                                                                                        13
+                                                               CHAPTER TWO: REQUIREMENT ANALYSIS
+     Personal data of users and vendors shall be handled in compliance with relevant data
+
+         protection and privacy regulations.
+     The system shall avoid unauthorized data manipulation or misuse of vendor content.
+
+2.6 System Model
+
+2.6.1 Actors and Scenario
+
+Actors
+1. End User (Customer)
+An end user is a customer who uses the e-commerce aggregator platform to search, compare,
+and view products from multiple vendors. The end user can manage a wishlist, receive price
+alerts when wishlist product prices change, share products, and manage their personal profile.
+The end user is redirected to external vendor platforms to complete purchases.
+2. Vendor
+A vendor represents a seller whose products are listed on the aggregator platform. Vendors
+can authenticate into the system, manage their vendor profile, add or update product listings,
+manage stock availability, and view analytics related to product performance and visibility on
+the platform.
+3. Administrator
+An administrator is responsible for managing and monitoring the overall operation of the
+e-commerce aggregator system. Administrators can manage users and vendors, configure
+system settings, oversee platform content, and generate analytical and operational reports to
+ensure smooth system functionality.
+
+                                                                                                                        14
+                                                             ECOMMERCE AGGREGATOR
+
+Scenarios
+Table 2.1 Scenario for User Registration and Login
+
+Scenario ID    SC-01
+Scenario Name  User Registration and Login
+
+Participating Actor(s) Amanuel (End User)
+
+Main Flow      1. Amanuel opens the e-commerce aggregator application.
+               2. The system displays login and registration options.
+               3. Amanuel selects the registration option if he is a new user.
+               4. Amanuel enters required registration details.
+               5. The system validates the entered information.
+               6. The system creates a new user account and confirms
+               registration.
+               7. Amanuel enters login credentials.
+               8. The system validates the credentials.
+               9. The system grants access to the user dashboard.
+
+Table 2.2 Scenario: Product Search, Details, and Comparison
+
+Scenario ID    SC-02
+
+Scenario Name  Product Search, Details Viewing, and Comparison
+
+Participating Actor(s) Amanuel (End User)
+
+                                                                15
+Main Flow                                CHAPTER TWO: REQUIREMENT ANALYSIS
+
+               1. Amanuel enters a product name or category.
+               2. The system validates the search input.
+               3. The system retrieves matching products from vendor
+               systems.
+               4. The system displays aggregated search results.
+               5. Amanuel selects a product to view details.
+               6. The system displays detailed product information.
+               7. Amanuel selects two or more products for comparison.
+               8. The system retrieves pricing and vendor information.
+               9. The system displays a structured product comparison table.
+
+Table 2.3 Scenario for Wishlist Management and Price Alerts
+
+Scenario ID    SC-03
+
+Scenario Name  Wishlist Management and Price Alerts
+
+Participating Actor(s) Amanuel (End User)
+
+Main Flow      1. Amanuel selects a product from the product list.
+               2. Amanuel adds the product to the wishlist.
+               3. The system saves the product under Amanuel's account.
+               4. Amanuel enables price tracking for the wishlist product.
+               5. The system periodically monitors product price changes.
+               6. The system detects a price change.
+               7. The system notifies Amanuel of the price update.
+
+                                                                            16
+                                                         ECOMMERCE AGGREGATOR
+
+Table 2.4 Scenario: Vendor Product and Analytics Management
+
+Scenario ID             SC-04
+Scenario Name           Vendor Product and Analytics Management
+
+Participating Actor(s) Kebede Store (Vendor)
+
+Main Flow               1. Kebede logs into the vendor dashboard.
+                        2. Kebede accesses the product management section.
+                        3. Kebede adds, updates, or removes product information.
+                        4. The system validates and saves the changes.
+                        5. Kebede opens the analytics dashboard.
+                        6. The system displays performance metrics and reports.
+                        7. Kebede reviews analytics information.
+
+Table 2.5 Scenario: System Administration and Reporting
+
+Scenario ID             SC-05
+Scenario Name           User, Vendor, and System Administration
+Participating Actor(s)  Tesfaye (Administrator)
+
+Main Flow               1. Tesfaye logs into the administrative panel.
+                        2. The system displays user, vendor, and reporting tools.
+                        3. Tesfaye manages users and vendors.
+                        4. Tesfaye generates and reviews system reports.
+                        5. The system saves changes and updates system records.
+
+                                                                                   17
+                           CHAPTER TWO: REQUIREMENT ANALYSIS
+
+2.6.2 Use Case Model
+2.6.2.1. Use Case Diagram
+
+                           Figure 2.1 Use Case Diagram
+                                                                                                         18
+                                                      ECOMMERCE AGGREGATOR
+
+2.6.2.2. Description of Use-Case Model
+
+Table 2.6 Sign Up Use Case Description
+
+Use Case ID     UC-01
+
+Use Case Name   Sign Up
+
+Participating Actors End User
+
+Use Case Description Allows a new user to register an account in the system.
+
+Precondition    The user does not already have an account.
+
+Flow of Events  1. The user opens the application.
+                2. The system displays the registration form.
+                3. The user enters required details.
+                4. The system validates the information.
+                5. The system creates the user account.
+
+Alternate Flow  1. If the entered data is invalid or incomplete:
+                1.1 System displays an error message requesting correction.
+
+Post-Condition  The user account is successfully created.
+
+Table 2.7 Login Use Case Description
+
+Use Case ID     UC-02
+
+Use Case Name   Login
+
+Participating Actors End User, Vendor, Administrator
+
+Use Case Description Authenticates users and grants system access based on their role.
+
+Precondition    The user has a registered account.
+
+Flow of Events  1. User enters login credentials.
+                2. The system verifies the credentials.
+                3. The system identifies the user 's role.
+                4. System grants access to the system.
+
+                                                                                        19
+Alternate Flow                                 CHAPTER TWO: REQUIREMENT ANALYSIS
+Post-Condition
+                1. If the login credentials are incorrect:
+                1.1 System displays an error message.
+                The user is logged into the system.
+
+Table 2.8 Manage Profile Use Case Description
+
+Use Case ID     UC-03
+
+Use Case Name   Manage Profile
+
+Participating Actors End User, Vendor, Administrator
+
+Use Case Description Allows users to view and update their profile information.
+
+Precondition    The user is authenticated.
+
+Flow of Events  1. The user navigates to the profile page.
+                2. The system displays current profile information.
+                3. User updates profile details.
+                4. The system validates the updated information.
+                5. The system saves the changes.
+
+Alternate Flow  1. If invalid data is entered:
+                1.1 System displays an error message.
+
+Post-Condition  Profile information is successfully updated.
+
+Table 2.9 Search Products Use Case Description
+
+Use Case ID     UC-04
+
+Use Case Name   Search Products
+
+Participating Actors End User
+
+Use Case Description Enables users to search for products from multiple vendors.
+
+                                                                                  20
+Precondition                                                        ECOMMERCE AGGREGATOR
+Flow of Events
+                The user is logged in.
+Alternate Flow
+Post-Condition  1. The user enters search keywords.
+                2. The system processes the search request.
+                3. The system retrieves matching products.
+                4. The system displays the search results.
+
+                1. If no matching products are found:
+                1.1 System displays a "No results found" message.
+
+                The product list is displayed to the user.
+
+Table 2.10 View Product Details Use Case Description
+
+Use Case ID     UC-05
+
+Use Case Name   View Product Details
+
+Participating Actors End User
+
+Use Case Description Displays detailed information of a selected product.
+
+Precondition    Product exists in the system.
+
+Flow of Events  1. User browses or searches for products.
+                2. The user selects a product.
+                3. The system retrieves product information.
+                4. The system displays detailed product infor
+                mation.
+
+Alternate Flow  1. If product details are unavailable:
+                1.1 System notifies the user that details cannot be displayed.
+
+Post-Condition  Product details are successfully viewed by the user.
+
+                                                                                21
+                                        CHAPTER TWO: REQUIREMENT ANALYSIS
+
+Table 2.11 Compare Product Prices Use Case Description
+
+Use Case ID     UC-06
+
+Use Case Name   Compare Product Prices
+
+Participating Actors End User
+
+Use Case Description Allows users to compare prices and features of products across
+                             different vendors.
+
+Precondition    At least two products are selected for comparison.
+
+Flow of Events  1. The user selects multiple products.
+                2. The user chooses the compare option.
+                3. System retrieves pricing and feature data.
+                4. The system compares the selected products.
+                5. The system displays a comparison table.
+
+Alternate Flow  1. If fewer than two products are selected:
+                1.1 System prompts the user to select additional products.
+
+Post-Condition  Comparison results are displayed to the user.
+
+Table 2.12 View Trending & Recommended Products Use Case Description
+
+Use Case ID     UC-07
+
+Use Case Name   View Trending & Recommended Products
+
+Participating Actors End User
+
+Use Case Description Displays trending and recommended products based on popularity
+                             or user behavior.
+
+Precondition    The user is logged in.
+
+Flow of Events  1. The user navigates to the trending or recommended section.
+                2. The system retrieves trending and recommendation data.
+                3. The system processes the data.
+
+                                                                               22
+Alternate Flow                                                     ECOMMERCE AGGREGATOR
+Post-Condition
+                4. The system displays trending and recommended products.
+                1. If recommendation data is unavailable:
+                1.1 The system displays default or popular products.
+                Trending and recommended products are shown to the user.
+
+Table 2.13 Manage Wishlist Use Case Description
+
+Use Case ID     UC-08
+
+Use Case Name   Manage Wishlist
+
+Participating Actors End User
+
+Use Case Description Allows users to add or remove products from their wishlist.
+
+Precondition    The user is authenticated.
+
+Flow of Events  1. The user selects a product.
+                2. The user chooses to add or remove the product from the wishlist.
+                3. System updates the wishlist.
+                4. The system confirms the update to the user.
+
+Alternate Flow  1. If the user is not authenticated:
+                1.1 System prompts the user to log in.
+
+Post-Condition  Wishlist is successfully updated.
+
+
+
+Table 2.14 Receive Price Alerts Use Case Description
+
+Use Case ID     UC-09
+Use Case Name   Receive Price Alerts
+
+                                                                                  23
+                                               CHAPTER TWO: REQUIREMENT ANALYSIS
+
+Participating Actors End User
+
+Use Case Description Notifies users when the prices of wishlist products change.
+
+Precondition    Product is added to the user's wishlist.
+
+Flow of Events  1. The system continuously monitors wishlist product prices.
+                2. A price change is detected.
+                3. The system generates a price alert.
+                4. The user receives a notification.
+
+Alternate Flow  1. If price data is unavailable:
+                1.1 System delays the price alert until data becomes available.
+
+Post-Condition  Price alert notification is successfully sent to the user.
+
+Table 2.15 Share Product Use Case Description
+
+Use Case ID     UC-10
+
+Use Case Name   Share Product
+
+Participating Actors End User
+
+Use Case Description Allows users to share product links with external platforms or users.
+
+Precondition    The product page is available in the system.
+
+Flow of Events  1. The user navigates to a product page.
+                2. The user selects the share option.
+                3. The system generates a shareable product link.
+                4. The user shares the link using the selected method.
+
+Alternate Flow  1. If sharing fails:
+                1.1 System displays an error message.
+
+Post-Condition  Product link is successfully shared.
+
+                                                                                  24
+                                                         ECOMMERCE AGGREGATOR
+
+Table 2.16 Manage Product Listings Use Case Description
+
+Use Case ID     UC-11
+
+Use Case Name   Manage Product Listings
+
+Participating Actors Vendor
+
+Use Case Description Enables vendors to add, update, or remove product listings.
+
+Precondition    The vendor is authenticated.
+
+Flow of Events  1. Vendor logs into the system.
+                2. Vendor accesses the product management dashboard.
+                3. Vendor adds, updates, or removes product listings.
+                4. The system validates the input data.
+                5. The system saves the changes.
+
+Alternate Flow  1. If invalid input is detected:
+                1.1 System displays appropriate error messages.
+
+Post-Condition  Product listings are successfully updated.
+
+Table 2.17 View Vendor Store Page Use Case Description
+
+Use Case ID     UC-12
+
+Use Case Name   View Vendor Store Page
+
+Participating Actors End User
+
+Use Case Description Displays product listings specific to a selected vendor.
+
+Precondition    Vendor stores exist in the system.
+
+Flow of Events  1. The user searches for or selects a vendor.
+                2. The user opens the vendor store page.
+                3. The system retrieves vendor-specific products.
+                4. The system displays the vendor store page.
+
+Alternate Flow  1. If the vendor store is unavailable:
+
+                                                                                  25
+Post-Condition                                        CHAPTER TWO: REQUIREMENT ANALYSIS
+
+                      1.1 System displays an error message.
+                      Vendor store page is successfully viewed.
+
+Table 2.18 View Vendor Analytics Use Case Description
+
+Use Case ID           UC-13
+Use Case Name
+Participating Actors  View Vendor Analytics
+Use Case Description
+Precondition          Vendor
+Flow of Events
+                      Displays analytics related to vendor product performance.
+Alternate Flow
+                      Vendor is logged in.
+Post-Condition
+                      1. Vendor accesses the analytics dashboard.
+                      2. The system retrieves sales and performance data.
+                      3. The system processes analytics information.
+                      4. The system displays analytics results.
+
+                      1. If complete analytics data is unavailable:
+                      1.1 The system displays partial analytics data.
+
+                      Vendor analytics are displayed to the vendor.
+
+Table 2.19 Manage Users & Vendors Use Case Description
+
+Use Case ID           UC-14
+Use Case Name         Manage Users & Vendors
+Participating Actors  Administrator
+Use Case Description  Allows administrators to manage user and vendor accounts.
+
+                                                                                 26
+Precondition                                                     ECOMMERCE AGGREGATOR
+Flow of Events
+                Administrator is authenticated.
+Alternate Flow
+Post-Condition  1. Admin logs into the system.
+                2. Admin accesses the management panel.
+                3. Admin performs user/vendor account actions (create, update,
+                delete).
+                4. System validates admin actions.
+                5. The system updates the user/vendor records accordingly.
+
+                1. If admin attempts unauthorized actions:
+                1.1 The system blocks the action and notifies the admin.
+
+                User and vendor accounts are managed successfully.
+
+Table 2.20 Show Reports Use Case Description
+
+Use Case ID     UC-15
+
+Use Case Name   Show Reports
+
+Participating Actors Administrator
+
+Use Case Description Generates system usage and performance reports.
+
+Precondition    Administrator is logged in.
+
+Flow of Events  1. Admin selects the desired report type.
+                2. The system collects relevant data.
+                3. The system generates the report.
+                4. The system displays the generated report to the admin.
+
+Alternate Flow  1. If some data is missing:
+                1.1 System generates and displays a partial report with available
+                data.
+
+Post-Condition  Reports are successfully generated and displayed.
+
+Table 2.21 Import Product Data Use Case Description
+                                                                                                                        27
+                                     CHAPTER TWO: REQUIREMENT ANALYSIS
+
+Use Case ID     UC-16
+
+Use Case Name   Import Product Data
+
+Participating Actors System (Automated Process)
+
+Use Case Description automatically retrieves and updates product information from
+                              external vendor e-commerce platforms
+
+Precondition    Vendor systems are integrated and product data import is scheduled
+                or triggered by the system.
+
+Flow of Events  1. The system initiates the product data import process
+                    automatically.
+
+                2. The system sends requests to external vendor systems through
+                    available APIs or data feeds.
+
+                3. External vendor systems return product information, including
+                    price and stock data.
+
+                4. The system validates and processes the received data.
+
+                5. The system updates the product records in the database.
+
+Alternate Flow  1. If a vendor system is unavailable, the system skips the vendor
+                    and retries the import later.
+
+                2. If received data is incomplete or invalid, the system logs the
+                    error and processes the remaining data.
+
+Post-Condition  Product information in the system database is successfully updated
+                with the latest vendor data.
+
+                                                                                   28
+                                                     ECOMMERCE AGGREGATOR
+
+2.6.3. Object Model
+2.6.3.1. Data Dictionary
+
+Table 2.22 User Data Dictionary
+
+Name       Type                  Length Description         Example
+
+UserId     String                10  Unique Identification  UID1
+Username                             The user's name
+Email      String                30  Email of the user      @username
+                                                            john@example.c
+Password   String                30  State of Login         om
+Role                                 User's access level    True, False
+           String                10
+                                                            Admin
+           String                10
+
+Table 2.23 Product Data Dictionary
+
+Name       Type           Length Description                Example
+
+productId  Integer        10         Unique product identifier PID1
+
+name       String         150        Product name           Samsung Galaxy
+                                                            S23
+
+description String        500        Product description    Android
+                                                            smartphone
+
+price      Decimal 10,2              Product price          899.99
+
+stockQuantity Integer     11         Number of units of the 25
+                                     product currently available
+
+                                                                        29
+vendorId    Integer  10                         CHAPTER TWO: REQUIREMENT ANALYSIS
+
+                                             in stock
+                                             Vendor who owns the 201
+                                             product
+
+Table 2.24 Category Data Dictionary
+
+Name        Type     Length Description                                Example
+
+CategoryId  String   10                      Unique         category CID1
+                                             identifier
+
+CategoryName String  100                     Category name             Electronics
+
+Table 2.25 Product Category Data Dictionary
+
+Name        Type         Length Description                                Example
+                                                                           PCID1
+productCategoryId Integer 10                 Unique identifier for         PID1
+                                             product­category mapping      CID1
+productId   Integer 10
+                                             Reference to Product
+
+categoryId  Integer 10                       Reference to Category
+
+                                                                                    30
+                                                       ECOMMERCE AGGREGATOR
+
+Table 2.26 Wishlist Data Dictionary
+
+Name           Type               Length Description       Example
+
+WishlistId     String             10      Unique           wishlist WID1
+UserId                                    identifier
+
+               String             30      The user's name  UID1
+
+Table 2.27 Alert Data Dictionary
+
+Name           Type               Length  Description      Example
+AlertId        String             10
+UserId                                    Unique price alert AID1
+ProductId                                 identifier
+PreviousPrice
+CurrentPrice   String             10      User who created the UID1
+AlertStatus                               alert
+
+               String             10      Tracked product  PID1
+
+               Decimal 10,2               Last recorded price of 850.00
+                                          the product
+               Decimal 10,2
+                                          Updated price after 799.99
+               String             20      change
+
+                                          Alert status (Active/ Active
+                                          Triggered)
+
+                                                                          31
+                                   CHAPTER TWO: REQUIREMENT ANALYSIS
+
+Table 2.28 Review Data Dictionary
+
+Name        Type     Length Description                 Example
+
+ReviewId    String   10            Unique      wishlist RID1
+                                   identifier
+UserId
+ProductId   String   30            Reviewer identifier  UID1
+
+Rating      String   10            Reviewed    product PID1
+Comment                            identifier
+
+            Integer  1             Product rating(1-5)  5
+
+            Sting    500           User review comment Excellent
+                                                                   product
+
+Table 2.29 Report Data Dictionary
+
+Name        Type     Length Description                 Example
+
+ReportId    String   10            Unique report identifier RID1
+
+ReportType  String   30            Reviewer identifier  UID1
+
+GeneratedBy String   20            Generated for vendor / Admin
+                                   admin
+
+                                                                            32
+                         ECOMMERCE AGGREGATOR
+
+2.6.3.2. Class Modeling
+
+                         Figure 2.2 Class Diagram
+                                                                                                    33
+                          CHAPTER TWO: REQUIREMENT ANALYSIS
+
+2.6.4 Dynamic Modeling
+2.6.4.1 Sequence diagram
+
+Figure 2.3 Sequence diagram for Signup
+                                                                                     34
+                                                          ECOMMERCE AGGREGATOR
+
+         Figure 2.4 Sequence diagram for Signin
+
+Figure 2.5 Sequence diagram for Wishlist management
+                                                                                               35
+                                      CHAPTER TWO: REQUIREMENT ANALYSIS
+
+Figure 2.6 Sequence diagram for Alerting Price Change
+
+ Figure 2.7 Sequence diagram for Product Comparison
+                                                                                               36
+                                                                 ECOMMERCE AGGREGATOR
+
+Figure 2.8 Sequence diagram for Product Search and Aggregation
+
+         Figure 2.9 Sequence diagram for Admin Analytics
+                                                                                                      37
+                                                               CHAPTER TWO: REQUIREMENT ANALYSIS
+2.6.4.2. Activity Diagrams
+Activity diagrams are used to model the workflow and control flow of the system. They
+illustrate how activities are performed step-by-step, including decision points, parallel
+actions, and alternative paths.
+
+                           Figure 2.10 Activity diagram for Authentication
+
+                                                                                                                        38
+                                                                     ECOMMERCE AGGREGATOR
+
+Figure 2.11 Activity diagram for Searching and Viewing Product details
+
+         Figure 2.12 Activity diagram for Wishlist Management.
+
+                                                                                                          39
+                                     CHAPTER TWO: REQUIREMENT ANALYSIS
+
+     Figure 2.13 Activity diagram for Price Alert
+
+Figure 2.14 Activity diagram for Product Comparison
+                                                                                              40
+                                                              ECOMMERCE AGGREGATOR
+
+Figure 2.15 Activity diagram for Vendor Product Management
+
+ Figure 2.16 Activity diagram for Admin Report Generation
+                                                                                                    41
+                               CHAPTER TWO: REQUIREMENT ANALYSIS
+
+2.6.4.3 State Machine Diagram
+
+Figure 2.17 State Machine Diagram
+                                                                                  42
+                                                                                   ECOMMERCE AGGREGATOR
+2.6.5 User Interfaces
+These are temporary drafts of what the user interface would look like.
+
+                               Figure 2.18 User Interface for Home Page
+                                                                                                                        43
+                                CHAPTER TWO: REQUIREMENT ANALYSIS
+
+Figure 2.19 User Interface for Product Details
+                                                                                         44
+                                                      ECOMMERCE AGGREGATOR
+
+Figure 2.20 User Interface for Vendor Dashboard
+                                                                                           45
+                              CHAPTER TWO: REQUIREMENT ANALYSIS
+
+Figure 2.21 User Interface for User Sign up
+Figure 2.22 User Interface for User Sign in
+
+                                                                                       46
+                                   CHAPTER THREE
+                                   SYSTEM DESIGN
+
+3.1 Introduction
+
+This chapter presents the system design of the proposed e-commerce aggregator platform. It
+describes the architectural structure, subsystem decomposition, data management strategy,
+security mechanisms, and overall system organization. UML diagrams are used to illustrate
+the structure and behavior of the system, ensuring a clear understanding of how the proposed
+solution satisfies the functional and non-functional requirements identified in previous
+chapters.
+
+3.2 Current Software Architecture
+
+Currently, online shoppers rely on individual e-commerce platforms to search for products,
+compare prices, and make purchasing decisions. Each vendor operates independently with
+its own user interface, pricing model, and product catalog. As a result, users must manually
+browse multiple websites to compare prices and availability, which is time-consuming and
+inefficient. Additionally, existing platforms do not provide centralized price comparison or
+automatic notifications for price changes across vendors. These limitations highlight the
+need for an integrated e-commerce aggregation system.
+
+3.3 Proposed Software Architecture
+
+ 3.3.1 Overview
+The proposed system is a web-based e-commerce aggregator designed to centralize product
+information from multiple vendors into a single platform. The system follows a layered
+client­server architecture consisting of a presentation layer, application logic layer, and data
+layer. End users, vendors, and administrators interact with the system through web
+interfaces, while the backend manages business logic, data processing, and persistence.
+External vendor platforms are integrated to add and update product information.
+
+                                                                                                                       47
+                                                                         CHAPTER THREE: SYSTEM DESIGN
+
+3.3.2 Subsystem Decomposition
+
+The system is divided into several logical subsystems to ensure modularity, scalability, and
+maintainability:
+
+     Authentication and User Management Subsystem
+         Handles user registration, login, role-based access control, and profile management
+         for customers, vendors, and administrators.
+
+     Product Aggregation and Search Subsystem
+         Responsible for collecting product data from vendors, enabling product search,
+         viewing details, and aggregating information in a unified format.
+
+     Wishlist and Price Alert Subsystem
+         Allows users to save products to a wishlist and automatically generates alerts when
+         price changes occur for wishlist items.
+
+     Product Comparison Subsystem
+         Enables comparison of similar products from different vendors based on price,
+         ratings, availability, and delivery options.
+
+     Recommendation & Trending Subsystem
+         Provides personalized product recommendations and highlights trending products
+         based on user behavior, popular searches, and overall product engagement across the
+         platform.
+
+     Vendor Management Subsystem
+         Supports vendors in managing product listings, updating stock information, and
+         viewing performance analytics.
+
+     Administration and Reporting Subsystem
+         Provides administrators with tools to manage users, vendors, system configurations,
+         and generate analytical reports.
+
+                                                                                                                       48
+                                                                        ECOMMERCE AGGREGATOR
+
+                    Figure 3.1 Subsystem Decomposition Component Diagram
+3.3.3 Hardware/Software Mapping
+Client Devices:
+End users, vendors, and administrators interact with the system through client devices such
+as desktop computers, laptops, smartphones, or tablets using a web browser.
+Application Server:
+The application server hosts the backend of the e-commerce aggregator system. It is
+
+                                                                                                                       49
+                                                                         CHAPTER THREE: SYSTEM DESIGN
+responsible for processing client requests, executing business logic, managing authentication
+and authorization, and coordinating interactions between different subsystems.
+Database
+The database server hosts the PostgreSQL database used by the system. It serves as the
+primary repository for storing persistent data, including user accounts, vendor profiles,
+product details, categories, wishlists, price alerts, reviews, and system reports.
+
+                  Figure 3.2 Hardware/Software Mapping Deployment Diagram
+                                                                                                                       50
+                                                                        ECOMMERCE AGGREGATOR
+3.3.4. Persistent Data Management
+A relational database management system (RDBMS) is used to store persistent data such as
+users, products, vendors, wishlists, price alerts, and reports. A relational database is suitable
+for this system due to its support for structured data, relationships, and transactional
+integrity.
+The database schema is designed using normalized entities to reduce redundancy and ensure
+scalability. Core entities include User, Vendor, Product, Wishlist, WishlistItem, PriceAlert,
+and Report. Relationships between these entities are defined using primary and foreign keys
+to enforce referential integrity.
+Main Entities
+
+     User ­ Stores customer, vendor, and administrator accounts
+     Vendor ­ Stores vendor-specific information
+     Product ­ Stores aggregated product data
+     Wishlist ­ Represents a user's wishlist
+     WishlistItem ­ Associates products with wishlists
+     PriceAlert ­ Stores price change notifications for wishlist items
+     Report ­ Stores administrative and analytical reports
+
+                                                                                                                       51
+                                                                                                CHAPTER THREE: SYSTEM DESIGN
+
+
+                                                               Figure 3.2 ER Diagram
+                     3.3.5. Access Control and Security
+                     Access control and security mechanisms are implemented in the system to protect user data,
+                     prevent unauthorized access, and ensure safe interaction between system components. The
+                     system follows a role-based access control (RBAC) approach, where permissions are
+                     assigned based on user roles. The main roles in the system are End User (Customer),
+                     Vendor, and Administrator.
+                     Authentication Mechanism
+                     Users are required to log in using valid credentials such as an email address and password.
+                     Once the credentials are verified, the system allows the user to access features according to
+                     their assigned role.
+
+                                                                                                                                               52
+                                                                        ECOMMERCE AGGREGATOR
+
+Session Management and Encryption
+After successful login, the system creates a secure session for the user using JSON Web
+Tokens (JWT). The JWT acts as a digital key that identifies the user during subsequent
+interactions with the system, eliminating the need to repeatedly enter login credentials. It
+automatically expires after a defined period of inactivity or when the user logs out to
+minimize the risk of session misuse.
+
+Authorization and Role-Based Access Control
+Authorization determines what actions an authenticated user is allowed to perform. The
+system checks the user's role before granting access to protected features. For example, only
+vendors can manage product listings, and only administrators can access administrative tools
+and reports.
+
+Table 3.1: Access Control and Security Overview
+
+Subsystem       Classes                          Operations            Users
+
+Authentication & User User, AuthController Register, Login, Logout     All Users
+Management
+
+Product Management Product, Vendor               Add Product, Update Vendor
+                                                 Product, Manage Stock
+
+Wishlist & Price Alerts Wishlist, PriceAlert     Add to Wishlist, Receive End User
+                                                 Alerts
+
+Administration  & Admin, Report                  Manage Users, Manage Administrator
+Reporting
+                                                 Vendors,    Generate
+
+                                                 Reports
+
+Database Management DatabaseHandler              Store Data, Update System
+                                                 Records, Retrieve Data
+
+                                                                                    53
+                                                                         CHAPTER THREE: SYSTEM DESIGN
+
+3.3.6. Subsystem Services
+
+This section describes the services provided by each subsystem in the e-commerce
+aggregator system.
+
+Authentication and User Management Subsystem
+This subsystem provides services related to user identity, access control, and profile
+management. It ensures that only authorized users can access system functionalities
+according to their assigned roles.
+
+Services Provided:
+     User registration and account creation
+     User authentication (login and logout)
+     Role-based access control for end users, vendors, and administrators
+     Profile management and updates
+     Session management and secure access handling
+
+Product Aggregation and Search Subsystem
+This subsystem is responsible for collecting and managing product information from
+multiple vendor platforms and presenting it in a unified and searchable format for users.
+
+Services Provided:
+     Aggregation of product data from external vendor systems
+     Product search by name, category, or keywords
+     Display of detailed product information
+
+Wishlist and Price Alert Subsystem
+This subsystem allows users to track products of interest and receive notifications when
+price changes occur.
+
+Services Provided:
+
+                                                                                                                       54
+                                                                        ECOMMERCE AGGREGATOR
+
+     Creation and management (Adding and removing products) of user wishlists
+     Enabling and disabling price alerts for wishlist items
+     Monitoring product price changes
+     Notifying users when price conditions are met
+
+Product Comparison Subsystem
+This subsystem supports informed purchasing decisions by allowing users to compare
+similar products across multiple vendors.
+
+Services Provided:
+
+     Selection of multiple products for comparison
+     Retrieval of comparable product attributes
+     Presentation of comparison results in a structured format
+
+Recommendation and Trending Subsystem
+This subsystem enhances user experience by highlighting popular and relevant products
+based on system data and user behavior.
+
+Services Provided:
+
+     Identification of trending products based on user interactions
+     Generation of personalized product recommendations
+     Ranking of recommended products
+     Showing recommendation results to the user interface
+
+Vendor Management Subsystem
+This subsystem supports vendor-specific operations related to product and performance
+management.
+
+Services Provided:
+
+     Management of product listings (add, update, remove)
+     Viewing vendor-specific performance analytics
+
+                                                                                                                       55
+                                                                         CHAPTER THREE: SYSTEM DESIGN
+
+     Access to vendor store pages
+
+Administration and Reporting Subsystem
+This subsystem provides administrative control and oversight of the entire system.
+Services Provided:
+
+     Management of user and vendor accounts
+     System configuration and category management
+     Generation of system-wide reports and analytics
+     Monitoring system usage and performance
+
+3.4. Detailed Class Diagram
+
+Table 3.2 description of attributes of User class
+
+Attribute  Type     Visibility Description
+
+status     String   Private (-) Indicates whether the user account is active,
+                                    suspended, or disabled
+
+lastLoginAt DateTime Private (-) Timestamp of the user's last successful login
+
+phoneNumber String  Private (-) Contact number used for notifications or
+                                    verification
+
+Table 3.3 description of operations of User class
+
+Operation        Return Type Visibility Pre-condition        Post-condition
+
+authenticate(email, Boolean  Public                User exists and User          is
+password)                    (+)
+                                                   credentials are authenticated and
+
+                                                   provided  session is created
+
+                                                                                56
+                                                            ECOMMERCE AGGREGATOR
+
+updateProfile(profil void  Public                     User           is User       profile
+eData)                     (+)                        authenticated
+                                                                     information is
+manageWishlist() void      Public
+                           (+)                                       updated
+receivePriceAlert() void   Public
+                           (+)                        User           is Wishlist operation
+
+                                                      authenticated  is initiated
+
+                                                      User has active User is notified of
+
+                                                      price alerts   price change
+
+Table 3.4 description of attributes of Product class
+
+Attribute Type             Visibility Description
+
+vendorId Integer           Private (-) Identifier of the vendor owning the
+                                           product
+
+imageUrl String            Private (-) URL of the product image
+
+rating     Decimal Private (-) Average rating derived from user reviews
+
+lastUpdated DateTime Private (-) Timestamp of the most recent product
+                                                 update
+
+Table 3.5 description of operations of Product class
+
+Operation         Return Type Visibility Pre-condition               Post-condition
+
+updateProduct(prod void    Public (+) Vendor/Admin is Product details
+uctData)
+                                                      authenticated  are updated
+
+                                                                                   57
+                                                       CHAPTER THREE: SYSTEM DESIGN
+
+updateStock(quantit void            Public (+) Product exists            Stock quantity is
+y)                                  Public (+) Product exists            updated
+
+getProductDetails() Product                                              Product details
+                                                                         are returned
+
+Table 3.6 description of attributes of Category class
+
+Attribute Type      Visibility Description
+
+description String  Private         Description of the product category
+                    (-)
+
+createdAt DateTime Private          Date the category was created
+                               (-)
+
+Table 3.7 description of operations of Category class
+
+Operation           Return Type Visibility Pre-condition Post-condition
+
+linkProduct(produ void              Public (+)         Product and     A new entry is
+ctId)                                                  category        created in
+                                                       exist           ProductCategory
+unlinkProduct(pro void
+ductId)                             Public (+)         Link exists in  The entry in
+                                                       ProductCateg    ProductCategory is
+                                                       ory             deleted
+
+                                                                                        58
+                                                       ECOMMERCE AGGREGATOR
+
+Table 3.8 description of operations of ProductCatagory class
+
+Operation       Return Type Visibility Pre-condition                     Post-condition
+
+createAssociatio void   Public (+)                     Both Product      A new record is
+n(productId,                                           and Category      created linking
+categoryId)                                            exist in the      the two IDs
+                                                       system
+removeAssociati void
+on(productId,           Public (+)                     An existing link  The record is
+categoryId)                                            exists between    deleted,
+                                                       these two IDs     unlinking the
+                                                                         product from the
+                                                                         category
+
+Table 3.9 description of operations of Wishlist class
+
+Operation       Return Type Visibility Pre-condition                     Post-condition
+
+addProduct(produc void  Public (+) User authenticated, Product added to
+tId)
+                                                       product exists    wishlist
+
+removeProduct(pro void  Public (+) Product exists in Product removed
+ductId)
+                                                       wishlist          from wishlist
+
+viewWishlist()  List    Public (+) User authenticated Wishlist items are
+                                                                  displayed
+
+                                                                                         59
+                                 CHAPTER THREE: SYSTEM DESIGN
+
+Table 3.10 description of operations of WishlistItem class  Post-condition
+ Operation Return Type Visibility Pre-condition
+
+linkProduct void     Public (+)  Wishlist and Wishlist-product link is
+()                               product exist created
+
+Table 3.11 description of operations of Review class        Post-condition
+ Operation Return Type Visibility Pre-condition
+
+submitReview void    Public (+)  User authenticated, Review is stored
+()                               product exists
+
+editReview() void    Public (+)  Review exists, user Review content is
+
+                                 owns review                updated
+
+Table 3.12 description of operations of PriceAlert class    Post-condition
+ Operation Return Type Visibility Pre-condition
+
+generateAlert( void  Public (+)  Price change Alert is created
+)                                detected
+
+notifyUser() void    Public (+) Alert exists                User            receives
+                                                            notification
+
+Table 3.13 description of operations of Report class
+                                                                                                                       60
+                                         ECOMMERCE AGGREGATOR
+
+Operation  Return Type Visibility Pre-condition Post-condition
+
+generateReport Report  Public (+) Admin  Report is generated and
+()
+                       authenticated saved
+viewReport() Report
+                       Public (+) Report exists Report is displayed
+
+                                                                     61
+                 CHAPTER THREE: SYSTEM DESIGN
+
+3.5. Packages
+
+                 Figure 3.4 Package Diagram
+
+                                             62
+                                      REFERENCES
+
+[1] Addis Ababa University, Department of Computer Science, Undergraduate Final Project
+Guideline, Addis Ababa, Ethiopia, n.d.
+
+[2] Object Management Group (OMG), Unified Modeling Language (UML) Specification,
+   Version 2.5, OMG, 2015. Available: https://www.omg.org/spec/UML/ .
+
+[3] M. Fowler, UML Distilled: A Brief Guide to the Standard Object Modeling Language,rd
+ed., Boston, MA, Addison-Wesley, 2004.
+
+[4] PostgreSQL Global Development Group, PostgreSQL Official Documentation,
+PostgreSQL Global Development Group, n.d. Available: https://www.postgresql.org/docs/ .
+
+[5] A. Silberschatz, H. F. Korth, and S. Sudarshan, Database System Concepts, 6th ed., New
+York, NY, McGraw-Hill, 2011.
+
+[6] PlantUML, PlantUML Language Reference Guide, PlantUML Community, n.d.
+Available: https://plantuml.com/ .
+
+[7] OWASP Foundation, OWASP Top Ten Web Application Security Risks, OWASP
+Foundation, 2023. Available: https://owasp.org/www-project-top-ten/ .
+
+[8] I. Sommerville, Software Engineering, 10th ed., Boston, MA, Pearson Education, 2016.
+
+[9] Visual Paradigm, UML and System Design Tutorials, Visual Paradigm International Ltd.,
+n.d. Available: https://online.visual-paradigm.com/ .
+
+[10] Creately, UML Deployment Diagram Examples, Creately Ltd., n.d. Available:
+https://creately.com/ .
+
+[11] Wrike, Agile Development Life Cycle Guide, Wrike Inc., n.d. Available:
+https://www.wrike.com/agile-guide/agile-development-life-cycle/ .
+
+                                                                                                                       63
+[12] R. S. Pressman and B. R. Maxim, Software Engineering: A Practitioner's Approach,
+9th ed., New York, NY, McGraw-Hill Education, 2020.
+[13] L. Bass, P. Clements, and R. Kazman, Software Architecture in Practice, 3rd ed.,
+Boston, MA, Addison-Wesley, 2013.
+[14] P. Mell and T. Grance, The NIST Definition of Cloud Computing, NIST Special
+Publication 800-145, National Institute of Standards and Technology, Gaithersburg, MD,
+2011.
+
+                                                                                                                       64
+

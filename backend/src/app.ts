@@ -20,6 +20,10 @@ import { sendSuccess } from "./utils/api-response";
 
 export const app = express();
 
+// We sit behind a proxy (Vercel/host load balancer), so trust X-Forwarded-*
+// headers — this lets us derive the correct public https URL from requests.
+app.set("trust proxy", true);
+
 app.use(cors());
 app.use(express.json());
 

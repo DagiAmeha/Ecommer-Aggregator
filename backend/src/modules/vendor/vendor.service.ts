@@ -15,6 +15,28 @@ import {
   updateVendorProduct,
   VendorProductInput,
 } from "./vendor.model";
+import {
+  isRehostedImageUrl,
+  rehostImageFromUrl,
+} from "../../utils/image-rehost";
+
+/**
+ * Replace a vendor-supplied image URL with a copy hosted on our own backend.
+ * Already re-hosted URLs are left untouched so edits don't re-download.
+ */
+async function rehostImageUrlIfNeeded<T extends { image_url?: string }>(
+  payload: T,
+  baseUrl: string,
+): Promise<T> {
+  const url = payload.image_url?.trim();
+
+  if (!url || isRehostedImageUrl(url)) {
+    return payload;
+  }
+
+  const hostedUrl = await rehostImageFromUrl(url, baseUrl);
+  return { ...payload, image_url: hostedUrl };
+}
 
 async function getVendorStoreId(userId: number): Promise<number> {
   const store = await getStoreByOwnerId(userId);
@@ -43,18 +65,22 @@ export async function getVendorProduct(userId: number, productId: number) {
 export async function createVendorProductForUser(
   userId: number,
   payload: VendorProductInput,
+  baseUrl: string,
 ) {
   const storeId = await getVendorStoreId(userId);
-  return createVendorProduct(storeId, payload);
+  const withHostedImage = await rehostImageUrlIfNeeded(payload, baseUrl);
+  return createVendorProduct(storeId, withHostedImage);
 }
 
 export async function updateVendorProductForUser(
   userId: number,
   productId: number,
   payload: Partial<VendorProductInput>,
+  baseUrl: string,
 ) {
   const storeId = await getVendorStoreId(userId);
-  return updateVendorProduct(storeId, productId, payload);
+  const withHostedImage = await rehostImageUrlIfNeeded(payload, baseUrl);
+  return updateVendorProduct(storeId, productId, withHostedImage);
 }
 
 export async function deleteVendorProductForUser(

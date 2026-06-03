@@ -5,6 +5,7 @@ import {
   getRelatedOffersHandler,
   getProductSearchSuggestionsHandler,
   getProductByIdHandler,
+  getProductImageHandler,
   getProductsHandler,
 } from "./product.controller";
 import {
@@ -29,6 +30,9 @@ productRouter.post(
   requireRoles(["vendor", "admin"]),
   createProductHandler,
 );
+// Serves re-hosted product image bytes. Registered before "/:id" so the
+// two-segment path isn't shadowed by the single-segment product route.
+productRouter.get("/images/:id", getProductImageHandler);
 productRouter.get("/categories", listCategoryHandler);
 productRouter.post(
   "/categories",

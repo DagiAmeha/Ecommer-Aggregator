@@ -19,6 +19,8 @@ import {
 } from "./vendor.validator";
 import { vendorStoreProfileSchema } from "./vendorStore.validator";
 import { sendError, sendSuccess } from "../../utils/api-response";
+import { ImageRehostError } from "../../utils/image-rehost";
+import { getRequestBaseUrl } from "../../utils/request-url";
 
 function handleVendorError(
   error: unknown,
@@ -27,6 +29,11 @@ function handleVendorError(
 ): void {
   if (error instanceof Error && error.message === "Vendor store not found") {
     sendError(res, "Vendor store not found", 404);
+    return;
+  }
+
+  if (error instanceof ImageRehostError) {
+    sendError(res, error.message, 400);
     return;
   }
 
@@ -111,7 +118,11 @@ export async function createVendorProductHandler(
       return;
     }
 
-    const product = await createVendorProductForUser(user.id, payload);
+    const product = await createVendorProductForUser(
+      user.id,
+      payload,
+      getRequestBaseUrl(req),
+    );
     sendSuccess(res, { product }, 201);
   } catch (error) {
     handleVendorError(error, res, next);
@@ -139,7 +150,12 @@ export async function updateVendorProductHandler(
       return;
     }
 
-    const updated = await updateVendorProductForUser(user.id, id, payload);
+    const updated = await updateVendorProductForUser(
+      user.id,
+      id,
+      payload,
+      getRequestBaseUrl(req),
+    );
 
     if (!updated) {
       sendError(res, "Product not found", 404);

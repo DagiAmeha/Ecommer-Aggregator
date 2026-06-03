@@ -15,6 +15,7 @@ import {
   searchProducts,
 } from "./product.service";
 import { recordProductEvent } from "../analytics/analytics.model";
+import { getProductImageById } from "./productImage.model";
 import { sendError, sendSuccess } from "../../utils/api-response";
 
 export async function getProductsHandler(
@@ -192,6 +193,27 @@ export async function compareProductsHandler(
     }
 
     sendSuccess(res, products);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getProductImageHandler(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const image = await getProductImageById(String(req.params.id));
+
+    if (!image) {
+      sendError(res, "Image not found", 404);
+      return;
+    }
+
+    res.setHeader("Content-Type", image.content_type);
+    res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+    res.send(image.data);
   } catch (error) {
     next(error);
   }
