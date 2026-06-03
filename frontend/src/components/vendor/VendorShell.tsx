@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { VendorGuard } from "./VendorGuard";
 import { logout as firebaseLogout } from "@/services/auth.service";
+import { fetchVendorStoreSource } from "@/services/vendor.service";
 
 const navItems = [
   {
@@ -75,10 +76,39 @@ function getPageTitle(pathname: string | null): string {
 export function VendorShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isManualVendor, setIsManualVendor] = useState<boolean | null>(null);
 
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadSourceType() {
+      try {
+        const source = await fetchVendorStoreSource();
+        if (active) {
+          setIsManualVendor(source.source_type === "manual");
+        }
+      } catch {
+        if (active) {
+          setIsManualVendor(null);
+        }
+      }
+    }
+
+    loadSourceType();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const visibleNavItems =
+    isManualVendor === true
+      ? navItems.filter((item) => item.href !== "/vendor/integrations")
+      : navItems;
 
   return (
     <VendorGuard>
@@ -100,7 +130,7 @@ export function VendorShell({ children }: { children: React.ReactNode }) {
             </div>
 
             <nav className="space-y-1">
-              {navItems.map((item) => {
+              {visibleNavItems.map((item) => {
                 const isActive =
                   item.href === "/vendor/products" &&
                   pathname?.startsWith("/vendor/products/create")
