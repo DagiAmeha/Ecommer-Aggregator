@@ -222,18 +222,7 @@ export default function HomePage() {
             >
               Browse products
             </Link>
-            <Link
-              href="/compare"
-              className="text-sm font-semibold text-slate-600 transition hover:text-emerald-700"
-            >
-              Compare now
-            </Link>
-            <Link
-              href="/dashboard"
-              className="text-sm font-semibold text-slate-600 transition hover:text-emerald-700"
-            >
-              Your dashboard
-            </Link>
+        
           </div>
         </div>
       </div>
