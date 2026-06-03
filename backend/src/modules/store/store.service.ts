@@ -1,12 +1,14 @@
 import {
   CreateStoreInput,
   Store,
+  StorePublicProfile,
   UpdateStoreInput,
   createStoreRecord,
   deleteStoreById,
   findAllStores,
   findStoreByOwnerId,
   findStoreById,
+  findStorePublicProfile,
   updateStoreById,
 } from "./store.model";
 
@@ -20,6 +22,12 @@ export async function listStores(): Promise<Store[]> {
 
 export async function getStore(id: number): Promise<Store | null> {
   return findStoreById(id);
+}
+
+export async function getStorePublicProfile(
+  id: number,
+): Promise<StorePublicProfile | null> {
+  return findStorePublicProfile(id);
 }
 
 export async function getStoreByOwnerId(

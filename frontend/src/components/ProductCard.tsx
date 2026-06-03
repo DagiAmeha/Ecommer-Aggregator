@@ -19,8 +19,8 @@ export function ProductCard({
   wishlistLoading,
 }: {
   product: Product;
-  isSelected: boolean;
-  onToggleCompare: (product: Product) => void;
+  isSelected?: boolean;
+  onToggleCompare?: (product: Product) => void;
   onToggleWishlist?: (product: Product) => void;
   wishlistLoading?: boolean;
 }) {
@@ -59,9 +59,19 @@ export function ProductCard({
       </div>
       <div className="space-y-4 p-5">
         <div className="space-y-1">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-slate-500">
-            {product.store?.name ?? `Store`}
-          </p>
+          {product.store?.id ? (
+            <Link
+              href={`/stores/${product.store.id}`}
+              onClick={(event) => event.stopPropagation()}
+              className="inline-block text-[11px] font-semibold uppercase tracking-[0.28em] text-slate-500 transition hover:text-emerald-700 dark:hover:text-emerald-300"
+            >
+              {product.store.name ?? `Store`}
+            </Link>
+          ) : (
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-slate-500">
+              {product.store?.name ?? `Store`}
+            </p>
+          )}
           <Link href={`/products/${product.id}`} className="block">
             <h3 className="line-clamp-2 text-lg font-semibold text-slate-950 transition group-hover:text-emerald-800 dark:text-white dark:group-hover:text-emerald-300">
               {product.name}
@@ -79,17 +89,19 @@ export function ProductCard({
           <p className="text-xl font-semibold text-emerald-700">
             {formatPrice(product.price)}
           </p>
-          <button
-            type="button"
-            onClick={() => onToggleCompare(product)}
-            className={
-              isSelected
-                ? "rounded-full border border-emerald-700 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800 transition hover:bg-emerald-100"
-                : "rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white transition hover:bg-emerald-700"
-            }
-          >
-            {isSelected ? "Remove from Compare" : "Add to Compare"}
-          </button>
+          {onToggleCompare ? (
+            <button
+              type="button"
+              onClick={() => onToggleCompare(product)}
+              className={
+                isSelected
+                  ? "rounded-full border border-emerald-700 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800 transition hover:bg-emerald-100"
+                  : "rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white transition hover:bg-emerald-700"
+              }
+            >
+              {isSelected ? "Remove from Compare" : "Add to Compare"}
+            </button>
+          ) : null}
         </div>
         <Link
           href={`/products/${product.id}`}

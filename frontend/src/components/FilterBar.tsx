@@ -13,6 +13,7 @@ export function FilterBar({
   onApply,
   onReset,
   bare = false,
+  hideStoreFilter = false,
 }: {
   categories: Category[];
   stores: { id: number; name: string }[];
@@ -32,13 +33,19 @@ export function FilterBar({
   onReset: () => void;
   /** Drop the card chrome so this can sit inside a shared container. */
   bare?: boolean;
+  /** Hide the store dropdown (e.g. on a single-vendor storefront). */
+  hideStoreFilter?: boolean;
 }) {
+  const gridCols = hideStoreFilter
+    ? "md:grid-cols-[1fr_repeat(2,minmax(0,0.7fr))_1fr_auto_auto]"
+    : "md:grid-cols-[1fr_1fr_repeat(2,minmax(0,0.7fr))_1fr_auto_auto]";
+
   return (
     <form
       className={
         bare
-          ? "grid gap-3 md:grid-cols-[1fr_1fr_repeat(2,minmax(0,0.7fr))_1fr_auto_auto]"
-          : "grid gap-3 rounded-2xl border border-black/10 bg-white/75 p-4 shadow-[0_4px_16px_rgba(16,35,30,0.05)] md:grid-cols-[1fr_1fr_repeat(2,minmax(0,0.7fr))_1fr_auto_auto]"
+          ? `grid gap-3 ${gridCols}`
+          : `grid gap-3 rounded-2xl border border-black/10 bg-white/75 p-4 shadow-[0_4px_16px_rgba(16,35,30,0.05)] ${gridCols}`
       }
       onSubmit={(event) => {
         event.preventDefault();
@@ -64,21 +71,23 @@ export function FilterBar({
           </option>
         ))}
       </select>
-      <select
-        name="storeId"
-        defaultValue={initialStoreId}
-        className="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-600"
-      >
-        <option value="">All stores</option>
-        {stores.map((store) => (
-          <option key={store.id} value={store.id}>
-            {store.name}
-            {highlightedStoreId && store.id === highlightedStoreId
-              ? " (Your store)"
-              : ""}
-          </option>
-        ))}
-      </select>
+      {hideStoreFilter ? null : (
+        <select
+          name="storeId"
+          defaultValue={initialStoreId}
+          className="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-600"
+        >
+          <option value="">All stores</option>
+          {stores.map((store) => (
+            <option key={store.id} value={store.id}>
+              {store.name}
+              {highlightedStoreId && store.id === highlightedStoreId
+                ? " (Your store)"
+                : ""}
+            </option>
+          ))}
+        </select>
+      )}
       <input
         name="minPrice"
         defaultValue={initialMinPrice}

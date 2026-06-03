@@ -8,6 +8,7 @@ import type {
   ProductListPayload,
   SearchSuggestionPayload,
   Store,
+  StorePublicProfile,
 } from "@/types/catalog";
 
 function toSearchParams(
@@ -56,6 +57,12 @@ export async function fetchProducts(
   filters: ProductFilters = {},
 ): Promise<ProductListPayload> {
   return apiRequest<ProductListPayload>(`/products${toSearchParams(filters)}`);
+}
+
+export async function fetchStoreProfile(
+  id: number,
+): Promise<StorePublicProfile> {
+  return apiRequest<StorePublicProfile>(`/stores/${id}/profile`);
 }
 
 export async function fetchSearchSuggestions(

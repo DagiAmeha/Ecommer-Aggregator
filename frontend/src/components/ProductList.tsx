@@ -13,8 +13,8 @@ export function ProductList({
   products: Product[];
   loading: boolean;
   error: string | null;
-  compareList: number[];
-  onToggleCompare: (product: Product) => void;
+  compareList?: number[];
+  onToggleCompare?: (product: Product) => void;
   onToggleWishlist?: (product: Product) => void;
   wishlistLoadingId?: number | null;
 }) {
@@ -53,7 +53,7 @@ export function ProductList({
         <ProductCard
           key={product.id}
           product={product}
-          isSelected={compareList.includes(product.id)}
+          isSelected={compareList?.includes(product.id) ?? false}
           onToggleCompare={onToggleCompare}
           onToggleWishlist={onToggleWishlist}
           wishlistLoading={wishlistLoadingId === product.id}

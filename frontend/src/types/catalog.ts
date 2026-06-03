@@ -14,6 +14,24 @@ export interface Store {
   name: string;
 }
 
+export interface StoreStats {
+  total_products: number;
+  average_rating: number;
+  lowest_price: number | null;
+  highest_price: number | null;
+  categories: Category[];
+}
+
+export interface StorePublicProfile {
+  store: {
+    id: number;
+    store_name: string;
+    description: string | null;
+    is_active: boolean;
+  };
+  stats: StoreStats;
+}
+
 export interface ProductRelation {
   id: number;
   name: string;

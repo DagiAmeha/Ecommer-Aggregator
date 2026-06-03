@@ -346,9 +346,18 @@ export default function ProductDetailPage() {
                     ? "In stock"
                     : "Out of stock"}
                 </span>
-                <span className="rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700">
-                  Sold by {product.store?.name ?? "Unknown"}
-                </span>
+                {product.store?.id ? (
+                  <Link
+                    href={`/stores/${product.store.id}`}
+                    className="rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-emerald-100 hover:text-emerald-800"
+                  >
+                    Sold by {product.store.name ?? "Unknown"}
+                  </Link>
+                ) : (
+                  <span className="rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700">
+                    Sold by {product.store?.name ?? "Unknown"}
+                  </span>
+                )}
                 <button
                   type="button"
                   onClick={handleToggleWishlist}

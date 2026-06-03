@@ -3,6 +3,7 @@ import {
   createStore,
   deleteStore,
   getStore,
+  getStorePublicProfile,
   listStores,
   updateStore,
 } from "./store.service";
@@ -64,6 +65,26 @@ export async function getStoreByIdHandler(
     }
 
     sendSuccess(res, store);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getStorePublicProfileHandler(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const params = storeIdParamSchema.parse(req.params);
+    const profile = await getStorePublicProfile(params.id);
+
+    if (!profile) {
+      sendError(res, "Store not found", 404);
+      return;
+    }
+
+    sendSuccess(res, profile);
   } catch (error) {
     next(error);
   }

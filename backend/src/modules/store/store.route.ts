@@ -3,6 +3,7 @@ import {
   createStoreHandler,
   deleteStoreHandler,
   getStoreByIdHandler,
+  getStorePublicProfileHandler,
   listStoresHandler,
   updateStoreHandler,
 } from "./store.controller";
@@ -17,6 +18,7 @@ storeRouter.post(
   requireRoles(["admin"]),
   createStoreHandler,
 );
+storeRouter.get("/:id/profile", getStorePublicProfileHandler);
 storeRouter.get("/:id", getStoreByIdHandler);
 storeRouter.put(
   "/:id",
